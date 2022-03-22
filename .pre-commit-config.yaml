@@ -1,0 +1,90 @@
+default_language_version:
+  python: python3.10
+
+repos:
+- repo: https://github.com/psf/black
+  rev: 22.1.0
+  hooks:
+  - id: black-jupyter
+
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v4.1.0
+  hooks:
+  - id: check-added-large-files
+  - id: check-case-conflict
+  - id: check-merge-conflict
+  - id: check-symlinks
+  - id: check-yaml
+  - id: debug-statements
+  - id: end-of-file-fixer
+  - id: mixed-line-ending
+  - id: requirements-txt-fixer
+  - id: trailing-whitespace
+
+- repo: https://github.com/pre-commit/pygrep-hooks
+  rev: v1.9.0
+  hooks:
+  - id: python-check-blanket-noqa
+  - id: python-check-blanket-type-ignore
+  - id: python-no-eval
+  - id: python-use-type-annotations
+  - id: rst-backticks
+  - id: rst-directive-colons
+  - id: rst-inline-touching-normal
+
+- repo: https://github.com/PyCQA/isort
+  rev: 5.10.1
+  hooks:
+  - id: isort
+    args: ["-a", "from __future__ import annotations"]
+
+- repo: https://github.com/asottile/pyupgrade
+  rev: v2.31.0
+  hooks:
+  - id: pyupgrade
+    args: ["--py310-plus"]
+
+- repo: https://github.com/asottile/yesqa
+  rev: v1.3.0
+  hooks:
+  - id: yesqa
+    exclude: docs/conf.py
+    additional_dependencies: &flake8_dependencies
+      - flake8-bugbear
+
+- repo: https://github.com/pycqa/flake8
+  rev: 4.0.1
+  hooks:
+  - id: flake8
+    exclude: docs/conf.py
+    additional_dependencies: *flake8_dependencies
+
+- repo: https://github.com/pre-commit/mirrors-mypy
+  rev: v0.941
+  hooks:
+  - id: mypy
+    files: src
+    args: []
+    additional_dependencies:
+    - click
+    - rich
+    - types-PyYAML
+    - tomli
+
+- repo: https://github.com/codespell-project/codespell
+  rev: v2.1.0
+  hooks:
+  - id: codespell
+
+- repo: https://github.com/shellcheck-py/shellcheck-py
+  rev: v0.8.0.4
+  hooks:
+  - id: shellcheck
+
+- repo: local
+  hooks:
+  - id: disallow-caps
+    name: Disallow improper capitalization
+    language: pygrep
+    entry: PyBind|Numpy|Cmake|CCache|Github|PyTest
+    exclude: .pre-commit-config.yaml
