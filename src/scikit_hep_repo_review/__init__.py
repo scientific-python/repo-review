@@ -1,7 +1,7 @@
 """
 Copyright (c) 2022 Henry Schreiner. All rights reserved.
 
-scikit-hep-review: Review repos for compliance to the Scikit-HEP developer guidelines
+scikit-hep-repo-review: Review repos for compliance to the Scikit-HEP developer guidelines
 """
 
 

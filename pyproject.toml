@@ -50,7 +50,7 @@ dev = [
 ]
 
 [project.urls]
-homepage = "https://github.com/Scikit-HEP/scikit-hep-review"
+homepage = "https://github.com/Scikit-HEP/scikit-hep-repo-review"
 
 
 [tool.pytest.ini_options]
