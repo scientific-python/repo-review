@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import importlib.metadata
 import inspect
 import textwrap
 from graphlib import TopologicalSorter
@@ -12,7 +13,7 @@ import tomli as tomllib
 import yaml
 from rich import print
 
-from .ratings import Rating, general, mypy, precommit, pyproject
+from .ratings import Rating
 
 rich.traceback.install(suppress=[click, rich], show_locals=True, width=None)
 
@@ -59,8 +60,18 @@ def main(package: Path) -> None:
     else:
         precommit = {}
 
-    tasks = {t.__name__: t for t in Rating.__subclasses__()}
-    graph = {n: t.requires for n, t in tasks.items()}
+    ratings = (
+        rat
+        for ep in importlib.metadata.entry_points(
+            group="scikit_hep_repo_review.ratings"  # type: ignore[call-arg]
+        )
+        for rat in ep.load().__subclasses__()  # type: ignore[attr-defined]
+    )
+
+    tasks = {t.__name__: t for t in ratings}
+    graph: dict[str, set[str]] = {
+        n: getattr(t, "requires", set()) for n, t in tasks.items()
+    }
     completed: dict[str, Any] = {}
 
     ts = TopologicalSorter(graph)
@@ -68,7 +79,7 @@ def main(package: Path) -> None:
         print(f"[bold]{task_name}", end=" ")
 
         check = tasks[task_name]
-        if not all(completed.get(n, False) for n in check.requires):
+        if not all(completed.get(n, False) for n in graph[task_name]):
             print(rf"[yellow]{check.__doc__} [bold]\[skipped]")
             continue
 
@@ -83,7 +94,7 @@ def main(package: Path) -> None:
             print(":x:")
             print(
                 "      "
-                + " ".join(textwrap.dedent(check.check.__doc__).strip().splitlines())  # type: ignore[attr-defined]
+                + " ".join(textwrap.dedent(check.check.__doc__).strip().splitlines())
             )
 
 

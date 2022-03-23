@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from typing import ClassVar
+from typing import ClassVar, Protocol
 
 
-class Rating:
+class Rating(Protocol):
     requires: ClassVar[set[str]] = set()

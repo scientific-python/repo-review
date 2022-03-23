@@ -4,7 +4,7 @@ build-backend = "flit_core.buildapi"
 
 
 [project]
-name = "scikit_hep_review"
+name = "scikit_hep_repo_review"
 authors = [
   { name = "Henry Schreiner", email = "henryfs@princeton.edu" },
 ]
@@ -52,6 +52,14 @@ dev = [
 [project.urls]
 homepage = "https://github.com/Scikit-HEP/scikit-hep-repo-review"
 
+[project.scripts]
+scikit-hep-repo-review = "scikit_hep_repo_review.__main__:main"
+
+[project.entry-points."scikit_hep_repo_review.ratings"]
+general = "scikit_hep_repo_review.ratings.general:General"
+mypy = "scikit_hep_repo_review.ratings.mypy:MyPy"
+precommit = "scikit_hep_repo_review.ratings.precommit:PreCommit"
+pyproject =  "scikit_hep_repo_review.ratings.pyproject:PyProject"
 
 [tool.pytest.ini_options]
 minversion = "6.0"
@@ -79,7 +87,7 @@ profile = "black"
 
 [tool.pylint]
 master.py-version = "3.10"
-master.ignore-paths= ["src/scikit_hep_review/_version.py"]
+master.ignore-paths= ["src/scikit_hep_repo_review/_version.py"]
 reports.output-format = "colorized"
 similarities.ignore-imports = "yes"
 messages_control.disable = [

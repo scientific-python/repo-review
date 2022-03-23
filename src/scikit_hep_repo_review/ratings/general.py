@@ -2,13 +2,15 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from . import Rating
-
 # PY: Python Project
 ## 0xx: File existence
 
 
-class PY001(Rating):
+class General:
+    pass
+
+
+class PY001(General):
     "Has a pyproject.toml"
 
     @staticmethod
@@ -20,7 +22,7 @@ class PY001(Rating):
         return package.joinpath("pyproject.toml").exists()
 
 
-class PY002(Rating):
+class PY002(General):
     "Has a README.(md|rst) file"
 
     @staticmethod
@@ -32,7 +34,7 @@ class PY002(Rating):
         )
 
 
-class PY003(Rating):
+class PY003(General):
     "Has a LICENSE* file"
 
     @staticmethod
@@ -41,7 +43,7 @@ class PY003(Rating):
         return len(list(package.glob("LICENSE*"))) > 0
 
 
-class PY004(Rating):
+class PY004(General):
     "Has docs folder"
 
     @staticmethod
@@ -50,7 +52,7 @@ class PY004(Rating):
         return package.joinpath("docs").exists()
 
 
-class PY005(Rating):
+class PY005(General):
     "Has tests folder"
 
     @staticmethod
@@ -59,7 +61,7 @@ class PY005(Rating):
         return package.joinpath("tests").exists()
 
 
-class PY006(Rating):
+class PY006(General):
     "Has pre-commit config"
 
     @staticmethod

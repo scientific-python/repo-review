@@ -2,13 +2,15 @@ from __future__ import annotations
 
 from typing import Any
 
-from . import Rating
-
 # PP: PyProject.toml
 ## PP0xx: Build system
 
 
-class PP002(Rating):
+class PyProject:
+    pass
+
+
+class PP002(PyProject):
     "Has a proper build-system table"
 
     requires = {"PY001"}

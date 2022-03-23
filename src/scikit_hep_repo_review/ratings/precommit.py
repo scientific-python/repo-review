@@ -5,10 +5,12 @@ from __future__ import annotations
 
 from typing import Any
 
-from . import Rating
+
+class PreCommit:
+    pass
 
 
-class PC101(Rating):
+class PC101(PreCommit):
     "Has pre-commit-hooks"
 
     @staticmethod

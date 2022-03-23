@@ -2,12 +2,14 @@ from __future__ import annotations
 
 from typing import Any
 
-from . import Rating
-
 ## PP2xx: MyPy
 
 
-class PP200(Rating):
+class MyPy:
+    pass
+
+
+class PP200(MyPy):
     "Uses MyPy (pyproject config)"
 
     requires = {"PY001"}
@@ -23,7 +25,7 @@ class PP200(Rating):
                 return False
 
 
-class PP201(Rating):
+class PP201(MyPy):
     "MyPy strict"
 
     requires = {"PP200"}
@@ -39,7 +41,7 @@ class PP201(Rating):
                 return False
 
 
-class PP202(Rating):
+class PP202(MyPy):
     "MyPy show error codes"
 
     requires = {"PP200"}
