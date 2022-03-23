@@ -39,6 +39,23 @@ class PC130(PreCommit):
     repo = "https://github.com/pycqa/flake8"
 
 
+class PC131(PreCommit):
+    "Adds flake8-bugbear"
+    requires = {"PC130"}
+
+    @staticmethod
+    def check(precommit: dict[str, Any]) -> bool:
+        "Must have flake8-bugbear in additional_dependencies"
+        for repo in precommit["repos"]:
+            match repo:
+                case {"repo": "https://github.com/pycqa/flake8"}:
+                    for hook in repo["hooks"]:
+                        match hook:
+                            case {"additional_dependencies": list(x)}:
+                                return "flake8-bugbear" in x
+        return False
+
+
 class PC140(PreCommit):
     "Uses mypy"
     repo = "https://github.com/pre-commit/mirrors-mypy"

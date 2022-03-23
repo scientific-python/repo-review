@@ -10,13 +10,13 @@ DIR = Path(__file__).parent.resolve()
 nox.options.sessions = ["lint", "pylint", "tests"]
 
 
-@nox.session
+@nox.session(reuse_venv=True)
 def run(session: nox.Session) -> None:
     """
     Run the program
     """
 
-    session.install(".")
+    session.install("-e", ".")
     session.run("python", "-m", "scikit_hep_repo_review", *session.posargs)
 
 

@@ -25,7 +25,7 @@ jobs:
     - name: Run PyLint
       run: |
         echo "::add-matcher::$GITHUB_WORKSPACE/.github/matchers/pylint.json"
-        pipx run nox -s pylint
+        pipx run --python=python nox -s pylint
 
   checks:
     name: Check Python ${{ matrix.python-version }} on ${{ matrix.runs-on }}
