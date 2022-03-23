@@ -32,3 +32,28 @@ class PC110(PreCommit):
 class PC120(PreCommit):
     "Uses isort"
     repo = "https://github.com/PyCQA/isort"
+
+
+class PC130(PreCommit):
+    "Uses flake8"
+    repo = "https://github.com/pycqa/flake8"
+
+
+class PC140(PreCommit):
+    "Uses mypy"
+    repo = "https://github.com/pre-commit/mirrors-mypy"
+
+
+class PC150(PreCommit):
+    "Uses PyUpgrade"
+    repo = "https://github.com/asottile/pyupgrade"
+
+
+class PC160(PreCommit):
+    "Uses codespell"
+    repo = "https://github.com/codespell-project/codespell"
+
+
+class PC170(PreCommit):
+    "Uses PyGrep hooks"
+    repo = "https://github.com/pre-commit/pygrep-hooks"
