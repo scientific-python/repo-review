@@ -95,4 +95,9 @@ messages_control.disable = [
   "fixme",
   "line-too-long",
   "wrong-import-position",
+  "redefined-builtin",
+  "missing-module-docstring",
+  "missing-class-docstring",
+  "missing-function-docstring",
+  "invalid-name",
 ]

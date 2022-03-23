@@ -14,6 +14,7 @@ class PreCommit:
         "Must have {cls.repo} repo in pre-commit config"
         for repo in precommit["repos"]:
             match repo:
+                # pylint: disable-next=no-member
                 case {"repo": cls.repo}:  # type: ignore[attr-defined]
                     return True
         return False
