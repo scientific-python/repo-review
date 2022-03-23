@@ -83,18 +83,20 @@ def main(package: Path) -> None:
             print(rf"[yellow]{check.__doc__} [bold]\[skipped]")
             continue
 
-        print(f"[green]{check.__doc__}?...", end=" ")
-
         completed[task_name] = build(
             check, package=package, pyproject=pyproject, precommit=precommit
         )
         if completed[task_name]:
-            print(":white_check_mark:")
+            print(f"[green]{check.__doc__}?... :white_check_mark:")
         else:
-            print(":x:")
+            print(f"[red]{check.__doc__}?... :x:")
             print(
                 "      "
-                + " ".join(textwrap.dedent(check.check.__doc__).strip().splitlines())
+                + " ".join(
+                    textwrap.dedent(check.check.__doc__.format(cls=check))
+                    .strip()
+                    .splitlines()
+                )
             )
 
 
