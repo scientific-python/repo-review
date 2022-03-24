@@ -24,3 +24,19 @@ class PP002(PyProject):
                 return True
             case _:
                 return False
+
+
+class PP003(PyProject):
+    "Does not list wheel as a build-dep"
+
+    requires = {"PY001"}
+
+    @staticmethod
+    def check(pyproject: dict[str, Any]) -> bool:
+        "Must not include wheel, setuptools does this via PEP 517 already"
+
+        match pyproject:
+            case {"build-system": {"requires": list(req)}}:
+                return all("wheel" not in r for r in req)
+            case _:
+                return False

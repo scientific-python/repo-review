@@ -55,3 +55,61 @@ class PP202(MyPy):
                 return True
             case _:
                 return False
+
+
+class PP203(MyPy):
+    "MyPy warn unreachable"
+
+    requires = {"PP200"}
+
+    @staticmethod
+    def check(pyproject: dict[str, Any]) -> bool:
+        "Must have warn_unreachable = true"
+
+        match pyproject:
+            case {"tool": {"mypy": {"warn_unreachable": True}}}:
+                return True
+            case _:
+                return False
+
+
+class PP204(MyPy):
+    "MyPy enables ignore-without-code"
+
+    @staticmethod
+    def check(pyproject: dict[str, Any]) -> bool:
+        "Must have ignore-without-code in enable_error_code"
+
+        match pyproject:
+            case {"tool": {"mypy": {"enable_error_code": list(codes)}}}:
+                return "ignore-without-code" in codes
+            case _:
+                return False
+
+
+class PP205(MyPy):
+    "MyPy enables redundant-expr"
+
+    @staticmethod
+    def check(pyproject: dict[str, Any]) -> bool:
+        "Must have redundant-expr in enable_error_code"
+
+        match pyproject:
+            case {"tool": {"mypy": {"enable_error_code": list(codes)}}}:
+                return "redundant-expr" in codes
+            case _:
+                return False
+
+
+class PP206(MyPy):
+    "MyPy enables truthy-bool"
+
+    @staticmethod
+    def check(pyproject: dict[str, Any]) -> bool:
+        "Must have truthy-bool in enable_error_code"
+
+        match pyproject:
+            case {"tool": {"mypy": {"enable_error_code": list(codes)}}}:
+                return "truthy-bool" in codes
+            case _:
+                return False
