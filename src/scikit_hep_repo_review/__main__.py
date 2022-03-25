@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import functools
 import importlib.metadata
 import inspect
 import textwrap
@@ -10,7 +11,6 @@ from typing import Any
 import click
 import rich.traceback
 import tomli as tomllib
-import yaml
 from rich import print
 
 from .ratings import Rating
@@ -18,21 +18,30 @@ from .ratings import Rating
 rich.traceback.install(suppress=[click, rich], show_locals=True, width=None)
 
 
+@functools.cache
+def pyproject(package: Path) -> dict[str, Any]:
+    pyproject_path = package.joinpath("pyproject.toml")
+    if pyproject_path.exists():
+        with pyproject_path.open("rb") as f:
+            return tomllib.load(f)
+    return {}
+
+
 def build(
     check: type[Rating],
     *,
     package: Path,
-    pyproject: dict[str, Any],
-    precommit: dict[str, Any],
 ) -> bool | None:
     kwargs: dict[str, Any] = {}
     signature = inspect.signature(check.check)  # type: ignore[attr-defined]
     if "package" in signature.parameters:
         kwargs["package"] = package
     if "pyproject" in signature.parameters:
-        kwargs["pyproject"] = pyproject
-    if "precommit" in signature.parameters:
-        kwargs["precommit"] = precommit
+        kwargs["pyproject"] = pyproject(package)
+
+    for arg in getattr(check, "provides", set()):
+        kwargs[arg] = getattr(check, arg)(package)
+
     return check.check(**kwargs)  # type: ignore[attr-defined, no-any-return]
 
 
@@ -44,21 +53,6 @@ def build(
 @click.command()
 @click.argument("package", type=click.Path(dir_okay=True, path_type=Path))
 def main(package: Path) -> None:
-    pyproject_path = package.joinpath("pyproject.toml")
-    pyproject: dict[str, Any]
-    if pyproject_path.exists():
-        with pyproject_path.open("rb") as f:
-            pyproject = tomllib.load(f)
-    else:
-        pyproject = {}
-
-    precommit_path = package.joinpath(".pre-commit-config.yaml")
-    precommit: dict[str, Any]
-    if precommit_path.exists():
-        with precommit_path.open("rb") as f:
-            precommit = yaml.safe_load(f)
-    else:
-        precommit = {}
 
     ratings = (
         rat
@@ -83,9 +77,7 @@ def main(package: Path) -> None:
             print(rf"[yellow]{check.__doc__} [bold]\[skipped]")
             continue
 
-        completed[task_name] = build(
-            check, package=package, pyproject=pyproject, precommit=precommit
-        )
+        completed[task_name] = build(check, package=package)
         if completed[task_name]:
             print(f"[green]{check.__doc__}?... :white_check_mark:")
         else:

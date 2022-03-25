@@ -59,7 +59,8 @@ scikit-hep-repo-review = "scikit_hep_repo_review.__main__:main"
 general = "scikit_hep_repo_review.ratings.general:General"
 mypy = "scikit_hep_repo_review.ratings.mypy:MyPy"
 precommit = "scikit_hep_repo_review.ratings.precommit:PreCommit"
-pyproject =  "scikit_hep_repo_review.ratings.pyproject:PyProject"
+pyproject = "scikit_hep_repo_review.ratings.pyproject:PyProject"
+flake8 = "scikit_hep_repo_review.ratings.flake8:Flake8"
 
 [tool.pytest.ini_options]
 minversion = "6.0"

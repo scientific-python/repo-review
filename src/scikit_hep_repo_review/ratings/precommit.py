@@ -3,11 +3,27 @@
 
 from __future__ import annotations
 
+import functools
+from pathlib import Path
 from typing import Any
+
+import yaml
 
 
 class PreCommit:
+    provides = {"precommit"}
     requires = {"PY006"}
+
+    @staticmethod
+    @functools.cache
+    def precommit(package: Path) -> dict[str, Any]:
+        precommit_path = package.joinpath(".pre-commit-config.yaml")
+        precommit: dict[str, Any]
+        if precommit_path.exists():
+            with precommit_path.open("rb") as f:
+                return yaml.safe_load(f)  # type: ignore[no-any-return]
+
+        return {}
 
     @classmethod
     def check(cls, precommit: dict[str, Any]) -> bool:
