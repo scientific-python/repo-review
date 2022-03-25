@@ -65,7 +65,9 @@ def main(package: Path) -> None:
     completed: dict[str, Any] = {}
 
     ts = TopologicalSorter(graph)
-    completed = {name: build(tasks[name], package, fixtures) for name in ts.static_order()}
+    completed = {
+        name: build(tasks[name], package, fixtures) for name in ts.static_order()
+    }
 
     for task_name in sorted(completed):
         check = tasks[task_name]
