@@ -68,3 +68,7 @@ class PY006(General):
     def check(package: Path) -> bool:
         "Projects must have a .pre-commit-config.yaml file"
         return package.joinpath(".pre-commit-config.yaml").exists()
+
+
+repo_review_fixtures = set[str]()
+repo_review_checks = {p.__name__ for p in General.__subclasses__()}

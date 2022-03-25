@@ -1,6 +1,20 @@
 from __future__ import annotations
 
+import functools
+from pathlib import Path
 from typing import Any
+
+import tomli as tomllib
+
+
+@functools.cache
+def pyproject(package: Path) -> dict[str, Any]:
+    pyproject_path = package.joinpath("pyproject.toml")
+    if pyproject_path.exists():
+        with pyproject_path.open("rb") as f:
+            return tomllib.load(f)
+    return {}
+
 
 # PP: PyProject.toml
 ## PP0xx: Build system
@@ -40,3 +54,7 @@ class PP003(PyProject):
                 return all("wheel" not in r for r in req)
             case _:
                 return False
+
+
+repo_review_fixtures = {"pyproject"}
+repo_review_checks = {p.__name__ for p in PyProject.__subclasses__()}

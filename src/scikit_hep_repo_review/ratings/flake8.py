@@ -7,33 +7,34 @@ from typing import Any
 
 import tomli as tomllib
 
+
+@functools.cache
+def flake8(package: Path) -> dict[str, Any] | None:
+    pyproject_path = package / "pyproject.toml"
+    if pyproject_path.exists():
+        with pyproject_path.open("rb") as f:
+            pyproject = tomllib.load(f)
+            if "flake8" in pyproject.get("tool", {}):
+                return pyproject["tool"]["flake8"]  # type: ignore[no-any-return]
+    flake8_ini_path = package / ".flake8"
+    flake8_setup_cfg = package / "setup.cfg"
+    flake8_tox_ini = package / "tox.ini"
+
+    for flake8_path in [flake8_ini_path, flake8_setup_cfg, flake8_tox_ini]:
+        if flake8_path.exists():
+            config = configparser.ConfigParser()
+            config.read(flake8_path)
+            if "flake8" in config:
+                return dict(config["flake8"])
+
+    return None
+
+
 # FK: Flake8
 
 
 class Flake8:
-    provides = {"flake8"}
-
-    @staticmethod
-    @functools.cache
-    def flake8(package: Path) -> dict[str, Any] | None:
-        pyproject_path = package / "pyproject.toml"
-        if pyproject_path.exists():
-            with pyproject_path.open("rb") as f:
-                pyproject = tomllib.load(f)
-                if "flake8" in pyproject.get("tool", {}):
-                    return pyproject["tool"]["flake8"]  # type: ignore[no-any-return]
-        flake8_ini_path = package / ".flake8"
-        flake8_setup_cfg = package / "setup.cfg"
-        flake8_tox_ini = package / "tox.ini"
-
-        for flake8_path in [flake8_ini_path, flake8_setup_cfg, flake8_tox_ini]:
-            if flake8_path.exists():
-                config = configparser.ConfigParser()
-                config.read(flake8_path)
-                if "flake8" in config:
-                    return dict(config["flake8"])
-
-        return None
+    pass
 
 
 class FK001(Flake8):
@@ -70,3 +71,7 @@ class FK003(Flake8):
         extend-ignore should be used instead of ignore, shorter list doesn't wipe defaults.
         """
         return "extend-ignore" in flake8
+
+
+repo_review_fixtures = {"flake8"}
+repo_review_checks = {p.__name__ for p in Flake8.__subclasses__()}

@@ -56,11 +56,11 @@ homepage = "https://github.com/Scikit-HEP/scikit-hep-repo-review"
 scikit-hep-repo-review = "scikit_hep_repo_review.__main__:main"
 
 [project.entry-points."scikit_hep_repo_review.ratings"]
-general = "scikit_hep_repo_review.ratings.general:General"
-mypy = "scikit_hep_repo_review.ratings.mypy:MyPy"
-precommit = "scikit_hep_repo_review.ratings.precommit:PreCommit"
-pyproject = "scikit_hep_repo_review.ratings.pyproject:PyProject"
-flake8 = "scikit_hep_repo_review.ratings.flake8:Flake8"
+general = "scikit_hep_repo_review.ratings.general"
+pyproject = "scikit_hep_repo_review.ratings.pyproject"
+precommit = "scikit_hep_repo_review.ratings.precommit"
+flake8 = "scikit_hep_repo_review.ratings.flake8"
+mypy = "scikit_hep_repo_review.ratings.mypy"
 
 [tool.pytest.ini_options]
 minversion = "6.0"

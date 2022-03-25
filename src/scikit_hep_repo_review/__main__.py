@@ -1,66 +1,62 @@
 from __future__ import annotations
 
-import functools
 import importlib.metadata
 import inspect
 import textwrap
 from graphlib import TopologicalSorter
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable, Iterable
 
 import click
 import rich.traceback
-import tomli as tomllib
 from rich import print
 
 from .ratings import Rating
 
 rich.traceback.install(suppress=[click, rich], show_locals=True, width=None)
 
-
-@functools.cache
-def pyproject(package: Path) -> dict[str, Any]:
-    pyproject_path = package.joinpath("pyproject.toml")
-    if pyproject_path.exists():
-        with pyproject_path.open("rb") as f:
-            return tomllib.load(f)
-    return {}
+# Use module-level entry names
+# repo_review_fixtures = {"pyproject"}
+# repo_review_checks = set(p.__name___ for p in General.__subclasses__())
 
 
 def build(
-    check: type[Rating],
-    *,
-    package: Path,
+    check: type[Rating], package: Path, fixtures: Iterable[Callable[[Path], Any]]
 ) -> bool | None:
     kwargs: dict[str, Any] = {}
     signature = inspect.signature(check.check)  # type: ignore[attr-defined]
     if "package" in signature.parameters:
         kwargs["package"] = package
-    if "pyproject" in signature.parameters:
-        kwargs["pyproject"] = pyproject(package)
 
-    for arg in getattr(check, "provides", set()):
-        kwargs[arg] = getattr(check, arg)(package)
+    for func in fixtures:
+        if func.__name__ in signature.parameters:
+            kwargs[func.__name__] = func(package)
 
     return check.check(**kwargs)  # type: ignore[attr-defined, no-any-return]
-
-
-# Supported arguments:
-# package: Path
-# pyproject: Dict[str, Any]
 
 
 @click.command()
 @click.argument("package", type=click.Path(dir_okay=True, path_type=Path))
 def main(package: Path) -> None:
 
-    ratings = (
-        rat
+    modules: list[str] = [
+        ep.load()  # type: ignore[attr-defined]
         for ep in importlib.metadata.entry_points(
             group="scikit_hep_repo_review.ratings"  # type: ignore[call-arg]
         )
-        for rat in ep.load().__subclasses__()  # type: ignore[attr-defined]
-    )
+    ]
+
+    ratings = [
+        getattr(mod, rat)
+        for mod in modules
+        for rat in getattr(mod, "repo_review_checks", ())
+    ]
+
+    fixtures = [
+        getattr(mod, fixt)
+        for mod in modules
+        for fixt in getattr(mod, "repo_review_fixtures", ())
+    ]
 
     tasks = {t.__name__: t for t in ratings}
     graph: dict[str, set[str]] = {
@@ -69,21 +65,20 @@ def main(package: Path) -> None:
     completed: dict[str, Any] = {}
 
     ts = TopologicalSorter(graph)
-    for task_name in ts.static_order():
-        print(f"[bold]{task_name}", end=" ")
+    completed = {name: build(tasks[name], package, fixtures) for name in ts.static_order()}
 
+    for task_name in sorted(completed):
         check = tasks[task_name]
+
+        print(f"[bold]{task_name}", end=" ")
         if not all(completed.get(n, False) for n in graph[task_name]):
             print(rf"[yellow]{check.__doc__} [bold]\[skipped]")
-            continue
-
-        completed[task_name] = build(check, package=package)
-        if completed[task_name]:
-            print(f"[green]{check.__doc__}?... :white_check_mark:")
+        elif completed[task_name]:
+            print(f"[green]{check.__doc__}? :white_check_mark:")
         else:
-            print(f"[red]{check.__doc__}?... :x:")
+            print(f"[red]{check.__doc__}? :x:")
             print(
-                "      "
+                "[dim]      "
                 + " ".join(
                     textwrap.dedent(check.check.__doc__.format(cls=check))
                     .strip()

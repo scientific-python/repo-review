@@ -10,20 +10,19 @@ from typing import Any
 import yaml
 
 
+@functools.cache
+def precommit(package: Path) -> dict[str, Any]:
+    precommit_path = package.joinpath(".pre-commit-config.yaml")
+    precommit: dict[str, Any]
+    if precommit_path.exists():
+        with precommit_path.open("rb") as f:
+            return yaml.safe_load(f)  # type: ignore[no-any-return]
+
+    return {}
+
+
 class PreCommit:
-    provides = {"precommit"}
     requires = {"PY006"}
-
-    @staticmethod
-    @functools.cache
-    def precommit(package: Path) -> dict[str, Any]:
-        precommit_path = package.joinpath(".pre-commit-config.yaml")
-        precommit: dict[str, Any]
-        if precommit_path.exists():
-            with precommit_path.open("rb") as f:
-                return yaml.safe_load(f)  # type: ignore[no-any-return]
-
-        return {}
 
     @classmethod
     def check(cls, precommit: dict[str, Any]) -> bool:
@@ -91,3 +90,7 @@ class PC160(PreCommit):
 class PC170(PreCommit):
     "Uses PyGrep hooks"
     repo = "https://github.com/pre-commit/pygrep-hooks"
+
+
+repo_review_fixtures = {"precommit"}
+repo_review_checks = {p.__name__ for p in PreCommit.__subclasses__()}
