@@ -45,7 +45,7 @@ class PC110(PreCommit):
 
 class PC120(PreCommit):
     "Uses isort"
-    repo = "https://github.com/PyCQA/isort"
+    repo = "https://github.com/pycqa/isort"
 
 
 class PC130(PreCommit):
