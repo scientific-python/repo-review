@@ -21,7 +21,7 @@ def pyproject(package: Path) -> dict[str, Any]:
 
 
 class PyProject:
-    pass
+    family = "pyproject"
 
 
 class PP002(PyProject):

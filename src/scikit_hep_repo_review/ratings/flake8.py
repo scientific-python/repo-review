@@ -34,7 +34,7 @@ def flake8(package: Path) -> dict[str, Any] | None:
 
 
 class Flake8:
-    pass
+    family = "flake8"
 
 
 class FK001(Flake8):

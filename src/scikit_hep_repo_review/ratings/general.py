@@ -7,7 +7,8 @@ from pathlib import Path
 
 
 class General:
-    pass
+    family = "general"
+
 
 
 class PY001(General):

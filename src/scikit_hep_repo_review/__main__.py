@@ -9,6 +9,7 @@ from typing import Any, Callable, Iterable
 
 import click
 import rich.traceback
+import rich.tree
 from rich import print
 
 from .ratings import Rating
@@ -64,29 +65,40 @@ def main(package: Path) -> None:
     }
     completed: dict[str, Any] = {}
 
+    # A few families are here to make sure they print first
+    families = {"general": set(), "pyproject": set()}
+    for name, task in tasks.items():
+        families.setdefault(task.family, set()).add(name)
+
     ts = TopologicalSorter(graph)
     completed = {
         name: build(tasks[name], package, fixtures) for name in ts.static_order()
     }
 
-    for task_name in sorted(completed):
-        check = tasks[task_name]
+    print() 
+    for family, ftasks in families.items():
+        tree = rich.tree.Tree(f"[bold]{family}[/bold]:")
+        for task_name in sorted(ftasks):
+            check = tasks[task_name]
 
-        print(f"[bold]{task_name}", end=" ")
-        if not all(completed.get(n, False) for n in graph[task_name]):
-            print(rf"[yellow]{check.__doc__} [bold]\[skipped]")
-        elif completed[task_name]:
-            print(f"[green]{check.__doc__}? :white_check_mark:")
-        else:
-            print(f"[red]{check.__doc__}? :x:")
-            print(
-                "[dim]      "
-                + " ".join(
-                    textwrap.dedent(check.check.__doc__.format(cls=check))
-                    .strip()
-                    .splitlines()
+            msg = f"[bold]{task_name}[/bold] "
+            if not all(completed.get(n, False) for n in graph[task_name]):
+                msg += f"[yellow]{check.__doc__} [bold]\\[skipped]"
+            elif completed[task_name]:
+                msg += f"[green]{check.__doc__}? :white_check_mark:"
+            else:
+                msg += f"[red]{check.__doc__}? :x:[/red]\n"
+                msg += (
+                    "[dim]"
+                    + " ".join(
+                        textwrap.dedent(check.check.__doc__.format(cls=check))
+                        .strip()
+                        .splitlines()
+                    )
                 )
-            )
+            tree.add(msg)
+        print(tree)
+        print()
 
 
 if __name__ == "__main__":

@@ -6,7 +6,7 @@ from typing import Any
 
 
 class MyPy:
-    pass
+    family = "mypy"
 
 
 class PP200(MyPy):

@@ -22,6 +22,7 @@ def precommit(package: Path) -> dict[str, Any]:
 
 
 class PreCommit:
+    family = "pre-commit"
     requires = {"PY006"}
 
     @classmethod
@@ -91,6 +92,14 @@ class PC170(PreCommit):
     "Uses PyGrep hooks"
     repo = "https://github.com/pre-commit/pygrep-hooks"
 
+
+class PC901(PreCommit):
+    "Custom pre-commit CI message"
+    
+    def check(precommit: dict[str, Any]) -> bool:
+        "Should have [bold]ci: autoupdate_commit_msg: 'chore: update pre-commit hooks'[/bold] or similar in pre-commit config"
+
+        return "autoupdate_commit_msg" in precommit.get("ci", {})
 
 repo_review_fixtures = {"precommit"}
 repo_review_checks = {p.__name__ for p in PreCommit.__subclasses__()}
