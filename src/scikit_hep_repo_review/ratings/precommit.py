@@ -95,11 +95,13 @@ class PC170(PreCommit):
 
 class PC901(PreCommit):
     "Custom pre-commit CI message"
-    
+
+    @staticmethod
     def check(precommit: dict[str, Any]) -> bool:
         "Should have [bold]ci: autoupdate_commit_msg: 'chore: update pre-commit hooks'[/bold] or similar in pre-commit config"
 
         return "autoupdate_commit_msg" in precommit.get("ci", {})
+
 
 repo_review_fixtures = {"precommit"}
 repo_review_checks = {p.__name__ for p in PreCommit.__subclasses__()}

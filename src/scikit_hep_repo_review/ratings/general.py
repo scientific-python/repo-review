@@ -10,7 +10,6 @@ class General:
     family = "general"
 
 
-
 class PY001(General):
     "Has a pyproject.toml"
 

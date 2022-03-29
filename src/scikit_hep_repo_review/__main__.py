@@ -63,10 +63,10 @@ def main(package: Path) -> None:
     graph: dict[str, set[str]] = {
         n: getattr(t, "requires", set()) for n, t in tasks.items()
     }
-    completed: dict[str, Any] = {}
+    completed: dict[str, bool | None] = {}
 
     # A few families are here to make sure they print first
-    families = {"general": set(), "pyproject": set()}
+    families: dict[str, set[str]] = {"general": set(), "pyproject": set()}
     for name, task in tasks.items():
         families.setdefault(task.family, set()).add(name)
 
@@ -75,7 +75,7 @@ def main(package: Path) -> None:
         name: build(tasks[name], package, fixtures) for name in ts.static_order()
     }
 
-    print() 
+    print()
     for family, ftasks in families.items():
         tree = rich.tree.Tree(f"[bold]{family}[/bold]:")
         for task_name in sorted(ftasks):
@@ -88,13 +88,10 @@ def main(package: Path) -> None:
                 msg += f"[green]{check.__doc__}? :white_check_mark:"
             else:
                 msg += f"[red]{check.__doc__}? :x:[/red]\n"
-                msg += (
-                    "[dim]"
-                    + " ".join(
-                        textwrap.dedent(check.check.__doc__.format(cls=check))
-                        .strip()
-                        .splitlines()
-                    )
+                msg += "[dim]" + " ".join(
+                    textwrap.dedent(check.check.__doc__.format(cls=check))
+                    .strip()
+                    .splitlines()
                 )
             tree.add(msg)
         print(tree)
