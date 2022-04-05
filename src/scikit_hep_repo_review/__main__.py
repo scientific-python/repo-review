@@ -10,7 +10,8 @@ from typing import Any, Callable, Iterable
 import click
 import rich.traceback
 import rich.tree
-from rich import print
+import rich.console
+import rich.terminal_theme
 
 from .ratings import Rating
 
@@ -38,7 +39,13 @@ def build(
 
 @click.command()
 @click.argument("package", type=click.Path(dir_okay=True, path_type=Path))
-def main(package: Path) -> None:
+@click.option("--output", type=click.Path(file_okay=True, exists=False, path_type=Path), default=None)
+def main(package: Path, output: Path | None) -> None:
+
+    console = rich.console.Console(record=True)
+    print = console.print
+
+
 
     modules: list[str] = [
         ep.load()  # type: ignore[attr-defined]
@@ -96,6 +103,9 @@ def main(package: Path) -> None:
             tree.add(msg)
         print(tree)
         print()
+
+    if output is not None:
+        console.save_svg(output, theme=rich.terminal_theme.DEFAULT_TERMINAL_THEME)
 
 
 if __name__ == "__main__":
