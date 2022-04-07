@@ -16,7 +16,7 @@ class PY001(General):
     @staticmethod
     def check(package: Path) -> bool:
         """
-        All projects should have a pyproject.toml file to support a modern
+        All projects should have a `pyproject.toml` file to support a modern
         build system and support wheel installs properly.
         """
         return package.joinpath("pyproject.toml").exists()
@@ -66,7 +66,7 @@ class PY006(General):
 
     @staticmethod
     def check(package: Path) -> bool:
-        "Projects must have a .pre-commit-config.yaml file"
+        "Projects must have a `.pre-commit-config.yaml` file"
         return package.joinpath(".pre-commit-config.yaml").exists()
 
 

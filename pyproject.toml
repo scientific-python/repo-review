@@ -61,6 +61,7 @@ pyproject = "scikit_hep_repo_review.ratings.pyproject"
 precommit = "scikit_hep_repo_review.ratings.precommit"
 flake8 = "scikit_hep_repo_review.ratings.flake8"
 mypy = "scikit_hep_repo_review.ratings.mypy"
+github = "scikit_hep_repo_review.ratings.github"
 
 [tool.pytest.ini_options]
 minversion = "6.0"

@@ -16,7 +16,7 @@ class PP200(MyPy):
 
     @staticmethod
     def check(pyproject: dict[str, Any]) -> bool:
-        "Must have tool.mypy"
+        "Must have `tool.mypy` section in `pyproject.toml`"
 
         match pyproject:
             case {"tool": {"mypy": object()}}:
@@ -32,7 +32,7 @@ class PP201(MyPy):
 
     @staticmethod
     def check(pyproject: dict[str, Any]) -> bool:
-        "Must have strict = true"
+        "Must have `strict = true`"
 
         match pyproject:
             case {"tool": {"mypy": {"strict": True}}}:
@@ -48,7 +48,7 @@ class PP202(MyPy):
 
     @staticmethod
     def check(pyproject: dict[str, Any]) -> bool:
-        "Must have show_error_codes = true"
+        "Must have `show_error_codes = true`"
 
         match pyproject:
             case {"tool": {"mypy": {"show_error_codes": True}}}:
@@ -78,7 +78,7 @@ class PP204(MyPy):
 
     @staticmethod
     def check(pyproject: dict[str, Any]) -> bool:
-        "Must have ignore-without-code in enable_error_code"
+        """Must have `"ignore-without-code"` in `enable_error_code`"""
 
         match pyproject:
             case {"tool": {"mypy": {"enable_error_code": list(codes)}}}:
@@ -92,7 +92,7 @@ class PP205(MyPy):
 
     @staticmethod
     def check(pyproject: dict[str, Any]) -> bool:
-        "Must have redundant-expr in enable_error_code"
+        """Must have `"redundant-expr"` in `enable_error_code`"""
 
         match pyproject:
             case {"tool": {"mypy": {"enable_error_code": list(codes)}}}:
@@ -106,7 +106,7 @@ class PP206(MyPy):
 
     @staticmethod
     def check(pyproject: dict[str, Any]) -> bool:
-        "Must have truthy-bool in enable_error_code"
+        """Must have `"truthy-bool"` in `enable_error_code`"""
 
         match pyproject:
             case {"tool": {"mypy": {"enable_error_code": list(codes)}}}:

@@ -8,10 +8,12 @@ from pathlib import Path
 from typing import Any, Callable, Iterable
 
 import click
+import rich.console
+import rich.markdown
+import rich.terminal_theme
+import rich.text
 import rich.traceback
 import rich.tree
-import rich.console
-import rich.terminal_theme
 
 from .ratings import Rating
 
@@ -39,13 +41,15 @@ def build(
 
 @click.command()
 @click.argument("package", type=click.Path(dir_okay=True, path_type=Path))
-@click.option("--output", type=click.Path(file_okay=True, exists=False, path_type=Path), default=None)
+@click.option(
+    "--output",
+    type=click.Path(file_okay=True, exists=False, path_type=Path),
+    default=None,
+)
 def main(package: Path, output: Path | None) -> None:
 
     console = rich.console.Console(record=True)
     print = console.print
-
-
 
     modules: list[str] = [
         ep.load()  # type: ignore[attr-defined]
@@ -88,24 +92,31 @@ def main(package: Path, output: Path | None) -> None:
         for task_name in sorted(ftasks):
             check = tasks[task_name]
 
-            msg = f"[bold]{task_name}[/bold] "
+            msg = rich.text.Text()
+            msg.append(task_name, style="bold")
+            msg.append(" ")
             if not all(completed.get(n, False) for n in graph[task_name]):
-                msg += f"[yellow]{check.__doc__} [bold]\\[skipped]"
+                msg.append(check.__doc__, style="yellow")
+                msg.append(" [skipped]", style="yellow bold")
+                tree.add(msg)
             elif completed[task_name]:
-                msg += f"[green]{check.__doc__}? :white_check_mark:"
+                msg.append(f"{check.__doc__}? ", style="green")
+                msg.append(rich.text.Text.from_markup(":white_check_mark:"))
+                tree.add(msg)
             else:
-                msg += f"[red]{check.__doc__}? :x:[/red]\n"
-                msg += "[dim]" + " ".join(
+                msg.append(f"{check.__doc__}? ", style="red")
+                msg.append(rich.text.Text.from_markup(":x:"))
+                detail = rich.markdown.Markdown(
                     textwrap.dedent(check.check.__doc__.format(cls=check))
-                    .strip()
-                    .splitlines()
                 )
-            tree.add(msg)
+                msg_grp = rich.console.Group(msg, detail)
+                tree.add(msg_grp)
+
         print(tree)
         print()
 
     if output is not None:
-        console.save_svg(output, theme=rich.terminal_theme.DEFAULT_TERMINAL_THEME)
+        console.save_svg(str(output), theme=rich.terminal_theme.DEFAULT_TERMINAL_THEME)
 
 
 if __name__ == "__main__":

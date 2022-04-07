@@ -27,7 +27,7 @@ class PreCommit:
 
     @classmethod
     def check(cls, precommit: dict[str, Any]) -> bool:
-        "Must have {cls.repo} repo in pre-commit config"
+        "Must have `{cls.repo}` repo in `.pre-commit-config.yaml`"
         for repo in precommit["repos"]:
             if "repo" in repo and repo["repo"].lower() == cls.repo:  # type: ignore[attr-defined]
                 return True
@@ -60,7 +60,7 @@ class PC131(PreCommit):
 
     @staticmethod
     def check(precommit: dict[str, Any]) -> bool:
-        "Must have flake8-bugbear in additional_dependencies"
+        """Must have `"flake8-bugbear"` in `additional_dependencies`"""
         for repo in precommit["repos"]:
             if (
                 "repo" in repo
@@ -98,7 +98,14 @@ class PC901(PreCommit):
 
     @staticmethod
     def check(precommit: dict[str, Any]) -> bool:
-        "Should have [bold]ci: autoupdate_commit_msg: 'chore: update pre-commit hooks'[/bold] or similar in pre-commit config"
+        """
+        Should have something like this in `.pre-commit-config.yaml`:
+
+        ```yaml
+        ci:
+          autoupdate_commit_msg: 'chore: update pre-commit hooks'
+        ```
+        """
 
         return "autoupdate_commit_msg" in precommit.get("ci", {})
 

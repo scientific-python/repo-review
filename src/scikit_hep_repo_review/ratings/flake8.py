@@ -43,8 +43,7 @@ class FK001(Flake8):
     @staticmethod
     def check(flake8: dict[str, Any] | None) -> bool:
         """
-        All projects should have a pyproject.toml file to support a modern
-        build system and support wheel installs properly.
+        Should have some form of flake8 config (`.flake8`, `setup.cfg`, or `pyproject.toml` + pflake8).
         """
         return flake8 is not None
 
@@ -56,7 +55,7 @@ class FK002(Flake8):
     @staticmethod
     def check(flake8: dict[str, Any]) -> bool:
         """
-        extend-ignore should be used instead of ignore, shorter list doesn't wipe defaults.
+        `extend-ignore` should be used instead of `ignore`, shorter list doesn't wipe defaults.
         """
         return "extend-ignore" in flake8
 
@@ -68,9 +67,9 @@ class FK003(Flake8):
     @staticmethod
     def check(flake8: dict[str, Any]) -> bool:
         """
-        extend-ignore should be used instead of ignore, shorter list doesn't wipe defaults.
+        `extend-select` should be used instead of `select`, shorter list doesn't wipe defaults.
         """
-        return "extend-ignore" in flake8
+        return "extend-select" in flake8
 
 
 repo_review_fixtures = {"flake8"}
