@@ -70,5 +70,14 @@ class PY006(General):
         return package.joinpath(".pre-commit-config.yaml").exists()
 
 
+class PY007(General):
+    "Has a noxfile.py"
+
+    @staticmethod
+    def check(package: Path) -> bool:
+        "Projects must have a noxfile.py to encourage new contributors"
+        return package.joinpath("noxfile.py").exists()
+
+
 repo_review_fixtures = set[str]()
 repo_review_checks = {p.__name__ for p in General.__subclasses__()}
