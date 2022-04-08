@@ -37,7 +37,6 @@ dependencies = [
   "click>=8",
   "pyyaml",
   "rich>=12.2",
-  "ruamel.yaml",
   "tomli; python_version < '3.11'",
 ]
 
