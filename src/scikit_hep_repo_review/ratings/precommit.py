@@ -28,7 +28,7 @@ class PreCommit:
     @classmethod
     def check(cls, precommit: dict[str, Any]) -> bool:
         "Must have `{cls.repo}` repo in `.pre-commit-config.yaml`"
-        for repo in precommit["repos"]:
+        for repo in precommit.get("repos", {}):
             if "repo" in repo and repo["repo"].lower() == cls.repo:  # type: ignore[attr-defined]
                 return True
         return False
@@ -61,7 +61,7 @@ class PC131(PreCommit):
     @staticmethod
     def check(precommit: dict[str, Any]) -> bool:
         """Must have `"flake8-bugbear"` in `additional_dependencies`"""
-        for repo in precommit["repos"]:
+        for repo in precommit.get("repos", {}):
             if (
                 "repo" in repo
                 and repo["repo"].lower() == "https://github.com/pycqa/flake8"

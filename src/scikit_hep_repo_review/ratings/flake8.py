@@ -9,7 +9,7 @@ import tomli as tomllib
 
 
 @functools.cache
-def flake8(package: Traversable) -> dict[str, Any] | None:
+def flake8(package: Traversable) -> dict[str, Any]:
     pyproject_path = package / "pyproject.toml"
     if pyproject_path.is_file():
         with pyproject_path.open("rb") as f:
@@ -27,7 +27,7 @@ def flake8(package: Traversable) -> dict[str, Any] | None:
             if "flake8" in config:
                 return dict(config["flake8"])
 
-    return None
+    return {}
 
 
 # FK: Flake8
@@ -41,11 +41,11 @@ class FK001(Flake8):
     "Has Flake8 config"
 
     @staticmethod
-    def check(flake8: dict[str, Any] | None) -> bool:
+    def check(flake8: dict[str, Any]) -> bool:
         """
         Should have some form of flake8 config (`.flake8`, `setup.cfg`, or `pyproject.toml` + pflake8).
         """
-        return flake8 is not None
+        return bool(flake8)
 
 
 class FK002(Flake8):
