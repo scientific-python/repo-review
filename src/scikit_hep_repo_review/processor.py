@@ -5,7 +5,7 @@ import importlib.metadata
 import inspect
 import textwrap
 from graphlib import TopologicalSorter
-from pathlib import Path
+from importlib.abc import Traversable
 from typing import Any, Callable, Iterable
 
 from .ratings import Rating
@@ -24,7 +24,9 @@ class Result:
 
 
 def build(
-    check: type[Rating], package: Path, fixtures: Iterable[Callable[[Path], Any]]
+    check: type[Rating],
+    package: Traversable,
+    fixtures: Iterable[Callable[[Traversable], Any]],
 ) -> bool | None:
     kwargs: dict[str, Any] = {}
     signature = inspect.signature(check.check)  # type: ignore[attr-defined]
@@ -38,7 +40,7 @@ def build(
     return check.check(**kwargs)  # type: ignore[attr-defined, no-any-return]
 
 
-def process(package: Path) -> dict[str, list[Result]]:
+def process(package: Traversable) -> dict[str, list[Result]]:
 
     modules: list[str] = [
         ep.load()  # type: ignore[attr-defined]

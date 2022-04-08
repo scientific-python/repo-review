@@ -4,17 +4,17 @@
 from __future__ import annotations
 
 import functools
-from pathlib import Path
+from importlib.abc import Traversable
 from typing import Any
 
 import yaml
 
 
 @functools.cache
-def precommit(package: Path) -> dict[str, Any]:
+def precommit(package: Traversable) -> dict[str, Any]:
     precommit_path = package.joinpath(".pre-commit-config.yaml")
     precommit: dict[str, Any]
-    if precommit_path.exists():
+    if precommit_path.is_file():
         with precommit_path.open("rb") as f:
             return yaml.safe_load(f)  # type: ignore[no-any-return]
 

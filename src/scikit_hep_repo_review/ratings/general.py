@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from pathlib import Path
+from importlib.abc import Traversable
 
 # PY: Python Project
 ## 0xx: File existence
@@ -14,23 +14,23 @@ class PY001(General):
     "Has a pyproject.toml"
 
     @staticmethod
-    def check(package: Path) -> bool:
+    def check(package: Traversable) -> bool:
         """
         All projects should have a `pyproject.toml` file to support a modern
         build system and support wheel installs properly.
         """
-        return package.joinpath("pyproject.toml").exists()
+        return package.joinpath("pyproject.toml").is_file()
 
 
 class PY002(General):
     "Has a README.(md|rst) file"
 
     @staticmethod
-    def check(package: Path) -> bool:
+    def check(package: Traversable) -> bool:
         "Projects must have a readme file"
         return (
-            package.joinpath("README.md").exists()
-            or package.joinpath("README.rst").exists()
+            package.joinpath("README.md").is_file()
+            or package.joinpath("README.rst").is_file()
         )
 
 
@@ -38,45 +38,45 @@ class PY003(General):
     "Has a LICENSE* file"
 
     @staticmethod
-    def check(package: Path) -> bool:
+    def check(package: Traversable) -> bool:
         "Projects must have a license"
-        return len(list(package.glob("LICENSE*"))) > 0
+        return len(list(p for p in package.iterdir() if "LICENSE" in p.name)) > 0
 
 
 class PY004(General):
     "Has docs folder"
 
     @staticmethod
-    def check(package: Path) -> bool:
+    def check(package: Traversable) -> bool:
         "Projects must have documentation in a folder called docs (disable if not applicable)"
-        return package.joinpath("docs").exists()
+        return package.joinpath("docs").is_dir()
 
 
 class PY005(General):
     "Has tests folder"
 
     @staticmethod
-    def check(package: Path) -> bool:
+    def check(package: Traversable) -> bool:
         "Projects must have a folder called tests"
-        return package.joinpath("tests").exists()
+        return package.joinpath("tests").is_dir()
 
 
 class PY006(General):
     "Has pre-commit config"
 
     @staticmethod
-    def check(package: Path) -> bool:
+    def check(package: Traversable) -> bool:
         "Projects must have a `.pre-commit-config.yaml` file"
-        return package.joinpath(".pre-commit-config.yaml").exists()
+        return package.joinpath(".pre-commit-config.yaml").is_file()
 
 
 class PY007(General):
     "Has a noxfile.py"
 
     @staticmethod
-    def check(package: Path) -> bool:
+    def check(package: Traversable) -> bool:
         "Projects must have a noxfile.py to encourage new contributors"
-        return package.joinpath("noxfile.py").exists()
+        return package.joinpath("noxfile.py").is_file()
 
 
 repo_review_fixtures = set[str]()

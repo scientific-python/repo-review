@@ -2,16 +2,16 @@ from __future__ import annotations
 
 import configparser
 import functools
-from pathlib import Path
+from importlib.abc import Traversable
 from typing import Any
 
 import tomli as tomllib
 
 
 @functools.cache
-def flake8(package: Path) -> dict[str, Any] | None:
+def flake8(package: Traversable) -> dict[str, Any] | None:
     pyproject_path = package / "pyproject.toml"
-    if pyproject_path.exists():
+    if pyproject_path.is_file():
         with pyproject_path.open("rb") as f:
             pyproject = tomllib.load(f)
             if "flake8" in pyproject.get("tool", {}):
@@ -21,9 +21,9 @@ def flake8(package: Path) -> dict[str, Any] | None:
     flake8_tox_ini = package / "tox.ini"
 
     for flake8_path in [flake8_ini_path, flake8_setup_cfg, flake8_tox_ini]:
-        if flake8_path.exists():
+        if flake8_path.is_file():
             config = configparser.ConfigParser()
-            config.read(flake8_path)
+            config.read_string(flake8_path.read_text())
             if "flake8" in config:
                 return dict(config["flake8"])
 

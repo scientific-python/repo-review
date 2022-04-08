@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import functools
+from importlib.abc import Traversable
 from pathlib import Path
 from typing import Any
 
@@ -11,21 +12,22 @@ import yaml
 
 
 @functools.cache
-def workflows(package: Path) -> dict[str, Any]:
+def workflows(package: Traversable) -> dict[str, Any]:
     workflows_base_path = package.joinpath(".github/workflows")
     workflows_dict: dict[str, Any] = {}
-    if workflows_base_path.exists():
-        for workflow_path in workflows_base_path.glob("*.yml"):
-            with workflow_path.open("rb") as f:
-                workflows_dict[workflow_path.stem] = yaml.safe_load(f)
+    if workflows_base_path.is_dir():
+        for workflow_path in workflows_base_path.iterdir():
+            if workflow_path.name.endswith("*.yml"):
+                with workflow_path.open("rb") as f:
+                    workflows_dict[Path(workflow_path.name).stem] = yaml.safe_load(f)
 
     return workflows_dict
 
 
 @functools.cache
-def dependabot(package: Path) -> dict[str, Any]:
+def dependabot(package: Traversable) -> dict[str, Any]:
     dependabot_path = package.joinpath(".github/dependabot.yml")
-    if dependabot_path.exists():
+    if dependabot_path.is_file():
         with dependabot_path.open("rb") as f:
             result: dict[str, Any] = yaml.safe_load(f)
             return result
