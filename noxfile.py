@@ -70,7 +70,7 @@ def serve(session: nox.Session) -> None:
     """
     session.install("build")
     session.run("python", "-m", "build", "--wheel", "--outdir", "web")
-    
+
     if "--serve" in session.posargs:
         session.cd("web")
         session.run("python", "-m", "http.server", "8080")

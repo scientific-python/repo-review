@@ -32,7 +32,7 @@
                     import micropip
                     await micropip.install("/scikit_hep_repo_review-0.1.4-py3-none-any.whl")
                 `);
-                
+
                 function Results(props) {
                     const results_components = props.results.map(result => {
                         let details = result.state == false ? result.err_msg : null;
@@ -112,7 +112,7 @@
                                 })
                             }
                         }
-                        
+
                         this.setState({results: results, repo: this.state.repo, branch: this.state.branch});
                     }
 
