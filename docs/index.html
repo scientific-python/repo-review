@@ -31,7 +31,7 @@
                 await pyodide.loadPackage('micropip');
                 await pyodide.runPythonAsync(`
                     import micropip
-                    await micropip.install(["scikit_hep_repo_review==0.2.0", "markdown-it-py"])
+                    await micropip.install(["scikit_hep_repo_review==0.2.1", "markdown-it-py"])
                 `);
 
                 function Heading(props) {
@@ -54,9 +54,9 @@
                     for (const key in props.results) {
                         const inner_results = props.results[key];
                         const results_components = inner_results.map(result => {
-                            const details = result.state == false ? <span dangerouslySetInnerHTML={{__html: result.err_msg }} />: null;
-                            const color = result.state == false ? 'error' : result.state == null ? 'warning' : 'text.primary';
-                            const icon = <MaterialUI.Icon color={color}>{result.state == false ? 'error' : result.state == null ? 'warning' : 'check_circle'}</MaterialUI.Icon>;
+                            const details = result.state === false ? <span dangerouslySetInnerHTML={{__html: result.err_msg }} />: null;
+                            const color = result.state === false ? 'error' : (result.state === null ? 'warning' : 'text.primary');
+                            const icon = <MaterialUI.Icon color={color}>{result.state === false ? 'error' : (result.state === null ? 'warning' : 'check_circle')}</MaterialUI.Icon>;
                             const msg = (
                                 <React.Fragment>
                                     <MaterialUI.Typography

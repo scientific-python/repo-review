@@ -73,20 +73,18 @@ def process(package: Traversable) -> dict[str, list[Result]]:
         families.setdefault(task.family, set()).add(name)
 
     ts = TopologicalSorter(graph)
-    completed = {
-        name: build(tasks[name], package, fixtures) for name in ts.static_order()
-    }
+    for name in ts.static_order():
+        if not all(completed.get(n, False) for n in graph[name]):
+            completed[name] = None
+        else:
+            completed[name] = build(tasks[name], package, fixtures)
 
     results_dict = {}
     for family, ftasks in families.items():
         result_list = []
         for task_name in sorted(ftasks):
             check = tasks[task_name]
-
-            if not all(completed.get(n, False) for n in graph[task_name]):
-                result = None
-            else:
-                result = completed[task_name]
+            result = completed[task_name]
 
             result_list.append(
                 Result(
