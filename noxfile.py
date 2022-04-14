@@ -63,14 +63,8 @@ def build(session: nox.Session) -> None:
     session.run("python", "-m", "build")
 
 
-@nox.session(reuse_venv=True)
-def site(session: nox.Session) -> None:
-    """
-    Build (maybe --serve) the website.
-    """
-    session.install("build")
-    session.run("python", "-m", "build", "--wheel", "--outdir", "web")
+@nox.session(venv_backend="none")
+def serve(session: nox.Session) -> None:
 
-    if "--serve" in session.posargs:
-        session.cd("web")
-        session.run("python", "-m", "http.server", "8080")
+    session.cd("docs")
+    session.run("python", "-m", "http.server", "8080")
