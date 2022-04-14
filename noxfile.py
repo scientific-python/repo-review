@@ -16,7 +16,7 @@ def run(session: nox.Session) -> None:
     Run the program
     """
 
-    session.install("-e", ".")
+    session.install("-e", ".[cli]")
     session.run("python", "-m", "scikit_hep_repo_review", *session.posargs)
 
 
@@ -49,7 +49,7 @@ def tests(session: nox.Session) -> None:
     session.run("pytest", *session.posargs)
 
 
-@nox.session
+@nox.session(reuse_venv=True)
 def build(session: nox.Session) -> None:
     """
     Build an SDist and wheel.
@@ -61,3 +61,16 @@ def build(session: nox.Session) -> None:
 
     session.install("build")
     session.run("python", "-m", "build")
+
+
+@nox.session(reuse_venv=True)
+def serve(session: nox.Session) -> None:
+    """
+    Serve the website.
+    """
+    session.install("build")
+    session.run("python", "-m", "build", "--wheel", "--outdir", "web")
+    
+    session.cd("web")
+    session.run("curl", "https://github.com/scikit-hep/hist/archive/refs/heads/main.zip", "--output", "main.zip", external=True)
+    session.run("python", "-m", "http.server", "8080")
