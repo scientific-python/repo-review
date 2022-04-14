@@ -88,13 +88,13 @@
                         console.log("Clicked compute");
                         pyodide.runPython(`
                             from pyodide.http import open_url
-                            val = open_url("/app.py")
-                            with open("app.py", "w") as f:
+                            val = open_url("/ghpath.py")
+                            with open("ghpath.py", "w") as f:
                                 f.write(val.read())
                         `);
                         let results_dict = pyodide.runPython(`
                             from scikit_hep_repo_review.processor import process
-                            from app import GHPath
+                            from ghpath import GHPath
                             package = GHPath(repo="scikit-hep/hist", branch="main")
                             results_dict = process(package)
                             results_dict
@@ -127,6 +127,7 @@
                                         id="repo-select"
                                         label="Org/Repo"
                                         variant="outlined"
+                                        autoFocus={true}
                                         onChange={(e) => this.setState({repo: e.target.value})}
                                     />
                                     <MaterialUI.Autocomplete
