@@ -66,11 +66,11 @@ def build(session: nox.Session) -> None:
 @nox.session(reuse_venv=True)
 def serve(session: nox.Session) -> None:
     """
-    Serve the website.
+    Build (maybe --serve) the website.
     """
     session.install("build")
     session.run("python", "-m", "build", "--wheel", "--outdir", "web")
     
-    session.cd("web")
-    session.run("curl", "https://github.com/scikit-hep/hist/archive/refs/heads/main.zip", "--output", "main.zip", external=True)
-    session.run("python", "-m", "http.server", "8080")
+    if "--serve" in session.posargs:
+        session.cd("web")
+        session.run("python", "-m", "http.server", "8080")
