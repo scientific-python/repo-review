@@ -22,7 +22,12 @@ class GHPath:
             url = f"https://api.github.com/repos/{self.repo}/git/trees/{self.branch}?recursive=1"
             val: io.StringIO = open_url(url)
             vals = json.load(val)
-            object.__setattr__(self, "_info", vals["tree"])
+            try:
+                object.__setattr__(self, "_info", vals["tree"])
+            except KeyError:
+                print("Failed to find tree. Result:")
+                print(vals)
+                raise
 
     @property
     def name(self) -> str:
