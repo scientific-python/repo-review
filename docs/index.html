@@ -168,23 +168,12 @@
                     });
                 }
 
-                helpbox() {
-                    return (
-                        <MaterialUI.Box sx={{ p: 2 }}>
-                            <MaterialUI.Typography variant="body1" component="div">
-                                {this.state.msg}
-                            </MaterialUI.Typography>
-                        </MaterialUI.Box>
-                    );
-                }
-
-
                 render() {
                     const common_branches = ["main", "master", "develop", "stable"];
                     return (
                         <MaterialUI.Box>
                         <Heading />
-                        <MaterialUI.Stack direction="row" spacing={2} justifyContent="center" alignItems="top" sx={{ m: 1, mb: 3 }}>
+                        <MaterialUI.Stack direction="row" spacing={2} alignItems="top" sx={{ m: 1, mb: 3 }} >
                             <MaterialUI.TextField
                                 id="repo-select"
                                 label="Org/Repo"
@@ -192,6 +181,7 @@
                                 variant="outlined"
                                 autoFocus={true}
                                 onInput={(e) => this.setState({repo: e.target.value})}
+                                sx={{flexGrow: 2}}
                             />
                             <MaterialUI.Autocomplete
                                 disablePortal
@@ -200,11 +190,16 @@
                                 freeSolo = {true}
                                 renderInput={(params) => <MaterialUI.TextField {...params} label="Branch" variant="outlined" helperText="e.g. main" />}
                                 onInputChange={(e, value) => this.setState({branch: value})}
+                                sx={{flexGrow: 1}}
                             />
                             <MaterialUI.Button onClick={() => this.handleCompute()} variant="contained" size="large">Compute!</MaterialUI.Button>
                         </MaterialUI.Stack>
                         <MaterialUI.Paper elevation={3}>
-                            {this.helpbox()}
+                            <MaterialUI.Box sx={{ p: 2 }}>
+                                <MaterialUI.Typography variant="body1" component="div">
+                                    {this.state.msg}
+                                </MaterialUI.Typography>
+                            </MaterialUI.Box>
                             <Results results={this.state.results} />
                         </MaterialUI.Paper>
                         </MaterialUI.Box>
