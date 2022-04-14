@@ -55,8 +55,8 @@
                         const inner_results = props.results[key];
                         const results_components = inner_results.map(result => {
                             const details = result.state === false ? <span dangerouslySetInnerHTML={{__html: result.err_msg }} />: null;
-                            const color = result.state === false ? 'error' : (result.state === null ? 'warning' : 'text.primary');
-                            const icon = <MaterialUI.Icon color={color}>{result.state === false ? 'error' : (result.state === null ? 'warning' : 'check_circle')}</MaterialUI.Icon>;
+                            const color = result.state === false ? 'error' : (result.state === true ?  'text.primary' : 'warning');
+                            const icon = <MaterialUI.Icon color={color}>{result.state === false ? 'error' : (result.state === true ? 'check_circle' : 'warning' )}</MaterialUI.Icon>;
                             const msg = (
                                 <React.Fragment>
                                     <MaterialUI.Typography
@@ -127,7 +127,7 @@
                             from ghpath import GHPath
                             from markdown_it import MarkdownIt
                             md = MarkdownIt()
-                            package = GHPath(repo="scikit-hep/hist", branch="main")
+                            package = GHPath(repo="${this.state.repo}", branch="${this.state.branch}")
                             results_dict = process(package)
                             for cat_group in results_dict.values():
                                 for result in cat_group:
