@@ -64,7 +64,7 @@ def build(session: nox.Session) -> None:
 
 
 @nox.session(reuse_venv=True)
-def serve(session: nox.Session) -> None:
+def site(session: nox.Session) -> None:
     """
     Build (maybe --serve) the website.
     """
