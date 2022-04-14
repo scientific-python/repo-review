@@ -13,7 +13,6 @@ import yaml
 @functools.cache
 def precommit(package: Traversable) -> dict[str, Any]:
     precommit_path = package.joinpath(".pre-commit-config.yaml")
-    precommit: dict[str, Any]
     if precommit_path.is_file():
         with precommit_path.open("rb") as f:
             return yaml.safe_load(f)  # type: ignore[no-any-return]
@@ -29,6 +28,7 @@ class PreCommit:
     def check(cls, precommit: dict[str, Any]) -> bool:
         "Must have `{cls.repo}` repo in `.pre-commit-config.yaml`"
         for repo in precommit.get("repos", {}):
+            # pylint: disable-next=no-member
             if "repo" in repo and repo["repo"].lower() == cls.repo:  # type: ignore[attr-defined]
                 return True
         return False
