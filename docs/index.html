@@ -50,38 +50,51 @@
                 }
 
                 function Results(props) {
-                    const results_components = props.results.map(result => {
-                        let details = result.state == false ? <span dangerouslySetInnerHTML={{__html: result.err_msg }} />: null;
-                        let color = result.state == false ? 'error' : result.state == null ? 'warning' : 'text.primary';
-                        let icon = <MaterialUI.Icon color={color}>{result.state == false ? 'error' : result.state == null ? 'warning' : 'check_circle'}</MaterialUI.Icon>;
-                        let msg = (
-                            <React.Fragment>
-                                <MaterialUI.Typography
-                                    sx={{ display: 'inline' }}
-                                    component="span"
-                                    variant="body2"
-                                    color="text.primary"
-                                >
-                                    {result.name + ": "}
-                                </MaterialUI.Typography>
-                                {result.description}
-                            </React.Fragment>
-                        )
-                        return (
-                            <MaterialUI.ListItem disablePadding key={result.name}>
-                                <MaterialUI.ListItemButton>
-                                    <MaterialUI.ListItemIcon>
-                                        {icon}
-                                    </MaterialUI.ListItemIcon>
-                                    <MaterialUI.ListItemText primary={msg} secondary={details} color={color} />
-                                </MaterialUI.ListItemButton>
-                            </MaterialUI.ListItem>
-                        );
-                    });
+                    const output = [];
+                    for (const key in props.results) {
+                        const inner_results = props.results[key];
+                        const results_components = inner_results.map(result => {
+                            const details = result.state == false ? <span dangerouslySetInnerHTML={{__html: result.err_msg }} />: null;
+                            const color = result.state == false ? 'error' : result.state == null ? 'warning' : 'text.primary';
+                            const icon = <MaterialUI.Icon color={color}>{result.state == false ? 'error' : result.state == null ? 'warning' : 'check_circle'}</MaterialUI.Icon>;
+                            const msg = (
+                                <React.Fragment>
+                                    <MaterialUI.Typography
+                                        sx={{ display: 'inline' }}
+                                        component="span"
+                                        variant="body2"
+                                        color="text.primary"
+                                    >
+                                        {result.name + ": "}
+                                    </MaterialUI.Typography>
+                                    {result.description}
+                                </React.Fragment>
+                            )
+                            return (
+                                <MaterialUI.ListItem disablePadding key={result.name}>
+                                    <MaterialUI.ListItemButton>
+                                        <MaterialUI.ListItemIcon>
+                                            {icon}
+                                        </MaterialUI.ListItemIcon>
+                                        <MaterialUI.ListItemText primary={msg} secondary={details} color={color} />
+                                    </MaterialUI.ListItemButton>
+                                </MaterialUI.ListItem>
+                            );
+                        });
+
+                        output.push(
+                            <li key={`section-${key}`}>
+                                <ul>
+                                    <MaterialUI.ListSubheader>{key}</MaterialUI.ListSubheader>
+                                    {results_components}
+                                </ul>
+                            </li>
+                            );
+                    }
 
                     return (
-                        <MaterialUI.Box sx={{bgcolor: 'background.paper'}}>
-                            <MaterialUI.List>{results_components}</MaterialUI.List>
+                        <MaterialUI.Box sx={{bgcolor: 'background.paper'}} >
+                            <MaterialUI.List subheader={<li />} overflow='auto'>{output}</MaterialUI.List>
                         </MaterialUI.Box>
                     );
                 }
@@ -105,12 +118,11 @@
                         pyodide.runPython(`
                             from pyodide.http import open_url
                             import js
-                            print(js.location.pathname)
                             val = open_url(f"{js.location.pathname}ghpath.py")
                             with open("ghpath.py", "w") as f:
                                 f.write(val.read())
                         `);
-                        let results_dict = pyodide.runPython(`
+                        const results_dict = pyodide.runPython(`
                             from scikit_hep_repo_review.processor import process
                             from ghpath import GHPath
                             from markdown_it import MarkdownIt
@@ -123,28 +135,30 @@
                             results_dict
                         `);
 
-                        var results = [];
-                        for(let res of results_dict) {
-                            let vals = results_dict.get(res);
-                            for(let val of vals) {
-                                results.push({
+                        const results = {};
+                        for(const res of results_dict) {
+                            const vals = results_dict.get(res);
+                            const inner_results = []
+                            for(const val of vals) {
+                                inner_results.push({
                                     name: val.name.toString(),
                                     description: val.description.toString(),
                                     state: val.result,
                                     err_msg: val.err_msg.toString()
                                 })
                             }
+                            results[res] = inner_results;
                         }
 
                         this.setState({results: results, repo: this.state.repo, branch: this.state.branch});
                     }
 
                     helpbox() {
-                        if (this.state.results.length > 0) {
+                        if (Object.keys(this.state.results).length > 0) {
                             return null;
                         }
                         return (
-                            <MaterialUI.Box sx={{ m: 2 }}>
+                            <MaterialUI.Box sx={{ p: 2 }}>
                                 <MaterialUI.Typography variant="body1" component="div">
                                     Enter a GitHub repo and branch to review. Runs entirely in your browser using React, MaterialUI, and Pyodide.
                                 </MaterialUI.Typography>
@@ -154,31 +168,31 @@
 
 
                     render() {
-                        let common_branches = ["main", "master", "develop", "stable"];
+                        const common_branches = ["main", "master", "develop", "stable"];
                         return (
                             <MaterialUI.Box>
+                            <Heading />
+                            <MaterialUI.Stack direction="row" spacing={2} justifyContent="center" alignItems="top" sx={{ m: 1, mb: 3 }}>
+                                <MaterialUI.TextField
+                                    id="repo-select"
+                                    label="Org/Repo"
+                                    helperText="e.g. scikit-hep/hist"
+                                    variant="outlined"
+                                    autoFocus={true}
+                                    onChange={(e) => this.setState({repo: e.target.value})}
+                                />
+                                <MaterialUI.Autocomplete
+                                    disablePortal
+                                    id="branch-select"
+                                    options={common_branches}
+                                    sx={{ width: 300 }}
+                                    freeSolo = {true}
+                                    renderInput={(params) => <MaterialUI.TextField {...params} label="Branch" variant="outlined" helperText="e.g. main, press enter" />}
+                                    onChange={(e) => this.setState({branch: e.target.value})}
+                                />
+                                <MaterialUI.Button onClick={() => this.handleCompute()} variant="contained" size="large">Compute!</MaterialUI.Button>
+                            </MaterialUI.Stack>
                             <MaterialUI.Paper elevation={3}>
-                                <Heading />
-                                <MaterialUI.Stack direction="row" spacing={2} justifyContent="center" alignItems="top" sx={{ m: 1 }}>
-                                    <MaterialUI.TextField
-                                        id="repo-select"
-                                        label="Org/Repo"
-                                        helperText="e.g. scikit-hep/hist"
-                                        variant="outlined"
-                                        autoFocus={true}
-                                        onChange={(e) => this.setState({repo: e.target.value})}
-                                    />
-                                    <MaterialUI.Autocomplete
-                                        disablePortal
-                                        id="branch-select"
-                                        options={common_branches}
-                                        sx={{ width: 300 }}
-                                        freeSolo = {true}
-                                        renderInput={(params) => <MaterialUI.TextField {...params} label="Branch" variant="outlined" helperText="e.g. main, press enter" />}
-                                        onChange={(e) => this.setState({branch: e.target.value})}
-                                    />
-                                    <MaterialUI.Button onClick={() => this.handleCompute()} variant="contained" size="large">Compute!</MaterialUI.Button>
-                                </MaterialUI.Stack>
                                 {this.helpbox()}
                                 <Results results={this.state.results} />
                             </MaterialUI.Paper>
