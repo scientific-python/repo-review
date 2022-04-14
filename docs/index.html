@@ -23,6 +23,7 @@
     <body>
         <div id="root"> Loading... </div>
         <script type="text/babel">
+            const DEFAULT_MSG = "Enter a GitHub repo and branch to review. Runs entirely in your browser using React, MaterialUI, and Pyodide.";
             function Heading(props) {
                 return (
                     <MaterialUI.Box sx={{ flexGrow: 1, mb: 2 }}>
@@ -111,10 +112,11 @@
                         results: [],
                         repo: "",
                         branch: "",
+                        msg: DEFAULT_MSG,
                     };
                 }
 
-                hadleComputeCallback(pyodide) {
+                hadleComputeCallback(pyodide, state) {
                     pyodide.runPython(`
                         from pyodide.http import open_url
                         import js
@@ -127,7 +129,7 @@
                         from ghpath import GHPath
                         from markdown_it import MarkdownIt
                         md = MarkdownIt()
-                        package = GHPath(repo="${this.state.repo}", branch="${this.state.branch}")
+                        package = GHPath(repo="${state.repo}", branch="${state.branch}")
                         results_dict = process(package)
                         for cat_group in results_dict.values():
                             for result in cat_group:
@@ -150,29 +152,27 @@
                         results[res] = inner_results;
                     }
 
-                    this.setState({results: results, repo: this.state.repo, branch: this.state.branch});
+                    this.setState({results: results, msg: `Results for ${state.repo}@${state.branch}`});
 
                 }
 
                 handleCompute() {
-                    if (this.state.repo === "" || this.state.branch === "") {
-                        alert("Please enter a repo and branch");
+                    if (!this.state.repo || !this.state.branch ) {
+                        this.setState({"results": [], msg: DEFAULT_MSG});
+                        alert(`Please enter a repo (${this.state.repo}) and branch (${this.state.branch})`);
                         return;
                     }
-                    console.log("Clicked compute");
+                    this.setState({"results": [], msg: "Loading..."});
                     pyodide_promise.then(pyodide => {
-                        this.hadleComputeCallback(pyodide);
+                        this.hadleComputeCallback(pyodide, this.state);
                     });
                 }
 
                 helpbox() {
-                    if (Object.keys(this.state.results).length > 0) {
-                        return null;
-                    }
                     return (
                         <MaterialUI.Box sx={{ p: 2 }}>
                             <MaterialUI.Typography variant="body1" component="div">
-                                Enter a GitHub repo and branch to review. Runs entirely in your browser using React, MaterialUI, and Pyodide.
+                                {this.state.msg}
                             </MaterialUI.Typography>
                         </MaterialUI.Box>
                     );
@@ -191,16 +191,15 @@
                                 helperText="e.g. scikit-hep/hist"
                                 variant="outlined"
                                 autoFocus={true}
-                                onChange={(e) => this.setState({repo: e.target.value})}
+                                onInput={(e) => this.setState({repo: e.target.value})}
                             />
                             <MaterialUI.Autocomplete
                                 disablePortal
                                 id="branch-select"
                                 options={common_branches}
-                                sx={{ width: 300 }}
                                 freeSolo = {true}
-                                renderInput={(params) => <MaterialUI.TextField {...params} label="Branch" variant="outlined" helperText="e.g. main, press enter" />}
-                                onChange={(e) => this.setState({branch: e.target.value})}
+                                renderInput={(params) => <MaterialUI.TextField {...params} label="Branch" variant="outlined" helperText="e.g. main" />}
+                                onInputChange={(e, value) => this.setState({branch: value})}
                             />
                             <MaterialUI.Button onClick={() => this.handleCompute()} variant="contained" size="large">Compute!</MaterialUI.Button>
                         </MaterialUI.Stack>
