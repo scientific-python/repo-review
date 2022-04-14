@@ -30,7 +30,7 @@
                 await pyodide.loadPackage('micropip');
                 await pyodide.runPythonAsync(`
                     import micropip
-                    await micropip.install("/scikit_hep_repo_review-0.1.4-py3-none-any.whl")
+                    await micropip.install("scikit_hep_repo_review==0.2.0")
                 `);
 
                 function Results(props) {
