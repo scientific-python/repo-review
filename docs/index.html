@@ -2,14 +2,16 @@
     <head>
         <meta charset="utf-8" name="viewport" content="initial-scale=1, width=device-width"/>
         <script src="https://cdn.jsdelivr.net/pyodide/v0.20.0/full/pyodide.js" crossorigin></script>
-        <!--
+        <!-- Production -->
         <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
         <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
         <script src="https://unpkg.com/@mui/material@v5.6.1/umd/material-ui.production.min.js" crossorigin></script>
         -->
+        <!-- Development
         <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
         <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
         <script src="https://unpkg.com/@mui/material@v5.6.1/umd/material-ui.development.js" crossorigin></script>
+         -->
 
         <!-- Can remove this for a pre-processor -->
         <script src="https://unpkg.com/babel-standalone@6/babel.min.js" crossorigin></script>
@@ -30,12 +32,27 @@
                 await pyodide.loadPackage('micropip');
                 await pyodide.runPythonAsync(`
                     import micropip
-                    await micropip.install("scikit_hep_repo_review==0.2.0")
+                    await micropip.install(["scikit_hep_repo_review==0.2.0", "markdown-it-py"])
                 `);
+
+                function Heading(props) {
+                    return (
+                        <MaterialUI.Box sx={{ flexGrow: 1, mb: 2 }}>
+                            <MaterialUI.AppBar position="static">
+                                <MaterialUI.Toolbar>
+                                <MaterialUI.Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+                                    Scikit-HEP-Repo-Review
+                                </MaterialUI.Typography>
+                                <MaterialUI.Button href="https://github.com/henryiii/scikit-hep-repo-review" color="inherit">Source</MaterialUI.Button>
+                                </MaterialUI.Toolbar>
+                            </MaterialUI.AppBar>
+                        </MaterialUI.Box>
+                    );
+                }
 
                 function Results(props) {
                     const results_components = props.results.map(result => {
-                        let details = result.state == false ? result.err_msg : null;
+                        let details = result.state == false ? <span dangerouslySetInnerHTML={{__html: result.err_msg }} />: null;
                         let color = result.state == false ? 'error' : result.state == null ? 'warning' : 'text.primary';
                         let icon = <MaterialUI.Icon color={color}>{result.state == false ? 'error' : result.state == null ? 'warning' : 'check_circle'}</MaterialUI.Icon>;
                         let msg = (
@@ -97,8 +114,13 @@
                         let results_dict = pyodide.runPython(`
                             from scikit_hep_repo_review.processor import process
                             from ghpath import GHPath
+                            from markdown_it import MarkdownIt
+                            md = MarkdownIt()
                             package = GHPath(repo="scikit-hep/hist", branch="main")
                             results_dict = process(package)
+                            for cat_group in results_dict.values():
+                                for result in cat_group:
+                                    object.__setattr__(result, "err_msg", md.render(result.err_msg))
                             results_dict
                         `);
 
@@ -118,16 +140,31 @@
                         this.setState({results: results, repo: this.state.repo, branch: this.state.branch});
                     }
 
+                    helpbox() {
+                        if (this.state.results.length > 0) {
+                            return null;
+                        }
+                        return (
+                            <MaterialUI.Box sx={{ m: 2 }}>
+                                <MaterialUI.Typography variant="body1" component="div">
+                                    Enter a GitHub repo and branch to review. Runs entirely in your browser using React, MaterialUI, and Pyodide.
+                                </MaterialUI.Typography>
+                            </MaterialUI.Box>
+                        );
+                    }
+
 
                     render() {
                         let common_branches = ["main", "master", "develop", "stable"];
                         return (
                             <MaterialUI.Box>
                             <MaterialUI.Paper elevation={3}>
-                                <MaterialUI.Stack direction="row" spacing={2} justifyContent="center" alignItems="center">
+                                <Heading />
+                                <MaterialUI.Stack direction="row" spacing={2} justifyContent="center" alignItems="top" sx={{ m: 1 }}>
                                     <MaterialUI.TextField
                                         id="repo-select"
                                         label="Org/Repo"
+                                        helperText="e.g. scikit-hep/hist"
                                         variant="outlined"
                                         autoFocus={true}
                                         onChange={(e) => this.setState({repo: e.target.value})}
@@ -138,11 +175,12 @@
                                         options={common_branches}
                                         sx={{ width: 300 }}
                                         freeSolo = {true}
-                                        renderInput={(params) => <MaterialUI.TextField {...params} label="Branch" variant="outlined" />}
+                                        renderInput={(params) => <MaterialUI.TextField {...params} label="Branch" variant="outlined" helperText="e.g. main, press enter" />}
                                         onChange={(e) => this.setState({branch: e.target.value})}
                                     />
                                     <MaterialUI.Button onClick={() => this.handleCompute()} variant="contained" size="large">Compute!</MaterialUI.Button>
                                 </MaterialUI.Stack>
+                                {this.helpbox()}
                                 <Results results={this.state.results} />
                             </MaterialUI.Paper>
                             </MaterialUI.Box>
