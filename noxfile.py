@@ -67,4 +67,4 @@ def build(session: nox.Session) -> None:
 def serve(session: nox.Session) -> None:
 
     session.cd("docs")
-    session.run("python", "-m", "http.server", "8080")
+    session.run("python3", "-m", "http.server", "8080")

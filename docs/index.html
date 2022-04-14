@@ -88,7 +88,9 @@
                         console.log("Clicked compute");
                         pyodide.runPython(`
                             from pyodide.http import open_url
-                            val = open_url("/ghpath.py")
+                            import js
+                            print(js.location.pathname)
+                            val = open_url(f"{js.location.pathname}ghpath.py")
                             with open("ghpath.py", "w") as f:
                                 f.write(val.read())
                         `);
