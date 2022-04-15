@@ -111,7 +111,7 @@ class App extends React.Component {
                 results_dict = pyodide.runPython(`
                     from pyodide.http import open_url
                     from scikit_hep_repo_review.processor import process
-                    from scikit_hep_repo_review.ghpath imoprt GHPath
+                    from scikit_hep_repo_review.ghpath import GHPath
 
                     GHPath.open_url = classmethod(open_url)
 
