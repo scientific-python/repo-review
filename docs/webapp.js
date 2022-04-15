@@ -113,7 +113,7 @@ class App extends React.Component {
                     from scikit_hep_repo_review.processor import process
                     from scikit_hep_repo_review.ghpath import GHPath
 
-                    GHPath.open_url = classmethod(open_url)
+                    GHPath.open_url = staticmethod(open_url)
 
                     package = GHPath(repo="${state.repo}", branch="${state.branch}")
                     results_dict = process(package)
