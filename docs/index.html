@@ -113,47 +113,9 @@
                         repo: "",
                         branch: "",
                         msg: DEFAULT_MSG,
+                        progress: false,
+                        err_msg: "",
                     };
-                }
-
-                hadleComputeCallback(pyodide, state) {
-                    pyodide.runPython(`
-                        from pyodide.http import open_url
-                        import js
-                        val = open_url(f"{js.location.pathname}ghpath.py")
-                        with open("ghpath.py", "w") as f:
-                            f.write(val.read())
-                    `);
-                    const results_dict = pyodide.runPython(`
-                        from scikit_hep_repo_review.processor import process
-                        from ghpath import GHPath
-                        from markdown_it import MarkdownIt
-                        md = MarkdownIt()
-                        package = GHPath(repo="${state.repo}", branch="${state.branch}")
-                        results_dict = process(package)
-                        for cat_group in results_dict.values():
-                            for result in cat_group:
-                                object.__setattr__(result, "err_msg", md.render(result.err_msg))
-                        results_dict
-                    `);
-
-                    const results = {};
-                    for(const res of results_dict) {
-                        const vals = results_dict.get(res);
-                        const inner_results = []
-                        for(const val of vals) {
-                            inner_results.push({
-                                name: val.name.toString(),
-                                description: val.description.toString(),
-                                state: val.result,
-                                err_msg: val.err_msg.toString()
-                            })
-                        }
-                        results[res] = inner_results;
-                    }
-
-                    this.setState({results: results, msg: `Results for ${state.repo}@${state.branch}`});
-
                 }
 
                 handleCompute() {
@@ -162,9 +124,62 @@
                         alert(`Please enter a repo (${this.state.repo}) and branch (${this.state.branch})`);
                         return;
                     }
-                    this.setState({"results": [], msg: "Loading..."});
+                    this.setState({"results": [], msg: "Running Python via Pyodide", progress: true});
+                    const state = this.state;
                     pyodide_promise.then(pyodide => {
-                        this.hadleComputeCallback(pyodide, this.state);
+                        pyodide.runPython(`
+                            from pyodide.http import open_url
+                            import js
+                            val = open_url(f"{js.location.pathname}ghpath.py")
+                            with open("ghpath.py", "w") as f:
+                                f.write(val.read())
+                        `);
+                        var results_dict;
+                        try {
+                            results_dict = pyodide.runPython(`
+                                from scikit_hep_repo_review.processor import process
+                                from ghpath import GHPath
+                                from markdown_it import MarkdownIt
+                                md = MarkdownIt()
+                                package = GHPath(repo="${state.repo}", branch="${state.branch}")
+                                results_dict = process(package)
+                                for cat_group in results_dict.values():
+                                    for result in cat_group:
+                                        object.__setattr__(result, "err_msg", md.render(result.err_msg))
+                                results_dict
+                            `);
+                        } catch (e) {
+                            if(e.message.includes("KeyError: 'tree'")) {
+                                this.setState({
+                                    msg: DEFAULT_MSG,
+                                    progress: false,
+                                    err_msg: "Invalid branch. Please try again.",
+                                });
+                                return
+                            }
+                            this.setState({
+                                progress: false,
+                                err_msg: e.message,
+                            });
+                            return;
+                        }
+
+                        const results = {};
+                        for(const res of results_dict) {
+                            const vals = results_dict.get(res);
+                            const inner_results = []
+                            for(const val of vals) {
+                                inner_results.push({
+                                    name: val.name.toString(),
+                                    description: val.description.toString(),
+                                    state: val.result,
+                                    err_msg: val.err_msg.toString()
+                                })
+                            }
+                            results[res] = inner_results;
+                        }
+
+                        this.setState({results: results, msg: `Results for ${state.repo}@${state.branch}`, progress: false, err_msg: ""});
                     });
                 }
 
@@ -172,7 +187,7 @@
                     const common_branches = ["main", "master", "develop", "stable"];
                     return (
                         <MaterialUI.Box>
-                        <Heading />
+                        { this.props.header && <Heading /> }
                         <MaterialUI.Stack direction="row" spacing={2} alignItems="top" sx={{ m: 1, mb: 3 }} >
                             <MaterialUI.TextField
                                 id="repo-select"
@@ -191,7 +206,13 @@
                                 renderInput={(params) => <MaterialUI.TextField {...params} label="Branch" variant="outlined" helperText="e.g. main" sx={{flexGrow: 2}} />}
                                 onInputChange={(e, value) => this.setState({branch: value})}
                             />
-                            <MaterialUI.Button onClick={() => this.handleCompute()} variant="contained" size="large">
+
+                            <MaterialUI.Button
+                                onClick={() => this.handleCompute()}
+                                variant="contained"
+                                size="large"
+                                disabled={this.state.progress || !this.state.repo || !this.state.branch}
+                            >
                                 <MaterialUI.Icon>start</MaterialUI.Icon>
                             </MaterialUI.Button>
                         </MaterialUI.Stack>
@@ -200,6 +221,8 @@
                                 <MaterialUI.Typography variant="body1" component="div">
                                     {this.state.msg}
                                 </MaterialUI.Typography>
+                                {this.state.progress && <MaterialUI.LinearProgress />}
+                                {this.state.err_msg && <MaterialUI.Typography variant="body1" component="div" color="error"> {this.state.err_msg} </MaterialUI.Typography> }
                             </MaterialUI.Box>
                             <Results results={this.state.results} />
                         </MaterialUI.Paper>
@@ -210,7 +233,7 @@
 
             function main() {
                 const root = ReactDOM.createRoot(document.getElementById('root'));
-                root.render(<App />);
+                root.render(<App header={true} />);
             }
 
             main();
