@@ -188,12 +188,11 @@
                                 id="branch-select"
                                 options={common_branches}
                                 freeSolo = {true}
-                                renderInput={(params) => <MaterialUI.TextField {...params} label="Branch" variant="outlined" helperText="e.g. main" />}
+                                renderInput={(params) => <MaterialUI.TextField {...params} label="Branch" variant="outlined" helperText="e.g. main" sx={{flexGrow: 2}} />}
                                 onInputChange={(e, value) => this.setState({branch: value})}
-                                sx={{flexGrow: 2}}
                             />
                             <MaterialUI.Button onClick={() => this.handleCompute()} variant="contained" size="large">
-                                <MaterialUI.Icon>start</MaterialUI.Icon>;
+                                <MaterialUI.Icon>start</MaterialUI.Icon>
                             </MaterialUI.Button>
                         </MaterialUI.Stack>
                         <MaterialUI.Paper elevation={3}>
