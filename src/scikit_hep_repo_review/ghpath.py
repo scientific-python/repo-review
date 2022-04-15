@@ -18,7 +18,7 @@ class GHPath:
     @staticmethod
     def open_url(url: str) -> io.StringIO:
         "This method can be overridden for pyodide with pyodide.open_url"
-        import urllib.request
+        import urllib.request  # pylint: disable=import-outside-toplevel
 
         with urllib.request.urlopen(url) as response:
             return io.StringIO(response.read().decode("utf-8"))
