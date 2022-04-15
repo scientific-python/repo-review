@@ -8,11 +8,15 @@ from graphlib import TopologicalSorter
 from importlib.abc import Traversable
 from typing import Any, Callable, Iterable
 
+from markdown_it import MarkdownIt
+
 from .ratings import Rating
 
 # Use module-level entry names
 # repo_review_fixtures = {"pyproject"}
 # repo_review_checks = set(p.__name___ for p in General.__subclasses__())
+
+md = MarkdownIt()
 
 
 @dataclasses.dataclass(frozen=True, kw_only=True)
@@ -21,6 +25,10 @@ class Result:
     description: str
     result: bool | None
     err_msg: str = ""
+
+    def err_markdown(self) -> str:
+        result: str = md.render(self.err_msg)
+        return result
 
 
 def build(

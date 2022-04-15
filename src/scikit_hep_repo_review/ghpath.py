@@ -3,9 +3,7 @@ from __future__ import annotations
 import dataclasses
 import io
 import json
-from typing import Iterator, Literal
-
-from pyodide.http import open_url
+from typing import Iterator, Literal, overload
 
 
 @dataclasses.dataclass(frozen=True, kw_only=True)
@@ -17,10 +15,18 @@ class GHPath:
         hash=False, default_factory=list, repr=False
     )
 
-    def __post_init__(self):
+    @staticmethod
+    def open_url(url: str) -> io.StringIO:
+        "This method can be overridden for pyodide with pyodide.open_url"
+        import urllib.request
+
+        with urllib.request.urlopen(url) as response:
+            return io.StringIO(response.read().decode("utf-8"))
+
+    def __post_init__(self) -> None:
         if not self._info:
             url = f"https://api.github.com/repos/{self.repo}/git/trees/{self.branch}?recursive=1"
-            val: io.StringIO = open_url(url)
+            val: io.StringIO = self.open_url(url)
             vals = json.load(val)
             try:
                 object.__setattr__(self, "_info", vals["tree"])
@@ -33,8 +39,16 @@ class GHPath:
     def name(self) -> str:
         return (self.path or self.repo).split("/")[-1]
 
+    @overload
+    def open(self, mode: Literal["r"]) -> io.StringIO:
+        ...
+
+    @overload
+    def open(self, mode: Literal["rb"]) -> io.BytesIO:
+        ...
+
     def open(self, mode: Literal["r", "rb"] = "r") -> io.IOBase:
-        val: io.StringIO = open_url(
+        val: io.StringIO = self.open_url(
             f"https://raw.githubusercontent.com/{self.repo}/{self.branch}/{self.path}"
         )
         if "b" in mode:

@@ -70,6 +70,7 @@ repos:
     - rich
     - types-PyYAML
     - tomli
+    - markdown-it-py
 
 - repo: https://github.com/codespell-project/codespell
   rev: v2.1.0

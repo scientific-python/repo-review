@@ -77,7 +77,7 @@ async function prepare_pyodide() {
     await pyodide.loadPackage('micropip');
     await pyodide.runPythonAsync(`
         import micropip
-        await micropip.install(["scikit_hep_repo_review==0.2.1", "markdown-it-py"])
+        await micropip.install(["scikit_hep_repo_review==0.2.2"])
     `);
     return pyodide;
 }
@@ -106,25 +106,17 @@ class App extends React.Component {
         this.setState({"results": [], msg: "Running Python via Pyodide", progress: true});
         const state = this.state;
         pyodide_promise.then(pyodide => {
-            pyodide.runPython(`
-                from pyodide.http import open_url
-                import js
-                val = open_url(f"{js.location.pathname}ghpath.py")
-                with open("ghpath.py", "w") as f:
-                    f.write(val.read())
-            `);
             var results_dict;
             try {
                 results_dict = pyodide.runPython(`
+                    from pyodide.http import open_url
                     from scikit_hep_repo_review.processor import process
-                    from ghpath import GHPath
-                    from markdown_it import MarkdownIt
-                    md = MarkdownIt()
+                    from scikit_hep_repo_review.ghpath imoprt GHPath
+
+                    GHPath.open_url = classmethod(open_url)
+
                     package = GHPath(repo="${state.repo}", branch="${state.branch}")
                     results_dict = process(package)
-                    for cat_group in results_dict.values():
-                        for result in cat_group:
-                            object.__setattr__(result, "err_msg", md.render(result.err_msg))
                     results_dict
                 `);
             } catch (e) {
@@ -152,7 +144,7 @@ class App extends React.Component {
                         name: val.name.toString(),
                         description: val.description.toString(),
                         state: val.result,
-                        err_msg: val.err_msg.toString()
+                        err_msg: val.err_markdown().toString()
                     })
                 }
                 results[res] = inner_results;
@@ -182,7 +174,7 @@ class App extends React.Component {
                     id="branch-select"
                     options={common_branches}
                     freeSolo = {true}
-                    renderInput={(params) => <MaterialUI.TextField {...params} label="Branch" variant="outlined" helperText="e.g. main" sx={{flexGrow: 2}} />}
+                    renderInput={(params) => <MaterialUI.TextField {...params} label="Branch" variant="outlined" helperText="e.g. main" sx={{flexGrow: 2, minWidth: 130}} />}
                     onInputChange={(e, value) => this.setState({branch: value})}
                 />
 
