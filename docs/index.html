@@ -181,7 +181,7 @@
                                 variant="outlined"
                                 autoFocus={true}
                                 onInput={(e) => this.setState({repo: e.target.value})}
-                                sx={{flexGrow: 2}}
+                                sx={{flexGrow: 3}}
                             />
                             <MaterialUI.Autocomplete
                                 disablePortal
@@ -190,9 +190,11 @@
                                 freeSolo = {true}
                                 renderInput={(params) => <MaterialUI.TextField {...params} label="Branch" variant="outlined" helperText="e.g. main" />}
                                 onInputChange={(e, value) => this.setState({branch: value})}
-                                sx={{flexGrow: 1}}
+                                sx={{flexGrow: 2}}
                             />
-                            <MaterialUI.Button onClick={() => this.handleCompute()} variant="contained" size="large">Compute!</MaterialUI.Button>
+                            <MaterialUI.Button onClick={() => this.handleCompute()} variant="contained" size="large">
+                                <MaterialUI.Icon>start</MaterialUI.Icon>;
+                            </MaterialUI.Button>
                         </MaterialUI.Stack>
                         <MaterialUI.Paper elevation={3}>
                             <MaterialUI.Box sx={{ p: 2 }}>
