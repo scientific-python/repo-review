@@ -68,9 +68,9 @@ with the name (1-2 letters + number) and a docstring (the check message). It
 should define a set of `requires` with any checks it depends on (by name), and
 have a check classmethod. The docstring of this method is the failure message,
 and supports substitution. Arguments to this method are fixtures, and `package`
-is the build-in one providing the package directory as a Traversable. Any other
+is the built-in one providing the package directory as a Traversable. Any other
 fixtures are available by name. A new fixture is given the package Traversable,
-and can produce anything (recommended to be cached via `functools.cache`). 
+and can produce anything (recommended to be cached via `functools.cache`).
 
 The runner will topologically sort the checks, and checks that do not run will
 get a `None` result and the check classmethod will not run. The front-end (Rich
