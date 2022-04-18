@@ -65,6 +65,10 @@ def build(session: nox.Session) -> None:
 
 @nox.session(venv_backend="none")
 def serve(session: nox.Session) -> None:
+    """
+    Serve the webapp.
+    """
 
     session.cd("docs")
+    session.log("Serving on https://localhost:8080")
     session.run("python3", "-m", "http.server", "8080")

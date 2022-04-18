@@ -84,6 +84,26 @@ async function prepare_pyodide() {
 
 const pyodide_promise = prepare_pyodide();
 
+function MyThemeProvider(props) {
+    const prefersDarkMode = MaterialUI.useMediaQuery('(prefers-color-scheme: dark)');
+
+    const theme = React.useMemo(
+      () =>
+        MaterialUI.createTheme({
+          palette: {
+            mode: prefersDarkMode ? 'dark' : 'light',
+          },
+        }),
+      [prefersDarkMode],
+    );
+
+    return (
+        <MaterialUI.ThemeProvider theme={theme}>
+            {props.children}
+        </MaterialUI.ThemeProvider>
+    );
+}
+
 class App extends React.Component {
     constructor(props) {
         super(props);
@@ -157,6 +177,8 @@ class App extends React.Component {
     render() {
         const common_branches = ["main", "master", "develop", "stable"];
         return (
+            <MyThemeProvider>
+            <MaterialUI.CssBaseline />
             <MaterialUI.Box>
             { this.props.header && <Heading /> }
             <MaterialUI.Stack direction="row" spacing={2} alignItems="top" sx={{ m: 1, mb: 3 }} >
@@ -198,6 +220,7 @@ class App extends React.Component {
                 <Results results={this.state.results} />
             </MaterialUI.Paper>
             </MaterialUI.Box>
+            </MyThemeProvider>
         );
     }
 }
