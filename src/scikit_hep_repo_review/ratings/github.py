@@ -81,12 +81,19 @@ class GH102(GitHub):
 
 
 class GH103(GitHub):
-    "At least one workflow has manual dispatch"
+    "At least one workflow with manual dispatch trigger"
     requires = {"GH100"}
 
     @staticmethod
     def check(workflows: dict[str, Any]) -> bool:
-        "One workflow at least should have a workflow_displatch trigger"
+        """
+        At least one workflow should have manual dispatch to allow easy triggering from the web.
+
+        ```yaml
+        on:
+          workflow_dispatch:
+        ```
+        """
         return any("workflow_dispatch" in w.get(True, {}) for w in workflows.values())
 
 

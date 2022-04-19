@@ -49,7 +49,7 @@ class PY004(General):
     @staticmethod
     def check(package: Traversable) -> bool:
         "Projects must have documentation in a folder called docs (disable if not applicable)"
-        return package.joinpath("docs").is_dir()
+        return len(list(p for p in package.iterdir() if "doc" in p.name)) > 0
 
 
 class PY005(General):
@@ -58,7 +58,7 @@ class PY005(General):
     @staticmethod
     def check(package: Traversable) -> bool:
         "Projects must have a folder called tests"
-        return package.joinpath("tests").is_dir()
+        return len(list(p for p in package.iterdir() if "test" in p.name)) > 0
 
 
 class PY006(General):
@@ -71,12 +71,15 @@ class PY006(General):
 
 
 class PY007(General):
-    "Has a noxfile.py"
+    "Supports an easy task runner (nox or tox)"
 
     @staticmethod
     def check(package: Traversable) -> bool:
-        "Projects must have a noxfile.py to encourage new contributors"
-        return package.joinpath("noxfile.py").is_file()
+        "Projects must have a `noxfile.py` or `tox.ini` to encourage new contributors"
+        return (
+            package.joinpath("noxfile.py").is_file()
+            or package.joinpath("tox.ini").is_file()
+        )
 
 
 repo_review_fixtures = set[str]()

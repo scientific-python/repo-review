@@ -64,7 +64,7 @@ class PP203(MyPy):
 
     @staticmethod
     def check(pyproject: dict[str, Any]) -> bool:
-        "Must have warn_unreachable = true"
+        "Must have `warn_unreachable = true`"
 
         match pyproject:
             case {"tool": {"mypy": {"warn_unreachable": True}}}:
