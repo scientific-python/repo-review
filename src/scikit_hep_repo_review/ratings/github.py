@@ -117,6 +117,7 @@ class GH200(GitHub):
 
 class GH210(GitHub):
     "Has dependabot ecosystem"
+    requires = {"GH200"}
 
     @staticmethod
     def check(dependabot: dict[str, Any]) -> bool:
@@ -145,7 +146,7 @@ class GH210(GitHub):
 class GH211(GitHub):
     "Core actions should be pinned as major versions"
 
-    requires = {"GH210"}
+    requires = {"GH200", "GH210"}  # Currently listing both helps - TODO: remove GH200
 
     @staticmethod
     def check(dependabot: dict[str, Any]) -> bool:
