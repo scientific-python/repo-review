@@ -44,12 +44,10 @@ function Results(props) {
             )
             return (
                 <MaterialUI.ListItem disablePadding key={result.name}>
-                    <MaterialUI.ListItemButton>
-                        <MaterialUI.ListItemIcon>
-                            {icon}
-                        </MaterialUI.ListItemIcon>
-                        <MaterialUI.ListItemText primary={msg} secondary={details} color={color} />
-                    </MaterialUI.ListItemButton>
+                    <MaterialUI.ListItemIcon>
+                        {icon}
+                    </MaterialUI.ListItemIcon>
+                    <MaterialUI.ListItemText primary={msg} secondary={details} color={color} />
                 </MaterialUI.ListItem>
             );
         });
