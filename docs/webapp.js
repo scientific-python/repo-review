@@ -3,6 +3,8 @@
 
 const DEFAULT_MSG = "Enter a GitHub repo and branch to review. Runs entirely in your browser using React, MaterialUI, and Pyodide.";
 
+const urlParams = new URLSearchParams(window.location.search);
+
 function Heading(props) {
     return (
         <MaterialUI.Box sx={{ flexGrow: 1, mb: 2 }}>
@@ -109,8 +111,8 @@ class App extends React.Component {
         super(props);
         this.state = {
             results: [],
-            repo: "",
-            branch: "",
+            repo: urlParams.get('repo') || '',
+            branch: urlParams.get('branch') || '',
             msg: DEFAULT_MSG,
             progress: false,
             err_msg: "",
@@ -174,6 +176,12 @@ class App extends React.Component {
         });
     }
 
+    componentDidMount() {
+        if(urlParams.get('repo') && urlParams.get('branch')) {
+            this.handleCompute();
+        }
+    }
+
     render() {
         const common_branches = ["main", "master", "develop", "stable"];
         return (
@@ -189,6 +197,7 @@ class App extends React.Component {
                     variant="outlined"
                     autoFocus={true}
                     onInput={(e) => this.setState({repo: e.target.value})}
+                    defaultValue={urlParams.get("repo")}
                     sx={{flexGrow: 3}}
                 />
                 <MaterialUI.Autocomplete
@@ -196,8 +205,14 @@ class App extends React.Component {
                     id="branch-select"
                     options={common_branches}
                     freeSolo = {true}
-                    renderInput={(params) => <MaterialUI.TextField {...params} label="Branch" variant="outlined" helperText="e.g. main" sx={{flexGrow: 2, minWidth: 130}} />}
                     onInputChange={(e, value) => this.setState({branch: value})}
+                    defaultValue={urlParams.get("branch")}
+                    renderInput={(params) => <MaterialUI.TextField {...params}
+                        label="Branch"
+                        variant="outlined"
+                        helperText="e.g. main"
+                        sx={{flexGrow: 2, minWidth: 130}}
+                    />}
                 />
 
                 <MaterialUI.Button
