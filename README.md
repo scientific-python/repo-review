@@ -12,7 +12,7 @@
 This tool can check the style of a repository. Use like this:
 
 ```bash
-pipx run scikit-hep-repo-review[cli] <path to repository>
+pipx run 'scikit-hep-repo-review[cli]' <path to repository>
 ```
 
 This will produce a list of results - green checkmarks mean this rule is
@@ -77,9 +77,14 @@ get a `None` result and the check classmethod will not run. The front-end (Rich
 powered CLI or Pyodide webapp) will render the markdown-formatted check
 docstring only if the result is `False`.
 
+# Links
 
-[actions-badge]:            https://github.com/Scikit-HEP/scikit-hep-repo-review/workflows/CI/badge.svg
-[actions-link]:             https://github.com/Scikit-HEP/scikit-hep-repo-review/actions
+This project inspired [Try-PyHF](https://kratsg.github.io/try-pyhf/), an
+interface for a High Energy Physics package in Scikit-HEP.
+
+
+[actions-badge]:            https://github.com/henryiii/scikit-hep-repo-review/workflows/CI/badge.svg
+[actions-link]:             https://github.com/henryiii/scikit-hep-repo-review/actions
 [black-badge]:              https://img.shields.io/badge/code%20style-black-000000.svg
 [black-link]:               https://github.com/psf/black
 [pypi-link]:                https://pypi.org/project/scikit-hep-repo-review/
