@@ -29,6 +29,15 @@ function Results(props) {
             const details = result.state === false ? <span dangerouslySetInnerHTML={{__html: result.err_msg }} />: null;
             const color = result.state === false ? 'error' : (result.state === true ?  'success' : 'warning');
             const icon = <MaterialUI.Icon color={color}>{result.state === false ? 'error' : (result.state === true ? 'check_circle' : 'warning' )}</MaterialUI.Icon>;
+            const skipped = (
+                <MaterialUI.Typography
+                     sx={{ display: 'inline' }}
+                     component="span"
+                     variant="body2"
+                >
+                    {" [skipped]"}
+                </MaterialUI.Typography>
+            );
             const msg = (
                 <React.Fragment>
                     <MaterialUI.Typography
@@ -39,7 +48,10 @@ function Results(props) {
                     >
                         {result.name + ": "}
                     </MaterialUI.Typography>
-                    {result.description}
+                    <React.Fragment>
+                      {result.description}
+                    </React.Fragment>
+                    {result.state === undefined && skipped }
                 </React.Fragment>
             )
             return (
@@ -47,7 +59,7 @@ function Results(props) {
                     <MaterialUI.ListItemIcon>
                         {icon}
                     </MaterialUI.ListItemIcon>
-                    <MaterialUI.ListItemText primary={msg} secondary={details} color={color} />
+                    <MaterialUI.ListItemText primary={msg} secondary={details} />
                 </MaterialUI.ListItem>
             );
         });
