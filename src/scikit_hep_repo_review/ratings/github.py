@@ -62,7 +62,7 @@ class GH101(GitHub):
         All workflows should have a nice readable `name:` field to pass this
         check. Feel free to ignore if you are happy with the filenames as names.
         """
-        return all("name" in w for w in workflows)
+        return all("name" in w for w in workflows.values())
 
 
 class GH102(GitHub):
