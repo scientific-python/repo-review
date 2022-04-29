@@ -75,7 +75,9 @@ class PY007(General):
 
     @staticmethod
     def check(package: Traversable) -> bool:
-        "Projects must have a `noxfile.py` or `tox.ini` to encourage new contributors"
+        """
+        Projects must have a `noxfile.py` or `tox.ini` to encourage new contributors.
+        """
         return (
             package.joinpath("noxfile.py").is_file()
             or package.joinpath("tox.ini").is_file()

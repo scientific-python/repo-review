@@ -55,9 +55,10 @@ class FK002(Flake8):
     @staticmethod
     def check(flake8: dict[str, Any]) -> bool:
         """
-        `extend-ignore` should be used instead of `ignore`, it is a shorter list that doesn't wipe defaults.
+        `extend-ignore` should be used instead of `ignore`, it is a shorter list
+        that doesn't wipe defaults.
         """
-        return "extend-ignore" in flake8
+        return "ignore" not in flake8 or "extend-ignore" in flake8
 
 
 class FK003(Flake8):
@@ -67,9 +68,10 @@ class FK003(Flake8):
     @staticmethod
     def check(flake8: dict[str, Any]) -> bool:
         """
-        `extend-select` should be used instead of `select`, it is a shorter list that doesn't wipe defaults.
+        `extend-select` should be used instead of `select`, it is a shorter list
+        that doesn't wipe defaults.
         """
-        return "extend-select" in flake8
+        return "select" not in flake8 or "extend-select" in flake8
 
 
 repo_review_fixtures = {"flake8"}

@@ -45,7 +45,9 @@ class GH100(GitHub):
     @staticmethod
     def check(workflows: dict[str, Any]) -> bool:
         """
-        All projects should have GitHub Actions config for this series of checks.
+        All projects should have GitHub Actions config for this series of
+        checks.  If there are no `.yml` files in `.github/workflows`, the
+        remaining checks will be skipped.
         """
         return bool(workflows)
 
@@ -57,7 +59,8 @@ class GH101(GitHub):
     @staticmethod
     def check(workflows: dict[str, Any]) -> bool:
         """
-        All workflows should have a nice readable `name:` field.
+        All workflows should have a nice readable `name:` field to pass this
+        check. Feel free to ignore if you are happy with the filenames as names.
         """
         return all("name" in w for w in workflows)
 
@@ -104,7 +107,7 @@ class GH200(GitHub):
     def check(dependabot: dict[str, Any]) -> bool:
         """
         All projects should have a `.github/dependabot.yml` file to support at least
-        GitHub Actions updates.
+        GitHub Actions regular updates. Something like this:
 
         ```yaml
         version: 2
@@ -123,7 +126,7 @@ class GH200(GitHub):
 
 
 class GH210(GitHub):
-    "Has dependabot ecosystem"
+    "Maintains the GitHub action versions with Dependabot"
     requires = {"GH200"}
 
     @staticmethod
@@ -151,7 +154,7 @@ class GH210(GitHub):
 
 
 class GH211(GitHub):
-    "Core actions should be pinned as major versions"
+    "Pin core actions as major versions"
 
     requires = {"GH200", "GH210"}  # Currently listing both helps - TODO: remove GH200
 

@@ -31,7 +31,10 @@ class PP002(PyProject):
 
     @staticmethod
     def check(pyproject: dict[str, Any]) -> bool:
-        "Must have build-system.requires & build-system.backend"
+        """
+        Must have `build-system.requires` *and* `build-system.backend`. Both
+        should be present in all modern packages.
+        """
 
         match pyproject:
             case {"build-system": {"requires": list(), "build-backend": str()}}:
@@ -47,11 +50,15 @@ class PP003(PyProject):
 
     @staticmethod
     def check(pyproject: dict[str, Any]) -> bool:
-        "Must not include wheel, setuptools does this via PEP 517 already"
+        """
+        Do not include `"wheel"` in your `build-system.requires`, setuptools
+        does this via PEP 517 already. Setuptools will also only require this
+        for actual wheel builds, and might have version limits.
+        """
 
         match pyproject:
             case {"build-system": {"requires": list(req)}}:
-                return all("wheel" not in r for r in req)
+                return all(not r.startswith("wheel") for r in req)
             case _:
                 return False
 
@@ -63,7 +70,11 @@ class PP301(PyProject):
 
     @staticmethod
     def check(pyproject: dict[str, Any]) -> bool:
-        "Must have build-system.requires & build-system.backend"
+        """
+        Must have a pytest configuration section in pyproject.toml. If you must
+        have it somewhere else (such as to support `pytest<6`), ignore this
+        check.
+        """
 
         match pyproject:
             case {"tool": {"pytest": {"ini_options": {}}}}:
@@ -78,7 +89,10 @@ class PP302(PyProject):
 
     @staticmethod
     def check(pyproject: dict[str, Any]) -> bool:
-        "Must have a minversion, and must be at least 6"
+        """
+        Must have a `minversion=`, and must be at least 6 (first version to
+        support `pyproject.toml` configuration).
+        """
         options = pyproject["tool"]["pytest"]["ini_options"]
         return "minversion" in options and float(options["minversion"]) >= 6
 
@@ -89,7 +103,7 @@ class PP303(PyProject):
 
     @staticmethod
     def check(pyproject: dict[str, Any]) -> bool:
-        "The testpaths should be set (like to ['tests'])"
+        "The `testpaths` setting should be set (like to `['tests']`)"
         options = pyproject["tool"]["pytest"]["ini_options"]
         return "testpaths" in options
 
@@ -100,7 +114,9 @@ class PP304(PyProject):
 
     @staticmethod
     def check(pyproject: dict[str, Any]) -> bool:
-        "log_cli_level should be set (probably to INFO)"
+        """
+        `log_cli_level` should be set (probably to `"INFO"`)
+        """
         options = pyproject["tool"]["pytest"]["ini_options"]
         return "log_cli_level" in options
 
@@ -111,7 +127,10 @@ class PP305(PyProject):
 
     @staticmethod
     def check(pyproject: dict[str, Any]) -> bool:
-        "xfail_strict should be set (probably to true)"
+        """
+        `xfail_strict` should be set (probably to `true`). You can manually
+        specify if a check should be strict when setting each xfail.
+        """
         options = pyproject["tool"]["pytest"]["ini_options"]
         return "xfail_strict" in options
 
@@ -122,7 +141,10 @@ class PP306(PyProject):
 
     @staticmethod
     def check(pyproject: dict[str, Any]) -> bool:
-        "--strict-config should be in addopts"
+        """
+        `--strict-config` should be in `addopts = [...]`. This forces an error
+        if a config setting is misspelled.
+        """
         options = pyproject["tool"]["pytest"]["ini_options"]
         return "--strict-config" in options.get("addopts", [])
 
@@ -133,7 +155,10 @@ class PP307(PyProject):
 
     @staticmethod
     def check(pyproject: dict[str, Any]) -> bool:
-        "--strict-markers should be in addopts"
+        """
+        `--strict-markers` should be in `addopts = [...]`. This forces all
+        markers to be specified in config, avoiding misspellings.
+        """
         options = pyproject["tool"]["pytest"]["ini_options"]
         return "--strict-markers" in options.get("addopts", [])
 
@@ -144,7 +169,7 @@ class PP308(PyProject):
 
     @staticmethod
     def check(pyproject: dict[str, Any]) -> bool:
-        "-ra should be in addopts (summary of all fails/errors)"
+        "`-ra` should be in `addopts = [...]` (print summary of all fails/errors)."
         options = pyproject["tool"]["pytest"]["ini_options"]
         return "-ra" in options.get("addopts", [])
 
@@ -155,7 +180,10 @@ class PP309(PyProject):
 
     @staticmethod
     def check(pyproject: dict[str, Any]) -> bool:
-        "filterwarnings must be set (probably to at least ['error'])"
+        """
+        `filterwarnings` must be set (probably to at least `['error']`). Python
+        will hide important warnings otherwise, like deprecations.
+        """
         options = pyproject["tool"]["pytest"]["ini_options"]
         return "-ra" in options.get("addopts", [])
 

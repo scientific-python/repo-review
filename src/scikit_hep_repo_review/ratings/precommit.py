@@ -60,7 +60,10 @@ class PC131(PreCommit):
 
     @staticmethod
     def check(precommit: dict[str, Any]) -> bool:
-        """Must have `"flake8-bugbear"` in `additional_dependencies`"""
+        """
+        Must have `"flake8-bugbear"` in `additional_dependencies`. This can
+        catch lots of commonly buggy code patterns.
+        """
         for repo in precommit.get("repos", {}):
             if (
                 "repo" in repo
