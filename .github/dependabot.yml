@@ -9,3 +9,4 @@ updates:
       # Official actions have moving tags like v1
       # that are used, so they don't need updates here
       - dependency-name: "actions/*"
+        update-types: ["version-update:semver-minor", "version-update:semver-patch"]

@@ -1,5 +1,10 @@
+# Needed because we don't support anything before 3.10
 default_language_version:
   python: python3.10
+
+ci:
+  autoupdate_commit_msg: 'chore: update pre-commit hooks'
+  autofix_commit_msg: "style: pre-commit fixes"
 
 repos:
 - repo: https://github.com/psf/black

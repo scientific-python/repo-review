@@ -69,10 +69,9 @@ github = "scikit_hep_repo_review.ratings.github"
 minversion = "6.0"
 addopts = ["-ra", "--showlocals", "--strict-markers", "--strict-config"]
 xfail_strict = true
+log_cli_level = "INFO"
 filterwarnings = ["error"]
-testpaths = [
-    "tests",
-]
+testpaths = ["tests"]
 
 
 [tool.mypy]

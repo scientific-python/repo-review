@@ -5,12 +5,14 @@ on:
   pull_request:
   push:
     branches:
-    - master
     - main
-    - develop
   release:
     types:
       - published
+
+concurrency:
+  group: ci-${{ github.head_ref }}
+  cancel-in-progress: true
 
 jobs:
   pre-commit:
