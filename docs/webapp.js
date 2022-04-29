@@ -1,7 +1,7 @@
 
 
 
-const DEFAULT_MSG = "Enter a GitHub repo and branch to review. Runs entirely in your browser using React, MaterialUI, and Pyodide.";
+const DEFAULT_MSG = "Enter a GitHub repo and branch to review. Runs Python entirely in your browser using WebAssembly. Built with React, MaterialUI, and Pyodide.";
 
 const urlParams = new URLSearchParams(window.location.search);
 
@@ -156,7 +156,7 @@ class App extends React.Component {
                     this.setState({
                         msg: DEFAULT_MSG,
                         progress: false,
-                        err_msg: "Invalid branch. Please try again.",
+                        err_msg: "Invalid repository or branch. Please try again.",
                     });
                     return
                 }
