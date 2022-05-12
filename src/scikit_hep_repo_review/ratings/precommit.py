@@ -44,6 +44,12 @@ class PC110(PreCommit):
     repo = "https://github.com/psf/black"
 
 
+class PC111(PreCommit):
+    "Uses blacken-docs"
+    requires = {"PY006", "PC110"}
+    repo = "https://github.com/asottile/blacken-docs"
+
+
 class PC120(PreCommit):
     "Uses isort"
     repo = "https://github.com/pycqa/isort"
@@ -94,6 +100,11 @@ class PC160(PreCommit):
 class PC170(PreCommit):
     "Uses PyGrep hooks"
     repo = "https://github.com/pre-commit/pygrep-hooks"
+
+
+class PC180(PreCommit):
+    "Uses prettier"
+    repo = "https://github.com/pre-commit/mirrors-prettier"
 
 
 class PC901(PreCommit):
