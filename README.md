@@ -8,7 +8,6 @@
 
 [![Scikit-HEP][sk-badge]](https://scikit-hep.org/)
 
-
 This tool can check the style of a repository. Use like this:
 
 ```bash
@@ -39,7 +38,6 @@ You are not required to be in Scikit-HEP to find this useful, however -
 examples of repositories that at least partially follow the guidelines include
 `pypa/cibuildwheel`, `pypa/build`, and `pybind/pybind11`.
 
-
 ### Development
 
 This repository is intended to be fun to develop - it requires and uses Python
@@ -59,7 +57,7 @@ pulled from subclasses of a common ancestor) and a list of fixtures it
 provides.
 
 Check files do not depend on the main library, and can be extended (similar to
-Flake8).  You register new check files via entry-points - so extending this is
+Flake8). You register new check files via entry-points - so extending this is
 with custom checks or custom fixtures is easy and trivial. There's no need to
 subclass or do anything with the base library - no dependency required.
 
@@ -82,13 +80,12 @@ docstring only if the result is `False`.
 This project inspired [Try-PyHF](https://kratsg.github.io/try-pyhf/), an
 interface for a High Energy Physics package in Scikit-HEP.
 
-
-[actions-badge]:            https://github.com/scikit-hep/repo-review/workflows/CI/badge.svg
-[actions-link]:             https://github.com/scikit-hep/repo-review/actions
-[black-badge]:              https://img.shields.io/badge/code%20style-black-000000.svg
-[black-link]:               https://github.com/psf/black
-[pypi-link]:                https://pypi.org/project/scikit-hep-repo-review/
-[pypi-platforms]:           https://img.shields.io/pypi/pyversions/scikit-hep-repo-review
-[pypi-version]:             https://badge.fury.io/py/scikit-hep-repo-review.svg
-[sk-badge]:                 https://scikit-hep.org/assets/images/Scikit--HEP-Project-blue.svg
+[actions-badge]: https://github.com/scikit-hep/repo-review/workflows/CI/badge.svg
+[actions-link]: https://github.com/scikit-hep/repo-review/actions
+[black-badge]: https://img.shields.io/badge/code%20style-black-000000.svg
+[black-link]: https://github.com/psf/black
+[pypi-link]: https://pypi.org/project/scikit-hep-repo-review/
+[pypi-platforms]: https://img.shields.io/pypi/pyversions/scikit-hep-repo-review
+[pypi-version]: https://badge.fury.io/py/scikit-hep-repo-review.svg
+[sk-badge]: https://scikit-hep.org/assets/images/Scikit--HEP-Project-blue.svg
 [scikit-build developer guidelines]: https://scikit-hep.org/developer
