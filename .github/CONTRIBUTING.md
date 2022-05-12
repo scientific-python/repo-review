@@ -26,7 +26,6 @@ $ nox -s build  # Make an SDist and wheel
 Nox handles everything for you, including setting up an temporary virtual
 environment for each run.
 
-
 # Setting up a development environment manually
 
 You can set up a development environment by running:
@@ -55,8 +54,7 @@ pip install pre-commit # or brew install pre-commit on macOS
 pre-commit install # Will install a pre-commit hook into the git repo
 ```
 
-You can also/alternatively run `pre-commit run` (changes only) or `pre-commit
-run --all-files` to check even without installing the hook.
+You can also/alternatively run `pre-commit run` (changes only) or `pre-commit run --all-files` to check even without installing the hook.
 
 # Testing
 
