@@ -1,4 +1,4 @@
-# scikit-hep-repo-review
+# Scikit-HEP repo-review
 
 [![Actions Status][actions-badge]][actions-link]
 [![Code style: black][black-badge]][black-link]
@@ -83,8 +83,8 @@ This project inspired [Try-PyHF](https://kratsg.github.io/try-pyhf/), an
 interface for a High Energy Physics package in Scikit-HEP.
 
 
-[actions-badge]:            https://github.com/henryiii/scikit-hep-repo-review/workflows/CI/badge.svg
-[actions-link]:             https://github.com/henryiii/scikit-hep-repo-review/actions
+[actions-badge]:            https://github.com/scikit-hep/repo-review/workflows/CI/badge.svg
+[actions-link]:             https://github.com/scikit-hep/repo-review/actions
 [black-badge]:              https://img.shields.io/badge/code%20style-black-000000.svg
 [black-link]:               https://github.com/psf/black
 [pypi-link]:                https://pypi.org/project/scikit-hep-repo-review/

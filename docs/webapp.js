@@ -14,7 +14,7 @@ function Heading(props) {
                     Scikit-HEP-Repo-Review
                 </MaterialUI.Typography>
                 <MaterialUI.Button href="https://scikit-hep.org/developer" color="inherit">Developer Guidelines</MaterialUI.Button>
-                <MaterialUI.Button href="https://github.com/henryiii/scikit-hep-repo-review" color="inherit">Source</MaterialUI.Button>
+                <MaterialUI.Button href="https://github.com/scikit-hep/repo-review" color="inherit">Source</MaterialUI.Button>
                 </MaterialUI.Toolbar>
             </MaterialUI.AppBar>
         </MaterialUI.Box>
