@@ -78,7 +78,9 @@ class PC131(PreCommit):
                 for hook in repo["hooks"]:
                     match hook:
                         case {"additional_dependencies": list(x)}:
-                            return "flake8-bugbear" in x
+                            for item in x:
+                                if "flake8-bugbear" in item:
+                                    return True
         return False
 
 
