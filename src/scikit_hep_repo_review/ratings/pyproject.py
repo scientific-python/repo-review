@@ -185,7 +185,7 @@ class PP309(PyProject):
         will hide important warnings otherwise, like deprecations.
         """
         options = pyproject["tool"]["pytest"]["ini_options"]
-        return "-ra" in options.get("addopts", [])
+        return "filterwarnings" in options
 
 
 repo_review_fixtures = {"pyproject"}
