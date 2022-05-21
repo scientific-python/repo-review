@@ -2,6 +2,7 @@ const DEFAULT_MSG =
   "Enter a GitHub repo and branch to review. Runs Python entirely in your browser using WebAssembly. Built with React, MaterialUI, and Pyodide.";
 
 const urlParams = new URLSearchParams(window.location.search);
+const baseurl = window.location.pathname;
 
 function Heading(props) {
   return (
@@ -160,11 +161,17 @@ class App extends React.Component {
   handleCompute() {
     if (!this.state.repo || !this.state.branch) {
       this.setState({ results: [], msg: DEFAULT_MSG });
+      window.history.replaceState(null, "", baseurl);
       alert(
         `Please enter a repo (${this.state.repo}) and branch (${this.state.branch})`
       );
       return;
     }
+    const local_params = new URLSearchParams({
+      repo: this.state.repo,
+      branch: this.state.branch,
+    });
+    window.history.replaceState(null, "", `${baseurl}?${local_params}`);
     this.setState({
       results: [],
       msg: "Running Python via Pyodide",
