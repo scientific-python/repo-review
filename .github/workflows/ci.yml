@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-python@v3
+      - uses: actions/setup-python@v4
       - uses: pre-commit/action@v3.0.0
         with:
           extra_args: --hook-stage manual --all-files
@@ -42,7 +42,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - uses: actions/setup-python@v3
+      - uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -60,7 +60,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - uses: actions/setup-python@v3
+      - uses: actions/setup-python@v4
 
       - name: Build sdist and wheel
         run: pipx run build
