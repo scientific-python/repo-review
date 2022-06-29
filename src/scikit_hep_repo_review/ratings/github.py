@@ -76,7 +76,7 @@ class GH102(GitHub):
 
         ```yaml
         concurrency:
-          group: tests-${{ github.head_ref }}
+          group: ${{ github.workflow }}-${{ github.head_ref }}
           cancel-in-progress: true
         ```
         """
@@ -116,10 +116,7 @@ class GH200(GitHub):
           - package-ecosystem: "github-actions"
             directory: "/"
             schedule:
-            interval: "weekly"
-            ignore:
-              - dependency-name: "actions/*"
-                update-types: ["version-update:semver-minor", "version-update:semver-patch"]
+              interval: "weekly"
         ```
         """
         return bool(dependabot)
@@ -142,9 +139,6 @@ class GH210(GitHub):
             directory: "/"
             schedule:
             interval: "weekly"
-            ignore:
-              - dependency-name: "actions/*"
-                update-types: ["version-update:semver-minor", "version-update:semver-patch"]
         ```
         """
         for ecosystem in dependabot.get("updates", []):
@@ -154,30 +148,23 @@ class GH210(GitHub):
 
 
 class GH211(GitHub):
-    "Pin core actions as major versions"
+    "Do not pin core actions as major versions"
 
     requires = {"GH200", "GH210"}  # Currently listing both helps - TODO: remove GH200
 
     @staticmethod
     def check(dependabot: dict[str, Any]) -> bool:
         """
-        Projects should only pin to major versions for official actions.
-
-        ```yaml
-        ignore:
-          - dependency-name: "actions/*"
-            update-types: ["version-update:semver-minor", "version-update:semver-patch"]
-        ```
+        Projects should not pin major versions for official actions. This is now
+        supported by dependabot respecting the tag style you are already using
+        since April 2022.
         """
         for ecosystem in dependabot.get("updates", []):
             if ecosystem.get("package-ecosystem", "") == "github-actions":
                 for ignore in ecosystem.get("ignore", []):
                     if "actions/*" in ignore.get("dependency-name", ""):
-                        return set(ignore.get("update-types", [])) == {
-                            "version-update:semver-minor",
-                            "version-update:semver-patch",
-                        }
-        return False
+                        return False
+        return True
 
 
 repo_review_fixtures = {"workflows", "dependabot"}
