@@ -109,9 +109,7 @@ function Results(props) {
 }
 
 async function prepare_pyodide() {
-  const pyodide = await loadPyodide({
-    indexURL: "https://cdn.jsdelivr.net/pyodide/v0.21.0/full/",
-  });
+  const pyodide = await loadPyodide();
 
   await pyodide.loadPackage("micropip");
   await pyodide.runPythonAsync(`
