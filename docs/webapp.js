@@ -110,13 +110,13 @@ function Results(props) {
 
 async function prepare_pyodide() {
   const pyodide = await loadPyodide({
-    indexURL: "https://cdn.jsdelivr.net/pyodide/v0.20.0/full/",
+    indexURL: "https://cdn.jsdelivr.net/pyodide/v0.21.0/full/",
   });
 
   await pyodide.loadPackage("micropip");
   await pyodide.runPythonAsync(`
         import micropip
-        await micropip.install(["scikit_hep_repo_review==0.3.0"])
+        await micropip.install(["scikit_hep_repo_review==0.4.0"])
     `);
   return pyodide;
 }
