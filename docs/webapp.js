@@ -114,7 +114,7 @@ async function prepare_pyodide() {
   await pyodide.loadPackage("micropip");
   await pyodide.runPythonAsync(`
         import micropip
-        await micropip.install(["scikit_hep_repo_review==0.4.0"])
+        await micropip.install(["scikit_hep_repo_review==0.4.1"])
     `);
   return pyodide;
 }
