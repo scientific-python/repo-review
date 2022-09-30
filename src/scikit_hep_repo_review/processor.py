@@ -4,9 +4,10 @@ import dataclasses
 import importlib.metadata
 import inspect
 import textwrap
+from collections.abc import Callable, Iterable
 from graphlib import TopologicalSorter
 from importlib.abc import Traversable
-from typing import Any, Callable, Iterable
+from typing import Any
 
 from markdown_it import MarkdownIt
 
@@ -49,11 +50,10 @@ def build(
 
 
 def process(package: Traversable) -> dict[str, list[Result]]:
-
     modules: list[str] = [
-        ep.load()  # type: ignore[attr-defined]
+        ep.load()
         for ep in importlib.metadata.entry_points(
-            group="scikit_hep_repo_review.ratings"  # type: ignore[call-arg]
+            group="scikit_hep_repo_review.ratings"
         )
     ]
 

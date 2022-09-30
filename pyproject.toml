@@ -28,6 +28,7 @@ classifiers = [
   "Programming Language :: Python",
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
   "Development Status :: 4 - Beta",
 ]
 
@@ -45,10 +46,10 @@ cli = [
   "rich>=12.2",
 ]
 test = [
-  "pytest >=6",
+  "pytest >=7",
 ]
 dev = [
-  "pytest >=6",
+  "pytest >=7",
 ]
 
 [project.urls]
@@ -72,7 +73,7 @@ version.path = "src/scikit_hep_repo_review/__init__.py"
 
 
 [tool.pytest.ini_options]
-minversion = "6.0"
+minversion = "7.0"
 addopts = ["-ra", "--showlocals", "--strict-markers", "--strict-config"]
 xfail_strict = true
 log_cli_level = "INFO"

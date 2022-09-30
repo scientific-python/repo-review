@@ -136,7 +136,7 @@ class PP206(MyPy):
     def check(pyproject: dict[str, Any]) -> bool:
         """
         Must have `"truthy-bool"` in `enable_error_code = []`. This catches
-        mistakes in using a value as truthy if it cannot be falsy.
+        mistakes in using a value as truthy if it cannot be falsey.
         """
 
         match pyproject:
