@@ -3,7 +3,8 @@ from __future__ import annotations
 import dataclasses
 import io
 import json
-from typing import Iterator, Literal, overload
+from collections.abc import Iterator
+from typing import Literal, overload
 
 
 @dataclasses.dataclass(frozen=True, kw_only=True)
