@@ -80,6 +80,9 @@ docstring only if the result is `False`.
 This project inspired [Try-PyHF](https://kratsg.github.io/try-pyhf/), an
 interface for a High Energy Physics package in Scikit-HEP.
 
+This project inspired [abSENSE](https://princetonuniversity.github.io/abSENSE/), an
+web interface to abSENSE.
+
 [actions-badge]: https://github.com/scikit-hep/repo-review/workflows/CI/badge.svg
 [actions-link]: https://github.com/scikit-hep/repo-review/actions
 [black-badge]: https://img.shields.io/badge/code%20style-black-000000.svg
