@@ -32,8 +32,8 @@ class GHPath:
             try:
                 object.__setattr__(self, "_info", vals["tree"])
             except KeyError:
-                print("Failed to find tree. Result:")
-                print(vals)
+                print("Failed to find tree. Result:")  # noqa: T201
+                print(vals)  # noqa: T201
                 raise
 
     @property
