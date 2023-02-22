@@ -30,9 +30,7 @@ All checks are mentioned at least in some way in the [Scikit-HEP Developer
 Guidelines][]. You should read that first - if you are not attempting to follow
 them, some of the checks might not work. For example, the guidelines specify
 pytest configuration be placed in `pyproject.toml`. If you place it somewhere
-else, then all the pytest checks will be skipped. (Flake8 can be placed any
-supported location like `.flake8` or `pyproject.toml` with `pflakes`, since
-there's not a simple, no workaround method to place it in `pyproject.toml`). Etc.
+else, then all the pytest checks will be skipped.
 
 You are not required to be in Scikit-HEP to find this useful, however -
 examples of repositories that at least partially follow the guidelines include

@@ -5,7 +5,7 @@ from __future__ import annotations
 
 import functools
 from importlib.abc import Traversable
-from typing import Any
+from typing import Any, ClassVar, Protocol
 
 import yaml
 
@@ -20,16 +20,19 @@ def precommit(package: Traversable) -> dict[str, Any]:
     return {}
 
 
+class PreCommitMixin(Protocol):
+    repo: ClassVar[str]
+
+
 class PreCommit:
     family = "pre-commit"
     requires = {"PY006"}
 
     @classmethod
-    def check(cls, precommit: dict[str, Any]) -> bool:
+    def check(cls: type[PreCommitMixin], precommit: dict[str, Any]) -> bool | None:
         "Must have `{cls.repo}` repo in `.pre-commit-config.yaml`"
         for repo in precommit.get("repos", {}):
-            # pylint: disable-next=no-member
-            if "repo" in repo and repo["repo"].lower() == cls.repo:  # type: ignore[attr-defined]
+            if "repo" in repo and repo["repo"].lower() == cls.repo:
                 return True
         return False
 
@@ -50,48 +53,15 @@ class PC111(PreCommit):
     repo = "https://github.com/asottile/blacken-docs"
 
 
-class PC120(PreCommit):
-    "Uses isort"
-    repo = "https://github.com/pycqa/isort"
-
-
-class PC130(PreCommit):
-    "Uses flake8"
-    repo = "https://github.com/pycqa/flake8"
-
-
-class PC131(PreCommit):
-    "Adds flake8-bugbear"
-    requires = {"PC130"}
-
-    @staticmethod
-    def check(precommit: dict[str, Any]) -> bool:
-        """
-        Must have `"flake8-bugbear"` in `additional_dependencies`. This can
-        catch lots of commonly buggy code patterns.
-        """
-        for repo in precommit.get("repos", {}):
-            if (
-                "repo" in repo
-                and repo["repo"].lower() == "https://github.com/pycqa/flake8"
-            ):
-                for hook in repo["hooks"]:
-                    match hook:
-                        case {"additional_dependencies": list(x)}:
-                            for item in x:
-                                if "flake8-bugbear" in item:
-                                    return True
-        return False
+# PC120 was isort
+# PC130 was flake8
+# PC131 was flake8-bugbear
+# PC150 was pyupgrade
 
 
 class PC140(PreCommit):
     "Uses mypy"
     repo = "https://github.com/pre-commit/mirrors-mypy"
-
-
-class PC150(PreCommit):
-    "Uses PyUpgrade"
-    repo = "https://github.com/asottile/pyupgrade"
 
 
 class PC160(PreCommit):
@@ -100,13 +70,42 @@ class PC160(PreCommit):
 
 
 class PC170(PreCommit):
-    "Uses PyGrep hooks"
+    "Uses PyGrep hooks (only needed if RST present)"
     repo = "https://github.com/pre-commit/pygrep-hooks"
 
 
 class PC180(PreCommit):
     "Uses prettier"
     repo = "https://github.com/pre-commit/mirrors-prettier"
+
+
+class PC190(PreCommit):
+    "Uses Ruff"
+    repo = "https://github.com/charliermarsh/ruff-pre-commit"
+
+
+class PC191(PreCommit):
+    "Ruff show fixes if fixes enabled"
+    requires = {"PC190"}
+    repo = "https://github.com/charliermarsh/ruff-pre-commit"
+
+    @classmethod
+    def check(cls, precommit: dict[str, Any]) -> bool | None:
+        """
+        If `--fix` is present, `--show-fixes` must be too.
+        """
+        for repo in precommit.get("repos", {}):
+            if "repo" in repo and repo["repo"].lower() == cls.repo:
+                for hook in repo["hooks"]:
+                    if (
+                        hook["id"] == "ruff"
+                        and "args" in hook
+                        and "--fix" in hook["args"]
+                    ):
+                        return "--show-fixes" in hook["args"]
+                    return None
+
+        return False
 
 
 class PC901(PreCommit):
