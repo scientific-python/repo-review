@@ -40,7 +40,7 @@ class PY003(General):
     @staticmethod
     def check(package: Traversable) -> bool:
         "Projects must have a license"
-        return len(list(p for p in package.iterdir() if "LICENSE" in p.name)) > 0
+        return len([p for p in package.iterdir() if "LICENSE" in p.name]) > 0
 
 
 class PY004(General):
@@ -49,7 +49,7 @@ class PY004(General):
     @staticmethod
     def check(package: Traversable) -> bool:
         "Projects must have documentation in a folder called docs (disable if not applicable)"
-        return len(list(p for p in package.iterdir() if "doc" in p.name)) > 0
+        return len([p for p in package.iterdir() if "doc" in p.name]) > 0
 
 
 class PY005(General):
@@ -58,7 +58,7 @@ class PY005(General):
     @staticmethod
     def check(package: Traversable) -> bool:
         "Projects must have a folder called tests"
-        return len(list(p for p in package.iterdir() if "test" in p.name)) > 0
+        return len([p for p in package.iterdir() if "test" in p.name]) > 0
 
 
 class PY006(General):

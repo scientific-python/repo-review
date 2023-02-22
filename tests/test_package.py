@@ -15,7 +15,7 @@ def test_version():
     assert m.__version__
 
 
-@pytest.mark.skip
+@pytest.mark.skip()
 def test_pyodide():
     package = GHPath(repo="scikit-hep/repo-review", branch="main")
     results = process(package)

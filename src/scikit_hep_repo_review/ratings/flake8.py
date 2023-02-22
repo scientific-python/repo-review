@@ -2,10 +2,14 @@ from __future__ import annotations
 
 import configparser
 import functools
+import sys
 from importlib.abc import Traversable
 from typing import Any
 
-import tomli as tomllib
+if sys.version_info < (3, 11):
+    import tomli as tomllib
+else:
+    import tomllib
 
 
 @functools.cache

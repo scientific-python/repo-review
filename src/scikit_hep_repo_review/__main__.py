@@ -27,7 +27,6 @@ rich.traceback.install(suppress=[click, rich], show_locals=True, width=None)
     default=None,
 )
 def main(package: Path, output: Path | None) -> None:
-
     console = rich.console.Console(record=True)
 
     processed = process(package)
