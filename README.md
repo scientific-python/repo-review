@@ -89,4 +89,4 @@ web interface to abSENSE.
 [pypi-platforms]: https://img.shields.io/pypi/pyversions/scikit-hep-repo-review
 [pypi-version]: https://badge.fury.io/py/scikit-hep-repo-review.svg
 [sk-badge]: https://scikit-hep.org/assets/images/Scikit--HEP-Project-blue.svg
-[scikit-build developer guidelines]: https://scikit-hep.org/developer
+[scikit-hep developer guidelines]: https://scikit-hep.org/developer
