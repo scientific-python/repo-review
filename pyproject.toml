@@ -63,7 +63,7 @@ scikit-hep-repo-review = "scikit_hep_repo_review.__main__:main"
 general = "scikit_hep_repo_review.ratings.general"
 pyproject = "scikit_hep_repo_review.ratings.pyproject"
 precommit = "scikit_hep_repo_review.ratings.precommit"
-flake8 = "scikit_hep_repo_review.ratings.flake8"
+ruff = "scikit_hep_repo_review.ratings.ruff"
 mypy = "scikit_hep_repo_review.ratings.mypy"
 github = "scikit_hep_repo_review.ratings.github"
 
@@ -107,6 +107,7 @@ messages_control.disable = [
   "missing-function-docstring",
   "invalid-name",
   "redefined-outer-name",
+  "no-member",  # better handled by mypy, etc.
 ]
 
 
