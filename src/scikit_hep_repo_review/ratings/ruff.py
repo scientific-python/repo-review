@@ -50,6 +50,8 @@ class R002(Ruff):
 class R003(Ruff):
     "src directory specified if used"
 
+    requires = {"R001"}
+
     @staticmethod
     def check(pyproject: dict[str, Any], package: Traversable) -> bool | None:
         """
