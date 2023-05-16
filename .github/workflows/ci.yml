@@ -76,7 +76,18 @@ jobs:
       - name: Check products
         run: pipx run twine check dist/*
 
-      - uses: pypa/gh-action-pypi-publish@release/v1
-        if: github.event_name == 'release' && github.event.action == 'published'
+  publish:
+    name: Publish
+    needs: [dist]
+    environment: pypi
+    permissions:
+      id-token: write
+    runs-on: ubuntu-latest
+    if: github.event_name == 'release' && github.event.action == 'published'
+    steps:
+      - uses: actions/download-artifact@v3
         with:
-          password: ${{ secrets.pypi_password }}
+          name: artifact
+          path: dist
+
+      - uses: pypa/gh-action-pypi-publish@release/v1
