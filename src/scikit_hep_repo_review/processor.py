@@ -15,8 +15,10 @@ from .ratings import Rating
 
 __all__ = ["Result", "build", "process", "as_simple_dict"]
 
+
 def __dir__() -> list[str]:
     return __all__
+
 
 # Use module-level entry names
 # repo_review_fixtures = {"pyproject"}
@@ -113,4 +115,8 @@ def process(package: Traversable) -> dict[str, list[Result]]:
 
 
 def as_simple_dict(results_dict: dict[str, list[Result]]) -> str:
-    return {family: dataclasses.asdict(result) for family, results in results_dict.items() for result in results}
+    return {
+        family: dataclasses.asdict(result)
+        for family, results in results_dict.items()
+        for result in results
+    }
