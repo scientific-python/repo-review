@@ -13,6 +13,11 @@ from markdown_it import MarkdownIt
 
 from .ratings import Rating
 
+__all__ = ["Result", "build", "process", "as_simple_dict"]
+
+def __dir__() -> list[str]:
+    return __all__
+
 # Use module-level entry names
 # repo_review_fixtures = {"pyproject"}
 # repo_review_checks = set(p.__name___ for p in General.__subclasses__())
@@ -107,12 +112,5 @@ def process(package: Traversable) -> dict[str, list[Result]]:
     return results_dict
 
 
-def results_dict_to_json(results_dict: dict[str, list[Result]) -> str:
-    import json
-    from dataclasses import asdict
-
-    new_res = {}
-    for family, result_list in results_dict.items():
-        new_res[family] = [asdict(result) for result in result_list]
-
-    return json.dumps(new_res)
+def as_simple_dict(results_dict: dict[str, list[Result]]) -> str:
+    return {family: dataclasses.asdict(result) for family, results in results_dict.items() for result in results}
