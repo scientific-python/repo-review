@@ -1,0 +1,54 @@
+name: repo-review
+description: "Runs repo-review"
+branding:
+  icon: package
+  color: blue
+inputs:
+  plugins:
+    description: "Plugins to install, exactly as would be passed to pip install"
+    required: true
+  package-dir:
+    description: 'Input directory, defaults to "."'
+    required: false
+    default: ""
+  select:
+    description: "Checks to select, overrides pyproject.toml"
+    required: false
+    default: ""
+  ignore:
+    description: "Checks to ignore, overrides pyproject.toml"
+    required: false
+    default: ""
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-python@v4
+      id: python
+      with:
+        python-version: "3.11"
+        update-environment: false
+
+    - name: Install repo-review and plugins
+      shell: bash
+      run: |
+        pipx install --python '${{ steps.python.outputs.python-path }}' '${{ github.action_path }}[cli]'
+        pipx inject repo-review ${{ inputs.plugins }}
+
+    - name: Run repo-review
+      shell: bash
+      run: >
+        repo-review .
+        --select "${{ inputs.select }}"
+        --ignore "${{ inputs.ignore }}"
+        --package-dir "${{ inputs.package-dir }}"
+
+    - name: Produce job summary
+      shell: bash
+      run: >
+        repo-review .
+        --format html
+        --select "${{ inputs.select }}"
+        --ignore "${{ inputs.ignore }}"
+        --package-dir "${{ inputs.package-dir }}"
+        >> $GITHUB_STEP_SUMMARY
