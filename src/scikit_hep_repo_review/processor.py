@@ -105,3 +105,14 @@ def process(package: Traversable) -> dict[str, list[Result]]:
         results_dict[family] = result_list
 
     return results_dict
+
+
+def results_dict_to_json(results_dict: dict) -> str:
+    import json
+    from dataclasses import asdict
+
+    new_res = {}
+    for family, result_list in results_dict.items():
+        new_res[family] = [asdict(result) for result in result_list]
+
+    return json.dumps(new_res)
