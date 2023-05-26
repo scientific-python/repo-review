@@ -107,7 +107,7 @@ def process(package: Traversable) -> dict[str, list[Result]]:
     return results_dict
 
 
-def results_dict_to_json(results_dict: dict) -> str:
+def results_dict_to_json(results_dict: dict[str, list[Result]) -> str:
     import json
     from dataclasses import asdict
 
