@@ -1,0 +1,12 @@
+{
+  "name": "repo-review[dev]",
+  "image": "mcr.microsoft.com/devcontainers/python:0-3.11",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "donjayamanne.python-environment-manager"
+      ]
+    }
+  }
+}
