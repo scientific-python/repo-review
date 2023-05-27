@@ -20,9 +20,7 @@ rich.traceback.install(suppress=[click, rich], show_locals=True, width=None)
 # repo_review_checks = set(p.__name___ for p in General.__subclasses__())
 
 
-def rich_printer(
-    processed: dict[str, list[Result]], *, output: Path | None
-) -> None:
+def rich_printer(processed: dict[str, list[Result]], *, output: Path | None) -> None:
     console = rich.console.Console(record=True)
 
     for family, results_list in processed.items():
