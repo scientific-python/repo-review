@@ -114,7 +114,7 @@ def process(package: Traversable) -> dict[str, list[Result]]:
     return results_dict
 
 
-def as_simple_dict(results_dict: dict[str, list[Result]]) -> dict[str, dict[str, Any]]:
+def as_simple_dict(results_dict: dict[str, list[Result]]) -> dict[str, list[Any]]:
     return {
         family: [dataclasses.asdict(result) for result in results]
         for family, results in results_dict.items()
