@@ -21,7 +21,7 @@ rich.traceback.install(suppress=[click, rich], show_locals=True, width=None)
 
 
 def rich_printer(
-    processed: dict[str, dict[str, Result]], *, output: Path | None
+    processed: dict[str, list[Result]], *, output: Path | None
 ) -> None:
     console = rich.console.Console(record=True)
 
