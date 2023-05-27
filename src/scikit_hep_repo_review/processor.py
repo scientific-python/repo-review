@@ -115,4 +115,7 @@ def process(package: Traversable) -> dict[str, list[Result]]:
 
 
 def as_simple_dict(results_dict: dict[str, list[Result]]) -> dict[str, dict[str, Any]]:
-    return {family: [dataclasses.asdict(result) for result in results] for family, results in results_dict.items()}
+    return {
+        family: [dataclasses.asdict(result) for result in results]
+        for family, results in results_dict.items()
+    }

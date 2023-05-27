@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from pathlib import Path
 import json
+from pathlib import Path
 
 import click
 import rich.console
@@ -11,7 +11,7 @@ import rich.text
 import rich.traceback
 import rich.tree
 
-from .processor import process, Result, as_simple_dict
+from .processor import Result, as_simple_dict, process
 
 rich.traceback.install(suppress=[click, rich], show_locals=True, width=None)
 
@@ -20,7 +20,9 @@ rich.traceback.install(suppress=[click, rich], show_locals=True, width=None)
 # repo_review_checks = set(p.__name___ for p in General.__subclasses__())
 
 
-def rich_printer(processed: dict[str, dict[str, Result]], *, output: Path | None) -> None:
+def rich_printer(
+    processed: dict[str, dict[str, Result]], *, output: Path | None
+) -> None:
     console = rich.console.Console(record=True)
 
     for family, results_list in processed.items():
@@ -50,6 +52,7 @@ def rich_printer(processed: dict[str, dict[str, Result]], *, output: Path | None
     if output is not None:
         console.save_svg(str(output), theme=rich.terminal_theme.DEFAULT_TERMINAL_THEME)
 
+
 @click.command()
 @click.argument("package", type=click.Path(dir_okay=True, path_type=Path))
 @click.option(
@@ -73,7 +76,6 @@ def main(package: Path, output: Path | None, format: str) -> None:
             output.write_text(j)
         else:
             rich.print_json(j)
-        
 
 
 if __name__ == "__main__":
