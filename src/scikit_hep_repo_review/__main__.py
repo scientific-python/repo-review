@@ -72,7 +72,7 @@ def main(package: Path, output: Path | None, format: str) -> None:
         if output:
             output.write_text(j)
         else:
-            rich.print(j)
+            rich.print_json(j)
         
 
 
