@@ -4,6 +4,7 @@ import dataclasses
 import importlib.metadata
 import inspect
 import textwrap
+import typing
 from collections.abc import Callable, Iterable
 from graphlib import TopologicalSorter
 from importlib.abc import Traversable
@@ -13,7 +14,7 @@ from markdown_it import MarkdownIt
 
 from .ratings import Rating
 
-__all__ = ["Result", "build", "process", "as_simple_dict"]
+__all__ = ["Result", "ResultDict", "build", "process", "as_simple_dict"]
 
 
 def __dir__() -> list[str]:
@@ -27,6 +28,13 @@ def __dir__() -> list[str]:
 md = MarkdownIt()
 
 
+# Helper to get the type in the JSON style returns
+class ResultDict(typing.TypedDict):
+    description: str
+    result: bool | None
+    err_msg: str
+
+
 @dataclasses.dataclass(frozen=True, kw_only=True)
 class Result:
     name: str
@@ -37,6 +45,11 @@ class Result:
     def err_markdown(self) -> str:
         result: str = md.render(self.err_msg)
         return result
+
+    def _without_name_dict(self) -> ResultDict:
+        return ResultDict(
+            description=self.description, result=self.result, err_msg=self.err_msg
+        )
 
 
 def build(
@@ -114,8 +127,11 @@ def process(package: Traversable) -> dict[str, list[Result]]:
     return results_dict
 
 
-def as_simple_dict(results_dict: dict[str, list[Result]]) -> dict[str, list[Any]]:
+def as_simple_dict(
+    results_dict: dict[str, list[Result]]
+) -> dict[str, dict[str, ResultDict]]:
     return {
-        family: [dataclasses.asdict(result) for result in results]
+        # pylint: disable-next=protected-access
+        family: {result.name: result._without_name_dict() for result in results}
         for family, results in results_dict.items()
     }

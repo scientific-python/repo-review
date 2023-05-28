@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from typing import Literal
 
 import click
 import rich.console
@@ -63,7 +64,7 @@ def rich_printer(processed: dict[str, list[Result]], *, output: Path | None) -> 
     type=click.Choice(["rich", "json"]),
     default="rich",
 )
-def main(package: Path, output: Path | None, format: str) -> None:
+def main(package: Path, output: Path | None, format: Literal["rich", "json"]) -> None:
     processed = process(package)
 
     if format == "rich":
