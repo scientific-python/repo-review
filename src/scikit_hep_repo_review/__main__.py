@@ -64,8 +64,16 @@ def rich_printer(processed: dict[str, list[Result]], *, output: Path | None) -> 
     type=click.Choice(["rich", "json"]),
     default="rich",
 )
-def main(package: Path, output: Path | None, format: Literal["rich", "json"]) -> None:
-    processed = process(package)
+@click.option(
+    "--ignore",
+    help="Ignore a check or checks, comma separated",
+    default="",
+)
+def main(
+    package: Path, output: Path | None, format: Literal["rich", "json"], ignore: str
+) -> None:
+    ignore_list = [x.strip() for x in ignore.split(",")]
+    processed = process(package, ignore=ignore_list)
 
     if format == "rich":
         rich_printer(processed, output=output)

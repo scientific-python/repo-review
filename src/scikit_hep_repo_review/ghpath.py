@@ -1,14 +1,18 @@
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 import dataclasses
 import io
 import json
+import typing
 from collections.abc import Iterator
-from typing import Literal, overload
+from importlib.abc import Traversable
+from typing import Literal
 
 
 @dataclasses.dataclass(frozen=True, kw_only=True)
-class GHPath:
+class GHPath(Traversable):
     repo: str
     branch: str
     path: str = ""
@@ -40,15 +44,18 @@ class GHPath:
     def name(self) -> str:
         return (self.path or self.repo).split("/")[-1]
 
-    @overload
-    def open(self, mode: Literal["r"]) -> io.StringIO:
+    @typing.overload  # type: ignore[override]
+    def open(self, mode: Literal["r"], encoding: str | None = ...) -> io.StringIO:
         ...
 
-    @overload
+    @typing.overload
     def open(self, mode: Literal["rb"]) -> io.BytesIO:
         ...
 
-    def open(self, mode: Literal["r", "rb"] = "r") -> io.IOBase:
+    def open(
+        self, mode: Literal["r", "rb"] = "r", encoding: str | None = "utf-8"
+    ) -> io.IOBase:
+        assert encoding is None or encoding == "utf-8", "Only utf-8 is supported"
         val: io.StringIO = self.open_url(
             f"https://raw.githubusercontent.com/{self.repo}/{self.branch}/{self.path}"
         )
@@ -61,10 +68,11 @@ class GHPath:
             repo=self.repo, branch=self.branch, path=path.lstrip("/"), _info=self._info
         )
 
-    def joinpath(self, path: str) -> GHPath:
-        return self._with_path(f"{self.path}/{path}")
+    def joinpath(self, child: str) -> GHPath:
+        return self._with_path(f"{self.path}/{child}")
 
-    __truediv__ = joinpath
+    def __truediv__(self, child: str) -> GHPath:
+        return self._with_path(f"{self.path}/{child}")
 
     def iterdir(self) -> Iterator[GHPath]:
         if self.path:
@@ -84,8 +92,8 @@ class GHPath:
     def is_file(self) -> bool:
         return self.path in {d["path"] for d in self._info if d["type"] == "blob"}
 
-    def read_text(self) -> str:
-        return self.open("r").read()
+    def read_text(self, encoding: str | None = "utf-8") -> str:
+        return self.open("r", encoding=encoding).read()
 
     def read_bytes(self) -> bytes:
         return self.open("rb").read()

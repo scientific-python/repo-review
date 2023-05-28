@@ -49,10 +49,10 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Install package
-        run: python -m pip install .[test]
+        run: python -m pip install .[test,cli]
 
       - name: Test package
-        run: python -m pytest -ra
+        run: PYTHONUTF8=1 python -m pytest -ra
 
   dist:
     name: Distribution build

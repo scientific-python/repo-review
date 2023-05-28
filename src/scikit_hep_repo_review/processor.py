@@ -5,13 +5,14 @@ import importlib.metadata
 import inspect
 import textwrap
 import typing
-from collections.abc import Callable, Iterable
+from collections.abc import Callable, Iterable, Sequence
 from graphlib import TopologicalSorter
 from importlib.abc import Traversable
 from typing import Any
 
 from markdown_it import MarkdownIt
 
+from .fixtures import pyproject
 from .ratings import Rating
 
 __all__ = ["Result", "ResultDict", "build", "process", "as_simple_dict"]
@@ -58,7 +59,7 @@ def build(
     fixtures: Iterable[Callable[[Traversable], Any]],
 ) -> bool | None:
     kwargs: dict[str, Any] = {}
-    signature = inspect.signature(check.check)  # type: ignore[attr-defined]
+    signature = inspect.signature(check.check)
     if "package" in signature.parameters:
         kwargs["package"] = package
 
@@ -66,10 +67,25 @@ def build(
         if func.__name__ in signature.parameters:
             kwargs[func.__name__] = func(package)
 
-    return check.check(**kwargs)  # type: ignore[attr-defined, no-any-return]
+    return check.check(**kwargs)
 
 
-def process(package: Traversable) -> dict[str, list[Result]]:
+def is_allowed(ignore_list: set[str], name: str) -> bool:
+    """
+    Skips the check if the name is in the ignore list or if the name without
+    the number is in the ignore list.
+    """
+    if name in ignore_list:
+        return False
+    if name.rstrip("0123456789") in ignore_list:
+        return False
+    return True
+
+
+def process(
+    package: Traversable, *, ignore: Sequence[str] = ()
+) -> dict[str, list[Result]]:
+    # Collect all installed plugins
     modules: list[str] = [
         ep.load()
         for ep in importlib.metadata.entry_points(
@@ -77,19 +93,27 @@ def process(package: Traversable) -> dict[str, list[Result]]:
         )
     ]
 
+    # Collect the checks
     ratings = [
         getattr(mod, rat)
         for mod in modules
         for rat in getattr(mod, "repo_review_checks", ())
     ]
 
-    fixtures = [
+    # Collect the fixtures
+    fixtures = [pyproject] + [
         getattr(mod, fixt)
         for mod in modules
         for fixt in getattr(mod, "repo_review_fixtures", ())
     ]
 
-    tasks = {t.__name__: t for t in ratings}
+    # Collect our own config
+    config = pyproject(package).get("tool", {}).get("repo-review", {})  # type: ignore[arg-type]
+    skip_checks = set(ignore) | set(config.get("ignore", ()))
+
+    tasks: dict[str, type[Rating]] = {
+        t.__name__: t for t in ratings if is_allowed(skip_checks, t.__name__)
+    }
     graph: dict[str, set[str]] = {
         n: getattr(t, "requires", set()) for n, t in tasks.items()
     }
@@ -100,6 +124,7 @@ def process(package: Traversable) -> dict[str, list[Result]]:
     for name, task in tasks.items():
         families.setdefault(task.family, set()).add(name)
 
+    # Run all the checks in topological order
     ts = TopologicalSorter(graph)
     for name in ts.static_order():
         if all(completed.get(n, False) for n in graph[name]):
@@ -107,19 +132,21 @@ def process(package: Traversable) -> dict[str, list[Result]]:
         else:
             completed[name] = None
 
+    # Collect the results
     results_dict = {}
     for family, ftasks in families.items():
         result_list = []
         for task_name in sorted(ftasks):
             check = tasks[task_name]
             result = completed[task_name]
+            doc = check.__doc__ or ""
 
             result_list.append(
                 Result(
                     name=task_name,
-                    description=check.__doc__,
+                    description=doc,
                     result=result,
-                    err_msg=textwrap.dedent(check.check.__doc__.format(cls=check)),
+                    err_msg=textwrap.dedent(doc.format(cls=check)),
                 )
             )
         results_dict[family] = result_list
