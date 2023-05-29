@@ -85,6 +85,17 @@ def is_allowed(ignore_list: set[str], name: str) -> bool:
 def process(
     package: Traversable, *, ignore: Sequence[str] = ()
 ) -> dict[str, list[Result]]:
+    """
+    Process the package and return a dictionary of results.
+
+    Parameters
+    ----------
+    package: Traversable | Path
+        The Path(like) package to process
+
+    ignore: Sequence[str]
+        A list of checks to ignore
+    """
     # Collect all installed plugins
     modules: list[str] = [
         ep.load()
