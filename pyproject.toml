@@ -74,7 +74,7 @@ version.path = "src/scikit_hep_repo_review/__init__.py"
 
 [tool.pytest.ini_options]
 minversion = "7.0"
-addopts = ["-ra", "--showlocals", "--strict-markers", "--strict-config"]
+addopts = ["-ra", "--strict-markers", "--strict-config"]
 xfail_strict = true
 log_cli_level = "INFO"
 filterwarnings = ["error"]
@@ -82,14 +82,18 @@ testpaths = ["tests"]
 
 
 [tool.mypy]
-files = ["src", "web"]
+files = ["src", "web", "tests"]
 python_version = "3.10"
 warn_unused_configs = true
 strict = true
 show_error_codes = true
 enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
 warn_unreachable = true
+disallow_untyped_defs = false
 
+[[tool.mypy.overrides]]
+module = "scikit_hep_repo_review.*"
+disallow_untyped_defs = true
 
 [tool.pylint]
 master.py-version = "3.10"
@@ -136,6 +140,7 @@ select = [
 extend-ignore = [
   "PLR",    # Design related pylint codes
   "E501",   # Line too long
+  "PT004",  # Incorrect check, usefixtures is the correct way to do this
 ]
 target-version = "py310"
 src = ["src"]

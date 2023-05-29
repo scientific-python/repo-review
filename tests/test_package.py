@@ -15,8 +15,14 @@ def test_version():
     assert m.__version__
 
 
-@pytest.mark.skip()
+@pytest.mark.skip(reason="Can be rate limited")
 def test_pyodide():
     package = GHPath(repo="scikit-hep/repo-review", branch="main")
+    results = process(package)
+    assert results
+
+
+def test_local():
+    package = DIR.parent
     results = process(package)
     assert results

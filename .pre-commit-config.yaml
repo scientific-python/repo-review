@@ -53,14 +53,15 @@ repos:
     rev: v1.3.0
     hooks:
       - id: mypy
-        files: src
+        files: (src|web|tests)
         args: []
         additional_dependencies:
           - click
-          - rich
-          - types-PyYAML
-          - tomli
           - markdown-it-py
+          - pytest
+          - rich
+          - tomli
+          - types-PyYAML
 
   - repo: https://github.com/codespell-project/codespell
     rev: v2.2.4

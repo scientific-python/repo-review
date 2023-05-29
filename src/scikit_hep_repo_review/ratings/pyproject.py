@@ -1,24 +1,6 @@
 from __future__ import annotations
 
-import functools
-import sys
-from importlib.abc import Traversable
 from typing import Any
-
-if sys.version_info < (3, 11):
-    import tomli as tomllib
-else:
-    import tomllib
-
-
-@functools.cache
-def pyproject(package: Traversable) -> dict[str, Any]:
-    pyproject_path = package.joinpath("pyproject.toml")
-    if pyproject_path.is_file():
-        with pyproject_path.open("rb") as f:
-            return tomllib.load(f)
-    return {}
-
 
 # PP: PyProject.toml
 ## PP0xx: Build system
@@ -192,5 +174,5 @@ class PP309(PyProject):
         return "filterwarnings" in options
 
 
-repo_review_fixtures = {"pyproject"}
+repo_review_fixtures = set[str]()
 repo_review_checks = {p.__name__ for p in PyProject.__subclasses__()}
