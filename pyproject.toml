@@ -60,12 +60,12 @@ webpage = "https://scikit-hep.github.io/repo-review"
 scikit-hep-repo-review = "scikit_hep_repo_review.__main__:main"
 
 [project.entry-points."scikit_hep_repo_review.ratings"]
-general = "scikit_hep_repo_review.ratings.general"
-pyproject = "scikit_hep_repo_review.ratings.pyproject"
-precommit = "scikit_hep_repo_review.ratings.precommit"
-ruff = "scikit_hep_repo_review.ratings.ruff"
-mypy = "scikit_hep_repo_review.ratings.mypy"
-github = "scikit_hep_repo_review.ratings.github"
+general = "scikit_hep_repo_review.ratings.general:repo_review_checks"
+pyproject = "scikit_hep_repo_review.ratings.pyproject:repo_review_checks"
+precommit = "scikit_hep_repo_review.ratings.precommit:repo_review_checks"
+ruff = "scikit_hep_repo_review.ratings.ruff:repo_review_checks"
+mypy = "scikit_hep_repo_review.ratings.mypy:repo_review_checks"
+github = "scikit_hep_repo_review.ratings.github:repo_review_checks"
 
 [project.entry-points."scikit_hep_repo_review.fixtures"]
 pyproject = "scikit_hep_repo_review.fixtures:pyproject"

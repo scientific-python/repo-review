@@ -174,4 +174,5 @@ class PP309(PyProject):
         return "filterwarnings" in options
 
 
-repo_review_checks = {p.__name__ for p in PyProject.__subclasses__()}
+def repo_review_checks() -> dict[str, type[PyProject]]:
+    return {p.__name__: p for p in PyProject.__subclasses__()}

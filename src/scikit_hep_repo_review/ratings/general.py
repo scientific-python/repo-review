@@ -84,4 +84,5 @@ class PY007(General):
         )
 
 
-repo_review_checks = {p.__name__ for p in General.__subclasses__()}
+def repo_review_checks() -> dict[str, type[General]]:
+    return {p.__name__: p for p in General.__subclasses__()}

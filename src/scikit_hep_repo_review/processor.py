@@ -8,7 +8,6 @@ import typing
 from collections.abc import Callable, Iterable, Sequence
 from graphlib import TopologicalSorter
 from importlib.abc import Traversable
-from types import ModuleType
 from typing import Any
 
 from markdown_it import MarkdownIt
@@ -83,6 +82,25 @@ def is_allowed(ignore_list: set[str], name: str) -> bool:
     return True
 
 
+def collect_ratings() -> dict[str, type[Rating]]:
+    return {
+        k: v
+        for ep in importlib.metadata.entry_points(
+            group="scikit_hep_repo_review.ratings"
+        )
+        for k, v in ep.load()().items()
+    }
+
+
+def collect_fixtures() -> list[Callable[..., Any]]:
+    return [
+        ep.load()
+        for ep in importlib.metadata.entry_points(
+            group="scikit_hep_repo_review.fixtures"
+        )
+    ]
+
+
 def process(
     package: Traversable, *, ignore: Sequence[str] = ()
 ) -> dict[str, list[Result]]:
@@ -97,35 +115,18 @@ def process(
     ignore: Sequence[str]
         A list of checks to ignore
     """
-    # Collect all installed plugins
-    modules: list[ModuleType] = [
-        ep.load()
-        for ep in importlib.metadata.entry_points(
-            group="scikit_hep_repo_review.ratings"
-        )
-    ]
-
     # Collect the checks
-    ratings = [
-        getattr(mod, rat)
-        for mod in modules
-        for rat in getattr(mod, "repo_review_checks", ())
-    ]
+    ratings = collect_ratings()
 
     # Collect the fixtures
-    fixtures: list[Callable[..., Any]] = [
-        ep.load()
-        for ep in importlib.metadata.entry_points(
-            group="scikit_hep_repo_review.fixtures"
-        )
-    ]
+    fixtures = collect_fixtures()
 
     # Collect our own config
     config = pyproject(package).get("tool", {}).get("repo-review", {})  # type: ignore[arg-type]
     skip_checks = set(ignore) | set(config.get("ignore", ()))
 
     tasks: dict[str, type[Rating]] = {
-        t.__name__: t for t in ratings if is_allowed(skip_checks, t.__name__)
+        n: r for n, r in ratings.items() if is_allowed(skip_checks, n)
     }
     graph: dict[str, set[str]] = {
         n: getattr(t, "requires", set()) for n, t in tasks.items()
