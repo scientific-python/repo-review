@@ -52,7 +52,9 @@ jobs:
         run: python -m pip install .[test,cli]
 
       - name: Test package
-        run: PYTHONUTF8=1 python -m pytest -ra
+        run: python -m pytest -ra
+        env:
+          PYTHONUTF8: "1"
 
   dist:
     name: Distribution build
