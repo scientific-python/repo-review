@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
+
 import scikit_hep_repo_review as m
 from scikit_hep_repo_review.ghpath import GHPath
 from scikit_hep_repo_review.processor import process
