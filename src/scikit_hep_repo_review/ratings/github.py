@@ -167,5 +167,4 @@ class GH211(GitHub):
         return True
 
 
-repo_review_fixtures = {"workflows", "dependabot"}
 repo_review_checks = {p.__name__ for p in GitHub.__subclasses__()}

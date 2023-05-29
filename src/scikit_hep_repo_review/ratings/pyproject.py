@@ -174,5 +174,4 @@ class PP309(PyProject):
         return "filterwarnings" in options
 
 
-repo_review_fixtures = set[str]()
 repo_review_checks = {p.__name__ for p in PyProject.__subclasses__()}

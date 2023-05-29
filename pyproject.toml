@@ -67,6 +67,11 @@ ruff = "scikit_hep_repo_review.ratings.ruff"
 mypy = "scikit_hep_repo_review.ratings.mypy"
 github = "scikit_hep_repo_review.ratings.github"
 
+[project.entry-points."scikit_hep_repo_review.fixtures"]
+pyproject = "scikit_hep_repo_review.fixtures:pyproject"
+workflows = "scikit_hep_repo_review.ratings.github:workflows"
+dependabot = "scikit_hep_repo_review.ratings.github:dependabot"
+precommit = "scikit_hep_repo_review.ratings.precommit:precommit"
 
 [tool.hatch]
 version.path = "src/scikit_hep_repo_review/__init__.py"

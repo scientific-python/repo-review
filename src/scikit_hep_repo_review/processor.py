@@ -8,6 +8,7 @@ import typing
 from collections.abc import Callable, Iterable, Sequence
 from graphlib import TopologicalSorter
 from importlib.abc import Traversable
+from types import ModuleType
 from typing import Any
 
 from markdown_it import MarkdownIt
@@ -97,7 +98,7 @@ def process(
         A list of checks to ignore
     """
     # Collect all installed plugins
-    modules: list[str] = [
+    modules: list[ModuleType] = [
         ep.load()
         for ep in importlib.metadata.entry_points(
             group="scikit_hep_repo_review.ratings"
@@ -112,10 +113,11 @@ def process(
     ]
 
     # Collect the fixtures
-    fixtures = [pyproject] + [
-        getattr(mod, fixt)
-        for mod in modules
-        for fixt in getattr(mod, "repo_review_fixtures", ())
+    fixtures: list[Callable[..., Any]] = [
+        ep.load()
+        for ep in importlib.metadata.entry_points(
+            group="scikit_hep_repo_review.fixtures"
+        )
     ]
 
     # Collect our own config

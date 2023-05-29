@@ -84,5 +84,4 @@ class PY007(General):
         )
 
 
-repo_review_fixtures = set[str]()
 repo_review_checks = {p.__name__ for p in General.__subclasses__()}

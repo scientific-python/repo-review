@@ -146,5 +146,4 @@ class PP206(MyPy):
                 return False
 
 
-repo_review_fixtures = set[str]()
 repo_review_checks = {p.__name__ for p in MyPy.__subclasses__()}
