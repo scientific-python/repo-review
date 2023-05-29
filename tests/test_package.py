@@ -23,6 +23,6 @@ def test_pyodide():
 
 
 def test_local():
-    package = GHPath(repo="scikit-hep/repo-review", branch="main")
+    package = DIR.parent
     results = process(package)
     assert results
