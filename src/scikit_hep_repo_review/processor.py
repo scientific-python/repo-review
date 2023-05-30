@@ -5,7 +5,7 @@ import importlib.metadata
 import inspect
 import textwrap
 import typing
-from collections.abc import Callable, Iterable, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from graphlib import TopologicalSorter
 from importlib.abc import Traversable
 from typing import Any
@@ -21,10 +21,6 @@ __all__ = ["Result", "ResultDict", "build", "process", "as_simple_dict"]
 def __dir__() -> list[str]:
     return __all__
 
-
-# Use module-level entry names
-# repo_review_fixtures = {"pyproject"}
-# repo_review_checks = set(p.__name___ for p in General.__subclasses__())
 
 md = MarkdownIt()
 
@@ -56,16 +52,18 @@ class Result:
 def build(
     check: type[Rating],
     package: Traversable,
-    fixtures: Iterable[Callable[[Traversable], Any]],
+    fixtures: Mapping[str, Callable[[Traversable], Any]],
 ) -> bool | None:
     kwargs: dict[str, Any] = {}
     signature = inspect.signature(check.check)
+
+    # Built-in fixture
     if "package" in signature.parameters:
         kwargs["package"] = package
 
-    for func in fixtures:
-        if func.__name__ in signature.parameters:
-            kwargs[func.__name__] = func(package)
+    for name, func in fixtures.items():
+        if name in signature.parameters:
+            kwargs[name] = func(package)
 
     return check.check(**kwargs)
 
@@ -92,13 +90,13 @@ def collect_ratings() -> dict[str, type[Rating]]:
     }
 
 
-def collect_fixtures() -> list[Callable[..., Any]]:
-    return [
-        ep.load()
+def collect_fixtures() -> dict[str, Callable[[Traversable], Any]]:
+    return {
+        ep.name: ep.load()
         for ep in importlib.metadata.entry_points(
             group="scikit_hep_repo_review.fixtures"
         )
-    ]
+    }
 
 
 def process(

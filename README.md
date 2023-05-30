@@ -50,9 +50,9 @@ webapp. It also would allow `zipfile.Path` to work just as well, too - no need
 to extract.
 
 Checks can request fixtures (like pytest) as arguments. Check files can add new
-fixtures as needed. The end of every check file has a list of checks (usually
-pulled from subclasses of a common ancestor) and a list of fixtures it
-provides.
+fixtures as needed. Fixtures are are specified with entry points, and take a
+single `package` argument (which is also a built-in fixture). Checks are
+specified via an entrypoint that returns a dict of checks.
 
 Check files do not depend on the main library, and can be extended (similar to
 Flake8). You register new check files via entry-points - so extending this is
