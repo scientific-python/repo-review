@@ -6,7 +6,8 @@
     "vscode": {
       "extensions": [
         "ms-python.python",
-        "donjayamanne.python-environment-manager"
+        "donjayamanne.python-environment-manager",
+        "charliermarsh.ruff"
       ]
     }
   }
