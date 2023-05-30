@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-import itertools
 import builtins
 import functools
 import io
+import itertools
 import json
 from pathlib import Path
 from typing import Literal
@@ -57,6 +57,7 @@ def rich_printer(processed: list[Result], *, output: Path | None) -> None:
     if output is not None:
         console.save_svg(str(output), theme=rich.terminal_theme.DEFAULT_TERMINAL_THEME)
 
+
 def to_html(processed: list[Result]) -> str:
     out = io.StringIO()
     print = functools.partial(builtins.print, file=out)
@@ -87,6 +88,7 @@ def to_html(processed: list[Result]) -> str:
         print("</table>")
     return out.getvalue()
 
+
 @click.command(context_settings={"help_option_names": ["-h", "--help"]})
 @click.argument("package", type=click.Path(dir_okay=True, path_type=Path))
 @click.option(
@@ -107,7 +109,10 @@ def to_html(processed: list[Result]) -> str:
     default="",
 )
 def main(
-    package: Path, output: Path | None, format: Literal["rich", "json", "html"], ignore: str
+    package: Path,
+    output: Path | None,
+    format: Literal["rich", "json", "html"],
+    ignore: str,
 ) -> None:
     """
     Pass in a local Path or gh:org/repo@branch[:root].
