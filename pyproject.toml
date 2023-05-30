@@ -59,19 +59,19 @@ webpage = "https://scikit-hep.github.io/repo-review"
 [project.scripts]
 scikit-hep-repo-review = "scikit_hep_repo_review.__main__:main"
 
-[project.entry-points."scikit_hep_repo_review.ratings"]
-general = "scikit_hep_repo_review.ratings.general:repo_review_checks"
-pyproject = "scikit_hep_repo_review.ratings.pyproject:repo_review_checks"
-precommit = "scikit_hep_repo_review.ratings.precommit:repo_review_checks"
-ruff = "scikit_hep_repo_review.ratings.ruff:repo_review_checks"
-mypy = "scikit_hep_repo_review.ratings.mypy:repo_review_checks"
-github = "scikit_hep_repo_review.ratings.github:repo_review_checks"
+[project.entry-points."scikit_hep_repo_review.checks"]
+general = "scikit_hep_repo_review.checks.general:repo_review_checks"
+pyproject = "scikit_hep_repo_review.checks.pyproject:repo_review_checks"
+precommit = "scikit_hep_repo_review.checks.precommit:repo_review_checks"
+ruff = "scikit_hep_repo_review.checks.ruff:repo_review_checks"
+mypy = "scikit_hep_repo_review.checks.mypy:repo_review_checks"
+github = "scikit_hep_repo_review.checks.github:repo_review_checks"
 
 [project.entry-points."scikit_hep_repo_review.fixtures"]
 pyproject = "scikit_hep_repo_review.fixtures:pyproject"
-workflows = "scikit_hep_repo_review.ratings.github:workflows"
-dependabot = "scikit_hep_repo_review.ratings.github:dependabot"
-precommit = "scikit_hep_repo_review.ratings.precommit:precommit"
+workflows = "scikit_hep_repo_review.checks.github:workflows"
+dependabot = "scikit_hep_repo_review.checks.github:dependabot"
+precommit = "scikit_hep_repo_review.checks.precommit:precommit"
 
 [tool.hatch]
 version.path = "src/scikit_hep_repo_review/__init__.py"

@@ -51,18 +51,18 @@ def test_load_entry_point(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(
         importlib.metadata, "entry_points", lambda group: [ep]  # noqa: ARG005
     )
-    ratings = scikit_hep_repo_review.processor.collect_ratings()
+    checks = scikit_hep_repo_review.processor.collect_checks()
 
-    assert len(ratings) == 2
-    assert "D100" in ratings
-    assert "D200" in ratings
-    assert ratings["D200"] == D200  # type: ignore[comparison-overlap]
+    assert len(checks) == 2
+    assert "D100" in checks
+    assert "D200" in checks
+    assert checks["D200"] == D200  # type: ignore[comparison-overlap]
 
 
 def test_custom_checks(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(
         scikit_hep_repo_review.processor,
-        "collect_ratings",
+        "collect_checks",
         lambda: {"D100": D100, "D200": D200},
     )
     results = scikit_hep_repo_review.processor.process(Path("."))
@@ -78,7 +78,7 @@ def test_custom_checks(monkeypatch: pytest.MonkeyPatch) -> None:
 def test_ignore_filter_single(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(
         scikit_hep_repo_review.processor,
-        "collect_ratings",
+        "collect_checks",
         lambda: {"D100": D100, "D200": D200},
     )
     results = scikit_hep_repo_review.processor.process(Path("."), ignore=["D100"])
@@ -91,7 +91,7 @@ def test_ignore_filter_single(monkeypatch: pytest.MonkeyPatch) -> None:
 def test_ignore_filter_letter(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(
         scikit_hep_repo_review.processor,
-        "collect_ratings",
+        "collect_checks",
         lambda: {"D100": D100, "D200": D200},
     )
     results = scikit_hep_repo_review.processor.process(Path("."), ignore=["D"])

@@ -12,8 +12,8 @@ from typing import Any
 
 from markdown_it import MarkdownIt
 
+from .checks import Check
 from .fixtures import pyproject
-from .ratings import Rating
 
 __all__ = ["Result", "ResultDict", "build", "process", "as_simple_dict"]
 
@@ -47,7 +47,7 @@ class Result:
 
 
 def build(
-    check: type[Rating],
+    check: type[Check],
     package: Traversable,
     fixtures: Mapping[str, Callable[[Traversable], Any]],
 ) -> bool | None:
@@ -77,12 +77,10 @@ def is_allowed(ignore_list: set[str], name: str) -> bool:
     return True
 
 
-def collect_ratings() -> dict[str, type[Rating]]:
+def collect_checks() -> dict[str, type[Check]]:
     return {
         k: v
-        for ep in importlib.metadata.entry_points(
-            group="scikit_hep_repo_review.ratings"
-        )
+        for ep in importlib.metadata.entry_points(group="scikit_hep_repo_review.checks")
         for k, v in ep.load()().items()
     }
 
@@ -109,7 +107,7 @@ def process(package: Traversable, *, ignore: Sequence[str] = ()) -> list[Result]
         A list of checks to ignore
     """
     # Collect the checks
-    ratings = collect_ratings()
+    checks = collect_checks()
 
     # Collect the fixtures
     fixtures = collect_fixtures()
@@ -118,8 +116,8 @@ def process(package: Traversable, *, ignore: Sequence[str] = ()) -> list[Result]
     config = pyproject(package).get("tool", {}).get("repo-review", {})  # type: ignore[arg-type]
     skip_checks = set(ignore) | set(config.get("ignore", ()))
 
-    tasks: dict[str, type[Rating]] = {
-        n: r for n, r in ratings.items() if is_allowed(skip_checks, n)
+    tasks: dict[str, type[Check]] = {
+        n: r for n, r in checks.items() if is_allowed(skip_checks, n)
     }
     graph: dict[str, set[str]] = {
         n: getattr(t, "requires", set()) for n, t in tasks.items()
