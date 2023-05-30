@@ -40,6 +40,9 @@ class GHPath(Traversable):
                 print(vals)  # noqa: T201
                 raise
 
+    def __str__(self) -> str:
+        return f"gh:{self.repo}@{self.branch}:{self.path or '.'}"
+
     @property
     def name(self) -> str:
         return (self.path or self.repo).split("/")[-1]

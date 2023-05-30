@@ -13,6 +13,7 @@ import rich.text
 import rich.traceback
 import rich.tree
 
+from .ghpath import GHPath
 from .processor import Result, as_simple_dict, process
 
 rich.traceback.install(suppress=[click, rich], show_locals=True, width=None)
@@ -53,28 +54,45 @@ def rich_printer(processed: list[Result], *, output: Path | None) -> None:
         console.save_svg(str(output), theme=rich.terminal_theme.DEFAULT_TERMINAL_THEME)
 
 
-@click.command()
-@click.argument("package", type=click.Path(dir_okay=True, path_type=Path))
+@click.command(context_settings={"help_option_names": ["-h", "--help"]})
+@click.argument(
+    "package",
+    type=click.Path(dir_okay=True, path_type=Path),
+)
 @click.option(
     "--output",
     type=click.Path(file_okay=True, exists=False, path_type=Path),
     default=None,
+    help="Write out file. Writes SVG if format is rich.",
 )
 @click.option(
     "--format",
     type=click.Choice(["rich", "json"]),
     default="rich",
+    help="Select output format.",
 )
 @click.option(
     "--ignore",
-    help="Ignore a check or checks, comma separated",
+    help="Ignore a check or checks, comma separated.",
     default="",
 )
 def main(
     package: Path, output: Path | None, format: Literal["rich", "json"], ignore: str
 ) -> None:
+    """
+    Pass in a local Path or gh:org/repo@branch[:root].
+    """
     ignore_list = [x.strip() for x in ignore.split(",")]
-    processed = process(package, ignore=ignore_list)
+
+    if str(package).startswith("gh:"):
+        _, org_repo_branch, *p = str(package).split(":", maxsplit=2)
+        org_repo, branch = org_repo_branch.split("@", maxsplit=1)
+        ghpackage = GHPath(repo=org_repo, branch=branch, path=p[0] if p else "")
+        if format == "rich":
+            rich.print(f"[bold]Processing [blue]{package}[/blue] from GitHub\n")
+        processed = process(ghpackage, ignore=ignore_list)
+    else:
+        processed = process(package, ignore=ignore_list)
 
     if format == "rich":
         rich_printer(processed, output=output)
