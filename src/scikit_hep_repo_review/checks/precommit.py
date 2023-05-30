@@ -3,7 +3,6 @@
 
 from __future__ import annotations
 
-import functools
 from typing import Any, ClassVar, Protocol
 
 import yaml
@@ -11,7 +10,6 @@ import yaml
 from .._compat.importlib.resources.abc import Traversable
 
 
-@functools.cache
 def precommit(package: Traversable) -> dict[str, Any]:
     precommit_path = package.joinpath(".pre-commit-config.yaml")
     if precommit_path.is_file():
