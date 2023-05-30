@@ -83,7 +83,10 @@ minversion = "7.0"
 addopts = ["-ra", "--strict-markers", "--strict-config"]
 xfail_strict = true
 log_cli_level = "INFO"
-filterwarnings = ["error"]
+filterwarnings = [
+  'error',
+  'ignore:(ast.Str|Attribute s|ast.NameConstant|ast.Num) is deprecated:DeprecationWarning:_pytest',
+]
 testpaths = ["tests"]
 
 
