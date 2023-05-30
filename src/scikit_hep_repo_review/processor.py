@@ -12,8 +12,8 @@ from typing import Any
 
 from markdown_it import MarkdownIt
 
-from .fixtures import pyproject
 from .checks import Check
+from .fixtures import pyproject
 
 __all__ = ["Result", "ResultDict", "build", "process", "as_simple_dict"]
 
@@ -80,9 +80,7 @@ def is_allowed(ignore_list: set[str], name: str) -> bool:
 def collect_checks() -> dict[str, type[Check]]:
     return {
         k: v
-        for ep in importlib.metadata.entry_points(
-            group="scikit_hep_repo_review.checks"
-        )
+        for ep in importlib.metadata.entry_points(group="scikit_hep_repo_review.checks")
         for k, v in ep.load()().items()
     }
 
