@@ -41,9 +41,7 @@ def test_no_checks(monkeypatch: pytest.MonkeyPatch) -> None:
     )
 
     results = scikit_hep_repo_review.processor.process(Path("."))
-    assert not results["general"]
-    assert not results["pyproject"]
-    assert len(results) == 2
+    assert len(results) == 0
 
 
 def test_load_entry_point(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -69,12 +67,11 @@ def test_custom_checks(monkeypatch: pytest.MonkeyPatch) -> None:
     )
     results = scikit_hep_repo_review.processor.process(Path("."))
 
-    assert not results["general"]
-    assert len(results["pyproject"]) == 2
-    assert results["pyproject"][0].name == "D100"
-    assert results["pyproject"][0].result
-    assert results["pyproject"][1].name == "D200"
-    assert results["pyproject"][1].result
+    assert len(results) == 2
+    assert results[0].name == "D100"
+    assert results[0].result
+    assert results[1].name == "D200"
+    assert results[1].result
     assert len(results) == 2
 
 
@@ -86,11 +83,9 @@ def test_ignore_filter_single(monkeypatch: pytest.MonkeyPatch) -> None:
     )
     results = scikit_hep_repo_review.processor.process(Path("."), ignore=["D100"])
 
-    assert not results["general"]
-    assert len(results["pyproject"]) == 1
-    assert results["pyproject"][0].name == "D200"
-    assert results["pyproject"][0].result
-    assert len(results) == 2
+    assert len(results) == 1
+    assert results[0].name == "D200"
+    assert results[0].result
 
 
 def test_ignore_filter_letter(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -101,6 +96,4 @@ def test_ignore_filter_letter(monkeypatch: pytest.MonkeyPatch) -> None:
     )
     results = scikit_hep_repo_review.processor.process(Path("."), ignore=["D"])
 
-    assert not results["general"]
-    assert len(results["pyproject"]) == 0
-    assert len(results) == 2
+    assert not results

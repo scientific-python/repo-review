@@ -27,6 +27,7 @@ md = MarkdownIt()
 
 # Helper to get the type in the JSON style returns
 class ResultDict(typing.TypedDict):
+    family: str
     description: str
     result: bool | None
     err_msg: str
@@ -34,6 +35,7 @@ class ResultDict(typing.TypedDict):
 
 @dataclasses.dataclass(frozen=True, kw_only=True)
 class Result:
+    family: str
     name: str
     description: str
     result: bool | None
@@ -42,11 +44,6 @@ class Result:
     def err_markdown(self) -> str:
         result: str = md.render(self.err_msg)
         return result
-
-    def _without_name_dict(self) -> ResultDict:
-        return ResultDict(
-            description=self.description, result=self.result, err_msg=self.err_msg
-        )
 
 
 def build(
@@ -99,9 +96,7 @@ def collect_fixtures() -> dict[str, Callable[[Traversable], Any]]:
     }
 
 
-def process(
-    package: Traversable, *, ignore: Sequence[str] = ()
-) -> dict[str, list[Result]]:
+def process(package: Traversable, *, ignore: Sequence[str] = ()) -> list[Result]:
     """
     Process the package and return a dictionary of results.
 
@@ -131,11 +126,6 @@ def process(
     }
     completed: dict[str, bool | None] = {}
 
-    # A few families are here to make sure they print first
-    families: dict[str, set[str]] = {"general": set(), "pyproject": set()}
-    for name, task in tasks.items():
-        families.setdefault(task.family, set()).add(name)
-
     # Run all the checks in topological order
     ts = TopologicalSorter(graph)
     for name in ts.static_order():
@@ -145,32 +135,29 @@ def process(
             completed[name] = None
 
     # Collect the results
-    results_dict = {}
-    for family, ftasks in families.items():
-        result_list = []
-        for task_name in sorted(ftasks):
-            check = tasks[task_name]
-            result = completed[task_name]
-            doc = check.__doc__ or ""
+    result_list = []
+    for task_name, check in sorted(tasks.items(), key=lambda x: (x[1].family, x[0])):
+        result = completed[task_name]
+        doc = check.__doc__ or ""
 
-            result_list.append(
-                Result(
-                    name=task_name,
-                    description=doc,
-                    result=result,
-                    err_msg=textwrap.dedent(doc.format(cls=check)),
-                )
+        result_list.append(
+            Result(
+                family=check.family,
+                name=task_name,
+                description=doc,
+                result=result,
+                err_msg=textwrap.dedent(doc.format(cls=check)),
             )
-        results_dict[family] = result_list
+        )
 
-    return results_dict
+    return result_list
 
 
-def as_simple_dict(
-    results_dict: dict[str, list[Result]]
-) -> dict[str, dict[str, ResultDict]]:
+def as_simple_dict(results: list[Result]) -> dict[str, ResultDict]:
     return {
-        # pylint: disable-next=protected-access
-        family: {result.name: result._without_name_dict() for result in results}
-        for family, results in results_dict.items()
+        result.name: typing.cast(
+            ResultDict,
+            {k: v for k, v in dataclasses.asdict(result).items() if k != "name"},
+        )
+        for result in results
     }
