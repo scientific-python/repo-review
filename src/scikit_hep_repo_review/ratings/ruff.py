@@ -115,8 +115,8 @@ class R103(R1xx):
     name = "pyupgrade"
 
 
-base_classes = {p.__name__ for p in Ruff.__subclasses__()} - {"R1xx"}
-r1xx_classes = {p.__name__ for p in R1xx.__subclasses__()}
-
-repo_review_fixtures = set[str]()
-repo_review_checks = base_classes | r1xx_classes
+def repo_review_checks() -> dict[str, type[Ruff]]:
+    base_classes = set(Ruff.__subclasses__()) - {R1xx}
+    r1xx_classes = set(R1xx.__subclasses__())
+    repo_review_checks = base_classes | r1xx_classes
+    return {p.__name__: p for p in repo_review_checks}

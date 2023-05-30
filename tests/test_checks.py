@@ -6,7 +6,7 @@ from types import ModuleType
 
 import pytest
 
-from scikit_hep_repo_review.processor import process
+import scikit_hep_repo_review.processor
 
 
 class D100:
@@ -40,27 +40,34 @@ def test_no_checks(monkeypatch: pytest.MonkeyPatch) -> None:
         importlib.metadata, "entry_points", lambda group: []  # noqa: ARG005
     )
 
-    results = process(Path("."))
+    results = scikit_hep_repo_review.processor.process(Path("."))
     assert not results["general"]
     assert not results["pyproject"]
     assert len(results) == 2
 
 
-@pytest.fixture()
-def load_test_module(monkeypatch: pytest.MonkeyPatch) -> None:
-    mod = importlib.metadata.EntryPoint(name="x", group="y", value="test_module")
+def test_load_entry_point(monkeypatch: pytest.MonkeyPatch) -> None:
+    ep = importlib.metadata.EntryPoint(name="x", group="y", value="test_module:f")
     sys.modules["test_module"] = ModuleType("test_module")
-    sys.modules["test_module"].D100 = D100  # type: ignore[attr-defined]
-    sys.modules["test_module"].D200 = D200  # type: ignore[attr-defined]
-    sys.modules["test_module"].repo_review_checks = {"D100", "D200"}  # type: ignore[attr-defined]
+    sys.modules["test_module"].f = lambda: {"D100": D100, "D200": D200}  # type: ignore[attr-defined]
     monkeypatch.setattr(
-        importlib.metadata, "entry_points", lambda group: [mod]  # noqa: ARG005
+        importlib.metadata, "entry_points", lambda group: [ep]  # noqa: ARG005
     )
+    ratings = scikit_hep_repo_review.processor.collect_ratings()
+
+    assert len(ratings) == 2
+    assert "D100" in ratings
+    assert "D200" in ratings
+    assert ratings["D200"] == D200  # type: ignore[comparison-overlap]
 
 
-@pytest.mark.usefixtures("load_test_module")
-def test_custom_checks() -> None:
-    results = process(Path("."))
+def test_custom_checks(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(
+        scikit_hep_repo_review.processor,
+        "collect_ratings",
+        lambda: {"D100": D100, "D200": D200},
+    )
+    results = scikit_hep_repo_review.processor.process(Path("."))
 
     assert not results["general"]
     assert len(results["pyproject"]) == 2
@@ -71,9 +78,13 @@ def test_custom_checks() -> None:
     assert len(results) == 2
 
 
-@pytest.mark.usefixtures("load_test_module")
-def test_ignore_filter_single() -> None:
-    results = process(Path("."), ignore=["D100"])
+def test_ignore_filter_single(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(
+        scikit_hep_repo_review.processor,
+        "collect_ratings",
+        lambda: {"D100": D100, "D200": D200},
+    )
+    results = scikit_hep_repo_review.processor.process(Path("."), ignore=["D100"])
 
     assert not results["general"]
     assert len(results["pyproject"]) == 1
@@ -82,9 +93,13 @@ def test_ignore_filter_single() -> None:
     assert len(results) == 2
 
 
-@pytest.mark.usefixtures("load_test_module")
-def test_ignore_filter_letter() -> None:
-    results = process(Path("."), ignore=["D"])
+def test_ignore_filter_letter(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(
+        scikit_hep_repo_review.processor,
+        "collect_ratings",
+        lambda: {"D100": D100, "D200": D200},
+    )
+    results = scikit_hep_repo_review.processor.process(Path("."), ignore=["D"])
 
     assert not results["general"]
     assert len(results["pyproject"]) == 0

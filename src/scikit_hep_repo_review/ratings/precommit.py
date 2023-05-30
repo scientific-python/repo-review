@@ -125,5 +125,5 @@ class PC901(PreCommit):
         return "autoupdate_commit_msg" in precommit.get("ci", {})
 
 
-repo_review_fixtures = {"precommit"}
-repo_review_checks = {p.__name__ for p in PreCommit.__subclasses__()}
+def repo_review_checks() -> dict[str, type[PreCommit]]:
+    return {p.__name__: p for p in PreCommit.__subclasses__()}
