@@ -1,11 +1,15 @@
 from __future__ import annotations
 
 import itertools
+import builtins
+import functools
+import io
 import json
 from pathlib import Path
 from typing import Literal
 
 import click
+import markdown_it
 import rich.console
 import rich.markdown
 import rich.terminal_theme
@@ -53,12 +57,38 @@ def rich_printer(processed: list[Result], *, output: Path | None) -> None:
     if output is not None:
         console.save_svg(str(output), theme=rich.terminal_theme.DEFAULT_TERMINAL_THEME)
 
+def to_html(processed: list[Result]) -> str:
+    out = io.StringIO()
+    print = functools.partial(builtins.print, file=out)
+    md = markdown_it.MarkdownIt()
+
+    for family, results_list in itertools.groupby(processed, lambda r: r.family):
+        print(f"<h2>{family}</h2>")
+        print("<table>")
+        print("<tr><th>Result</th><th>Name</th><th>Description</th></tr>")
+        for result in results_list:
+            print("<tr>")
+            if result.result is None:
+                print("<td>Skipped</td>")
+            elif result.result:
+                print("<td>Passed</td>")
+            else:
+                print("<td>Failed</td>")
+            print(f"<td>{result.name}</td>")
+            if result.result is None or result.result:
+                print(f"<td>{result.description}</td>")
+            else:
+                print("<td>")
+                print(result.description)
+                print("<br/>")
+                print(md.render(result.err_msg))
+                print("</td>")
+            print("</tr>")
+        print("</table>")
+    return out.getvalue()
 
 @click.command(context_settings={"help_option_names": ["-h", "--help"]})
-@click.argument(
-    "package",
-    type=click.Path(dir_okay=True, path_type=Path),
-)
+@click.argument("package", type=click.Path(dir_okay=True, path_type=Path))
 @click.option(
     "--output",
     type=click.Path(file_okay=True, exists=False, path_type=Path),
@@ -67,7 +97,7 @@ def rich_printer(processed: list[Result], *, output: Path | None) -> None:
 )
 @click.option(
     "--format",
-    type=click.Choice(["rich", "json"]),
+    type=click.Choice(["rich", "json", "html"]),
     default="rich",
     help="Select output format.",
 )
@@ -77,7 +107,7 @@ def rich_printer(processed: list[Result], *, output: Path | None) -> None:
     default="",
 )
 def main(
-    package: Path, output: Path | None, format: Literal["rich", "json"], ignore: str
+    package: Path, output: Path | None, format: Literal["rich", "json", "html"], ignore: str
 ) -> None:
     """
     Pass in a local Path or gh:org/repo@branch[:root].
@@ -102,6 +132,12 @@ def main(
             output.write_text(j)
         else:
             rich.print_json(j)
+    elif format == "html":
+        html = to_html(processed)
+        if output:
+            output.write_text(html)
+        else:
+            rich.print(html)
 
 
 if __name__ == "__main__":
