@@ -7,11 +7,11 @@ import textwrap
 import typing
 from collections.abc import Callable, Mapping, Sequence
 from graphlib import TopologicalSorter
-from importlib.abc import Traversable
 from typing import Any
 
 from markdown_it import MarkdownIt
 
+from ._compat.importlib.resources.abc import Traversable
 from .checks import Check
 from .fixtures import pyproject
 

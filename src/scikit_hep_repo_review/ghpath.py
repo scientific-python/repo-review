@@ -7,8 +7,9 @@ import io
 import json
 import typing
 from collections.abc import Iterator
-from importlib.abc import Traversable
 from typing import Literal
+
+from ._compat.importlib.resources.abc import Traversable
 
 
 @dataclasses.dataclass(frozen=True, kw_only=True)

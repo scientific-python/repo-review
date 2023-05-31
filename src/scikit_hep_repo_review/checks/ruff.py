@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-from importlib.abc import Traversable
 from typing import Any, ClassVar, Protocol
+
+from .._compat.importlib.resources.abc import Traversable
 
 ## R0xx: Ruff general
 ## R1xx: Ruff checks
