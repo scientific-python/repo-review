@@ -17,5 +17,5 @@ def test_cmd_html():
     subprocess.run(["scikit-hep-repo-review", ".", "--format", "html"], check=True)
 
 
-def test_cmd_html():
+def test_cmd_json():
     subprocess.run(["scikit-hep-repo-review", ".", "--format", "json"], check=True)
