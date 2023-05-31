@@ -132,7 +132,7 @@ def main(
     if format == "rich":
         rich_printer(processed, output=output)
     elif format == "json":
-        j = json.dumps(as_simple_dict(processed), indent=2)
+        j = json.dumps({"checks": as_simple_dict(processed)}, indent=2)
         if output:
             output.write_text(j)
         else:
