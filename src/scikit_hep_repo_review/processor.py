@@ -7,7 +7,7 @@ import textwrap
 import typing
 from collections.abc import Callable, Mapping, Sequence
 from graphlib import TopologicalSorter
-from typing import Any
+from typing import Any, TypeVar
 
 from markdown_it import MarkdownIt
 
@@ -15,12 +15,14 @@ from ._compat.importlib.resources.abc import Traversable
 from .checks import Check
 from .fixtures import pyproject
 
-__all__ = ["Result", "ResultDict", "build", "process", "as_simple_dict"]
+__all__ = ["Result", "ResultDict", "process", "as_simple_dict"]
 
 
 def __dir__() -> list[str]:
     return __all__
 
+
+T = TypeVar("T")
 
 md = MarkdownIt()
 
@@ -46,25 +48,6 @@ class Result:
         return result
 
 
-def build(
-    check: type[Check],
-    package: Traversable,
-    fixtures: Mapping[str, Callable[[Traversable], Any]],
-) -> bool | None:
-    kwargs: dict[str, Any] = {}
-    signature = inspect.signature(check.check)
-
-    # Built-in fixture
-    if "package" in signature.parameters:
-        kwargs["package"] = package
-
-    for name, func in fixtures.items():
-        if name in signature.parameters:
-            kwargs[name] = func(package)
-
-    return check.check(**kwargs)
-
-
 def is_allowed(ignore_list: set[str], name: str) -> bool:
     """
     Skips the check if the name is in the ignore list or if the name without
@@ -77,12 +60,33 @@ def is_allowed(ignore_list: set[str], name: str) -> bool:
     return True
 
 
-def collect_checks() -> dict[str, type[Check]]:
-    return {
-        k: v
-        for ep in importlib.metadata.entry_points(group="scikit_hep_repo_review.checks")
-        for k, v in ep.load()().items()
+def compute_fixtures(
+    package: Traversable, fixtures: Mapping[str, Callable[..., Any]]
+) -> dict[str, Any]:
+    results: dict[str, Any] = {"package": package}
+    graph = {
+        name: set() if name == "package" else inspect.signature(fix).parameters.keys()
+        for name, fix in fixtures.items()
     }
+    ts = TopologicalSorter(graph)
+    for fixture_name in ts.static_order():
+        if fixture_name == "package":
+            continue
+        func = fixtures[fixture_name]
+        signature = inspect.signature(func)
+        kwargs = {name: results[name] for name in signature.parameters}
+        results[fixture_name] = fixtures[fixture_name](**kwargs)
+    return results
+
+
+def apply_fixtures(computed_fixtures: Mapping[str, Any], func: Callable[..., T]) -> T:
+    signature = inspect.signature(func)
+    kwargs = {
+        name: value
+        for name, value in computed_fixtures.items()
+        if name in signature.parameters
+    }
+    return func(**kwargs)
 
 
 def collect_fixtures() -> dict[str, Callable[[Traversable], Any]]:
@@ -91,6 +95,19 @@ def collect_fixtures() -> dict[str, Callable[[Traversable], Any]]:
         for ep in importlib.metadata.entry_points(
             group="scikit_hep_repo_review.fixtures"
         )
+    }
+
+
+def collect_checks(fixtures: Mapping[str, Any]) -> dict[str, type[Check]]:
+    check_functions = (
+        ep.load()
+        for ep in importlib.metadata.entry_points(group="scikit_hep_repo_review.checks")
+    )
+
+    return {
+        k: v
+        for func in check_functions
+        for k, v in apply_fixtures(fixtures, func).items()
     }
 
 
@@ -106,14 +123,15 @@ def process(package: Traversable, *, ignore: Sequence[str] = ()) -> list[Result]
     ignore: Sequence[str]
         A list of checks to ignore
     """
-    # Collect the checks
-    checks = collect_checks()
-
     # Collect the fixtures
-    fixtures = collect_fixtures()
+    fixture_functions = collect_fixtures()
+    fixtures = compute_fixtures(package, fixture_functions)
+
+    # Collect the checks
+    checks = collect_checks(fixtures)
 
     # Collect our own config
-    config = pyproject(package).get("tool", {}).get("repo-review", {})  # type: ignore[arg-type]
+    config = pyproject(package).get("tool", {}).get("repo-review", {})
     skip_checks = set(ignore) | set(config.get("ignore", ()))
 
     tasks: dict[str, type[Check]] = {
@@ -128,7 +146,7 @@ def process(package: Traversable, *, ignore: Sequence[str] = ()) -> list[Result]
     ts = TopologicalSorter(graph)
     for name in ts.static_order():
         if all(completed.get(n, False) for n in graph[name]):
-            completed[name] = build(tasks[name], package, fixtures)
+            completed[name] = apply_fixtures(fixtures, tasks[name].check)
         else:
             completed[name] = None
 

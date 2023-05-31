@@ -3,7 +3,6 @@
 
 from __future__ import annotations
 
-import functools
 from pathlib import Path
 from typing import Any
 
@@ -12,7 +11,6 @@ import yaml
 from .._compat.importlib.resources.abc import Traversable
 
 
-@functools.cache
 def workflows(package: Traversable) -> dict[str, Any]:
     workflows_base_path = package.joinpath(".github/workflows")
     workflows_dict: dict[str, Any] = {}
@@ -25,7 +23,6 @@ def workflows(package: Traversable) -> dict[str, Any]:
     return workflows_dict
 
 
-@functools.cache
 def dependabot(package: Traversable) -> dict[str, Any]:
     dependabot_path = package.joinpath(".github/dependabot.yml")
     if dependabot_path.is_file():

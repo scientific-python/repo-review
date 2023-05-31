@@ -39,9 +39,8 @@ examples of repositories that at least partially follow the guidelines include
 ### Development
 
 This repository is intended to be fun to develop - it requires and uses Python
-3.10, and makes a few potentially... uncommon decisions. You might not want to
-design your library this way, but this is not a library. It's a fun and
-enjoyable app.
+3.10, and uses a lot of the new features in 3.9 and 3.10. It's maybe not
+entirely conventional, but it's fun.
 
 There are a few key designs that are very useful and make this possible. First,
 all paths are handled as Traversables. This allows a simple Traversable
@@ -50,9 +49,11 @@ webapp. It also would allow `zipfile.Path` to work just as well, too - no need
 to extract.
 
 Checks can request fixtures (like pytest) as arguments. Check files can add new
-fixtures as needed. Fixtures are are specified with entry points, and take a
-single `package` argument (which is also a built-in fixture). Checks are
-specified via an entrypoint that returns a dict of checks.
+fixtures as needed. Fixtures are are specified with entry points, and take any
+other fixture as arguments as well - the `package` fixture represents the root
+of the package you are checking, and is the basis for all other fixtures.
+Checks are specified via an entrypoint that returns a dict of checks; this also
+can accept fixtures, allowing dynamic check listings.
 
 Check files do not depend on the main library, and can be extended (similar to
 Flake8). You register new check files via entry-points - so extending this is
@@ -66,7 +67,8 @@ have a check classmethod. The docstring of this method is the failure message,
 and supports substitution. Arguments to this method are fixtures, and `package`
 is the built-in one providing the package directory as a Traversable. Any other
 fixtures are available by name. A new fixture is given the package Traversable,
-and can produce anything (recommended to be cached via `functools.cache`).
+and can produce anything; fixtures are topologically sorted, pre-computed and
+cached.
 
 The runner will topologically sort the checks, and checks that do not run will
 get a `None` result and the check classmethod will not run. The front-end (Rich
