@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 import functools
-from importlib.abc import Traversable
 from typing import Any
 
 from ._compat import tomllib
+from ._compat.importlib.resources.abc import Traversable
 
 
 @functools.cache

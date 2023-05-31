@@ -4,10 +4,11 @@
 from __future__ import annotations
 
 import functools
-from importlib.abc import Traversable
 from typing import Any, ClassVar, Protocol
 
 import yaml
+
+from .._compat.importlib.resources.abc import Traversable
 
 
 @functools.cache

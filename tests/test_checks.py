@@ -1,12 +1,12 @@
 import importlib.metadata
 import sys
-from importlib.abc import Traversable
 from pathlib import Path
 from types import ModuleType
 
 import pytest
 
 import scikit_hep_repo_review.processor
+from scikit_hep_repo_review._compat.importlib.resources.abc import Traversable
 
 
 class D100:

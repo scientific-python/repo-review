@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from importlib.abc import Traversable
+from .._compat.importlib.resources.abc import Traversable
 
 # PY: Python Project
 ## 0xx: File existence
