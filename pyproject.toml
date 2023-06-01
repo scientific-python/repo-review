@@ -75,6 +75,9 @@ workflows = "scikit_hep_repo_review.checks.github:workflows"
 dependabot = "scikit_hep_repo_review.checks.github:dependabot"
 precommit = "scikit_hep_repo_review.checks.precommit:precommit"
 
+[project.entry-points."scikit_hep_repo_review.families"]
+scikit-hep = "scikit_hep_repo_review.families:get_familes"
+
 [tool.hatch]
 version.path = "src/scikit_hep_repo_review/__init__.py"
 

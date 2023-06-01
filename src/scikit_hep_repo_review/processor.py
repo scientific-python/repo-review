@@ -13,9 +13,10 @@ from markdown_it import MarkdownIt
 
 from ._compat.importlib.resources.abc import Traversable
 from .checks import Check
+from .families import Family
 from .fixtures import pyproject
 
-__all__ = ["Result", "ResultDict", "process", "as_simple_dict"]
+__all__ = ["Result", "ResultDict", "ProcessReturn", "process", "as_simple_dict"]
 
 
 def __dir__() -> list[str]:
@@ -46,6 +47,11 @@ class Result:
     def err_markdown(self) -> str:
         result: str = md.render(self.err_msg)
         return result
+
+
+class ProcessReturn(typing.NamedTuple):
+    families: dict[str, Family]
+    results: list[Result]
 
 
 def is_allowed(ignore_list: set[str], name: str) -> bool:
@@ -111,7 +117,17 @@ def collect_checks(fixtures: Mapping[str, Any]) -> dict[str, type[Check]]:
     }
 
 
-def process(package: Traversable, *, ignore: Sequence[str] = ()) -> list[Result]:
+def collect_families() -> dict[str, Family]:
+    return {
+        name: family
+        for ep in importlib.metadata.entry_points(
+            group="scikit_hep_repo_review.families"
+        )
+        for name, family in ep.load()().items()
+    }
+
+
+def process(package: Traversable, *, ignore: Sequence[str] = ()) -> ProcessReturn:
     """
     Process the package and return a dictionary of results.
 
@@ -129,6 +145,14 @@ def process(package: Traversable, *, ignore: Sequence[str] = ()) -> list[Result]
 
     # Collect the checks
     checks = collect_checks(fixtures)
+
+    # Collect families.
+    families = collect_families()
+
+    # These are optional, so fill in missing families.
+    for name in {c.family for c in checks.values()}:
+        if name not in families:
+            families[name] = Family()
 
     # Collect our own config
     config = pyproject(package).get("tool", {}).get("repo-review", {})
@@ -152,7 +176,10 @@ def process(package: Traversable, *, ignore: Sequence[str] = ()) -> list[Result]
 
     # Collect the results
     result_list = []
-    for task_name, check in sorted(tasks.items(), key=lambda x: (x[1].family, x[0])):
+    for task_name, check in sorted(
+        tasks.items(),
+        key=lambda x: (families[x[1].family].get("order", 0), x[1].family, x[0]),
+    ):
         result = completed[task_name]
         doc = check.__doc__ or ""
 
@@ -166,7 +193,7 @@ def process(package: Traversable, *, ignore: Sequence[str] = ()) -> list[Result]
             )
         )
 
-    return result_list
+    return ProcessReturn(families, result_list)
 
 
 def as_simple_dict(results: list[Result]) -> dict[str, ResultDict]:

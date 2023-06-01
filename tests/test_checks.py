@@ -40,7 +40,7 @@ def test_no_checks(monkeypatch: pytest.MonkeyPatch) -> None:
         importlib.metadata, "entry_points", lambda group: []  # noqa: ARG005
     )
 
-    results = scikit_hep_repo_review.processor.process(Path("."))
+    _, results = scikit_hep_repo_review.processor.process(Path("."))
     assert len(results) == 0
 
 
@@ -65,7 +65,7 @@ def test_custom_checks(monkeypatch: pytest.MonkeyPatch) -> None:
         "collect_checks",
         lambda _: {"D100": D100, "D200": D200},
     )
-    results = scikit_hep_repo_review.processor.process(Path("."))
+    _, results = scikit_hep_repo_review.processor.process(Path("."))
 
     assert len(results) == 2
     assert results[0].name == "D100"
@@ -81,7 +81,7 @@ def test_ignore_filter_single(monkeypatch: pytest.MonkeyPatch) -> None:
         "collect_checks",
         lambda _: {"D100": D100, "D200": D200},
     )
-    results = scikit_hep_repo_review.processor.process(Path("."), ignore=["D100"])
+    _, results = scikit_hep_repo_review.processor.process(Path("."), ignore=["D100"])
 
     assert len(results) == 1
     assert results[0].name == "D200"
@@ -94,6 +94,6 @@ def test_ignore_filter_letter(monkeypatch: pytest.MonkeyPatch) -> None:
         "collect_checks",
         lambda _: {"D100": D100, "D200": D200},
     )
-    results = scikit_hep_repo_review.processor.process(Path("."), ignore=["D"])
+    _, results = scikit_hep_repo_review.processor.process(Path("."), ignore=["D"])
 
     assert not results

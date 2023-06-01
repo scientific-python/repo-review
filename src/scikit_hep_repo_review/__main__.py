@@ -5,6 +5,7 @@ import functools
 import io
 import itertools
 import json
+from collections.abc import Mapping
 from pathlib import Path
 from typing import Literal
 
@@ -17,6 +18,7 @@ import rich.text
 import rich.traceback
 import rich.tree
 
+from .families import Family
 from .ghpath import GHPath
 from .processor import Result, as_simple_dict, process
 
@@ -27,11 +29,14 @@ rich.traceback.install(suppress=[click, rich], show_locals=True, width=None)
 # repo_review_checks = set(p.__name___ for p in General.__subclasses__())
 
 
-def rich_printer(processed: list[Result], *, output: Path | None) -> None:
+def rich_printer(
+    families: Mapping[str, Family], processed: list[Result], *, output: Path | None
+) -> None:
     console = rich.console.Console(record=True)
 
     for family, results_list in itertools.groupby(processed, lambda r: r.family):
-        tree = rich.tree.Tree(f"[bold]{family}[/bold]:")
+        family_name = families[family].get("name", family)
+        tree = rich.tree.Tree(f"[bold]{family_name}[/bold]:")
         for result in results_list:
             msg = rich.text.Text()
             msg.append(result.name, style="bold")
@@ -58,13 +63,14 @@ def rich_printer(processed: list[Result], *, output: Path | None) -> None:
         console.save_svg(str(output), theme=rich.terminal_theme.DEFAULT_TERMINAL_THEME)
 
 
-def to_html(processed: list[Result]) -> str:
+def to_html(families: Mapping[str, Family], processed: list[Result]) -> str:
     out = io.StringIO()
     print = functools.partial(builtins.print, file=out)
     md = markdown_it.MarkdownIt()
 
     for family, results_list in itertools.groupby(processed, lambda r: r.family):
-        print(f"<h2>{family}</h2>")
+        family_name = families[family].get("name", family)
+        print(f"<h2>{family_name}</h2>")
         print("<table>")
         print("<tr><th>Result</th><th>Name</th><th>Description</th></tr>")
         for result in results_list:
@@ -125,20 +131,22 @@ def main(
         ghpackage = GHPath(repo=org_repo, branch=branch, path=p[0] if p else "")
         if format == "rich":
             rich.print(f"[bold]Processing [blue]{package}[/blue] from GitHub\n")
-        processed = process(ghpackage, ignore=ignore_list)
+        families, processed = process(ghpackage, ignore=ignore_list)
     else:
-        processed = process(package, ignore=ignore_list)
+        families, processed = process(package, ignore=ignore_list)
 
     if format == "rich":
-        rich_printer(processed, output=output)
+        rich_printer(families, processed, output=output)
     elif format == "json":
-        j = json.dumps({"checks": as_simple_dict(processed)}, indent=2)
+        j = json.dumps(
+            {"families": families, "checks": as_simple_dict(processed)}, indent=2
+        )
         if output:
             output.write_text(j)
         else:
             rich.print_json(j)
     elif format == "html":
-        html = to_html(processed)
+        html = to_html(families, processed)
         if output:
             output.write_text(html)
         else:
