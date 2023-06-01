@@ -71,7 +71,7 @@ and can produce anything; fixtures are topologically sorted, pre-computed and
 cached.
 
 The runner will topologically sort the checks, and checks that do not run will
-get a `None` result and the check classmethod will not run. The front-end (Rich
+get a `None` result and the check method will not run. The front-end (Rich
 powered CLI or Pyodide webapp) will render the markdown-formatted check
 docstring only if the result is `False`.
 

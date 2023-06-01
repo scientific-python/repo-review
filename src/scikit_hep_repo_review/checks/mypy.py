@@ -146,5 +146,5 @@ class PP206(MyPy):
                 return False
 
 
-def repo_review_checks() -> dict[str, type[MyPy]]:
-    return {p.__name__: p for p in MyPy.__subclasses__()}
+def repo_review_checks() -> dict[str, MyPy]:
+    return {p.__name__: p() for p in MyPy.__subclasses__()}
