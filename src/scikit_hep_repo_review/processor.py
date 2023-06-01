@@ -16,7 +16,7 @@ from .checks import Check
 from .families import Family
 from .fixtures import pyproject
 
-__all__ = ["Result", "ResultDict", "process", "as_simple_dict"]
+__all__ = ["Result", "ResultDict", "ProcessReturn", "process", "as_simple_dict"]
 
 
 def __dir__() -> list[str]:
@@ -47,6 +47,11 @@ class Result:
     def err_markdown(self) -> str:
         result: str = md.render(self.err_msg)
         return result
+
+
+class ProcessReturn(typing.NamedTuple):
+    families: dict[str, Family]
+    results: list[Result]
 
 
 def is_allowed(ignore_list: set[str], name: str) -> bool:
@@ -122,9 +127,7 @@ def collect_families() -> dict[str, Family]:
     }
 
 
-def process(
-    package: Traversable, *, ignore: Sequence[str] = ()
-) -> tuple[dict[str, Family], list[Result]]:
+def process(package: Traversable, *, ignore: Sequence[str] = ()) -> ProcessReturn:
     """
     Process the package and return a dictionary of results.
 
@@ -190,7 +193,7 @@ def process(
             )
         )
 
-    return families, result_list
+    return ProcessReturn(families, result_list)
 
 
 def as_simple_dict(results: list[Result]) -> dict[str, ResultDict]:
