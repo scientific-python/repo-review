@@ -39,11 +39,12 @@ function Results(props) {
   for (const key in props.results) {
     const inner_results = props.results[key];
     const results_components = inner_results.map((result) => {
-      const text_color = result.state === false
-        ? "error.main"
-        : result.state === true
-        ? "text.primary"
-        : "info.main";
+      const text_color =
+        result.state === false
+          ? "error.main"
+          : result.state === true
+          ? "text.primary"
+          : "info.main";
       const details =
         result.state === false ? (
           <span dangerouslySetInnerHTML={{ __html: result.err_msg }} />
@@ -85,13 +86,13 @@ function Results(props) {
             {result.name + ": "}
           </MaterialUI.Typography>
           <React.Fragment>
-          <MaterialUI.Typography
-            sx={{ display: "inline" }}
-            component="span"
-            color={text_color}
-          >
-            {result.description}
-          </MaterialUI.Typography>
+            <MaterialUI.Typography
+              sx={{ display: "inline" }}
+              component="span"
+              color={text_color}
+            >
+              {result.description}
+            </MaterialUI.Typography>
           </React.Fragment>
           {result.state === undefined && skipped}
         </React.Fragment>
@@ -107,7 +108,9 @@ function Results(props) {
     output.push(
       <li key={`section-${key}`}>
         <ul>
-          <MaterialUI.ListSubheader>{props.families[key]}</MaterialUI.ListSubheader>
+          <MaterialUI.ListSubheader>
+            {props.families[key]}
+          </MaterialUI.ListSubheader>
           {results_components}
         </ul>
       </li>,
@@ -327,7 +330,10 @@ class App extends React.Component {
                 </MaterialUI.Typography>
               )}
             </MaterialUI.Box>
-            <Results results={this.state.results} families={this.state.families} />
+            <Results
+              results={this.state.results}
+              families={this.state.families}
+            />
           </MaterialUI.Paper>
         </MaterialUI.Box>
       </MyThemeProvider>
