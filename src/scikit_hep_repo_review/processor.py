@@ -40,8 +40,8 @@ class Result:
     err_msg: str = ""
 
     def err_markdown(self) -> str:
-        result: str = md.render(self.err_msg)
-        return result
+        result: str = md.render(self.err_msg).strip()
+        return result.removeprefix("<p>").removesuffix("</p>").strip()
 
 
 class ProcessReturn(typing.NamedTuple):
