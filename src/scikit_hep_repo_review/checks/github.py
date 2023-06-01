@@ -165,5 +165,5 @@ class GH211(GitHub):
         return True
 
 
-def repo_review_checks() -> dict[str, type[GitHub]]:
-    return {p.__name__: p for p in GitHub.__subclasses__()}
+def repo_review_checks() -> dict[str, GitHub]:
+    return {p.__name__: p() for p in GitHub.__subclasses__()}

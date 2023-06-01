@@ -104,7 +104,7 @@ def collect_fixtures() -> dict[str, Callable[[Traversable], Any]]:
     }
 
 
-def collect_checks(fixtures: Mapping[str, Any]) -> dict[str, type[Check]]:
+def collect_checks(fixtures: Mapping[str, Any]) -> dict[str, Check]:
     check_functions = (
         ep.load()
         for ep in importlib.metadata.entry_points(group="scikit_hep_repo_review.checks")
@@ -158,7 +158,7 @@ def process(package: Traversable, *, ignore: Sequence[str] = ()) -> ProcessRetur
     config = pyproject(package).get("tool", {}).get("repo-review", {})
     skip_checks = set(ignore) | set(config.get("ignore", ()))
 
-    tasks: dict[str, type[Check]] = {
+    tasks: dict[str, Check] = {
         n: r for n, r in checks.items() if is_allowed(skip_checks, n)
     }
     graph: dict[str, set[str]] = {
