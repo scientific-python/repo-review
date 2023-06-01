@@ -104,6 +104,7 @@ def process(package: Traversable, *, ignore: Sequence[str] = ()) -> ProcessRetur
     ):
         result = completed[task_name]
         doc = check.__doc__ or ""
+        err_msg = check.check.__doc__ or ""
 
         result_list.append(
             Result(
@@ -111,7 +112,7 @@ def process(package: Traversable, *, ignore: Sequence[str] = ()) -> ProcessRetur
                 name=task_name,
                 description=doc,
                 result=result,
-                err_msg=textwrap.dedent(doc.format(cls=check)),
+                err_msg=textwrap.dedent(err_msg.format(cls=check)),
             )
         )
 
