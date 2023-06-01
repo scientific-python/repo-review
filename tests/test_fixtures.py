@@ -6,12 +6,8 @@ from types import ModuleType
 import pytest
 
 from scikit_hep_repo_review._compat.importlib.resources.abc import Traversable
-from scikit_hep_repo_review.fixtures import package
-from scikit_hep_repo_review.processor import (
-    apply_fixtures,
-    collect_checks,
-    compute_fixtures,
-)
+from scikit_hep_repo_review.checks import collect_checks
+from scikit_hep_repo_review.fixtures import apply_fixtures, compute_fixtures, package
 
 
 class D100:

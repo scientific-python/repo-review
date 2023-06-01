@@ -1,20 +1,17 @@
 from __future__ import annotations
 
 import dataclasses
-import importlib.metadata
-import inspect
+import graphlib
 import textwrap
 import typing
-from collections.abc import Callable, Mapping, Sequence
-from graphlib import TopologicalSorter
-from typing import Any, TypeVar
+from collections.abc import Sequence
 
-from markdown_it import MarkdownIt
+import markdown_it
 
 from ._compat.importlib.resources.abc import Traversable
-from .checks import Check
-from .families import Family
-from .fixtures import pyproject
+from .checks import Check, collect_checks, is_allowed
+from .families import Family, collect_families
+from .fixtures import apply_fixtures, collect_fixtures, compute_fixtures, pyproject
 
 __all__ = ["Result", "ResultDict", "ProcessReturn", "process", "as_simple_dict"]
 
@@ -23,9 +20,7 @@ def __dir__() -> list[str]:
     return __all__
 
 
-T = TypeVar("T")
-
-md = MarkdownIt()
+md = markdown_it.MarkdownIt()
 
 
 # Helper to get the type in the JSON style returns
@@ -52,79 +47,6 @@ class Result:
 class ProcessReturn(typing.NamedTuple):
     families: dict[str, Family]
     results: list[Result]
-
-
-def is_allowed(ignore_list: set[str], name: str) -> bool:
-    """
-    Skips the check if the name is in the ignore list or if the name without
-    the number is in the ignore list.
-    """
-    if name in ignore_list:
-        return False
-    if name.rstrip("0123456789") in ignore_list:
-        return False
-    return True
-
-
-def compute_fixtures(
-    package: Traversable, fixtures: Mapping[str, Callable[..., Any]]
-) -> dict[str, Any]:
-    results: dict[str, Any] = {"package": package}
-    graph = {
-        name: set() if name == "package" else inspect.signature(fix).parameters.keys()
-        for name, fix in fixtures.items()
-    }
-    ts = TopologicalSorter(graph)
-    for fixture_name in ts.static_order():
-        if fixture_name == "package":
-            continue
-        func = fixtures[fixture_name]
-        signature = inspect.signature(func)
-        kwargs = {name: results[name] for name in signature.parameters}
-        results[fixture_name] = fixtures[fixture_name](**kwargs)
-    return results
-
-
-def apply_fixtures(computed_fixtures: Mapping[str, Any], func: Callable[..., T]) -> T:
-    signature = inspect.signature(func)
-    kwargs = {
-        name: value
-        for name, value in computed_fixtures.items()
-        if name in signature.parameters
-    }
-    return func(**kwargs)
-
-
-def collect_fixtures() -> dict[str, Callable[[Traversable], Any]]:
-    return {
-        ep.name: ep.load()
-        for ep in importlib.metadata.entry_points(
-            group="scikit_hep_repo_review.fixtures"
-        )
-    }
-
-
-def collect_checks(fixtures: Mapping[str, Any]) -> dict[str, Check]:
-    check_functions = (
-        ep.load()
-        for ep in importlib.metadata.entry_points(group="scikit_hep_repo_review.checks")
-    )
-
-    return {
-        k: v
-        for func in check_functions
-        for k, v in apply_fixtures(fixtures, func).items()
-    }
-
-
-def collect_families() -> dict[str, Family]:
-    return {
-        name: family
-        for ep in importlib.metadata.entry_points(
-            group="scikit_hep_repo_review.families"
-        )
-        for name, family in ep.load()().items()
-    }
 
 
 def process(package: Traversable, *, ignore: Sequence[str] = ()) -> ProcessReturn:
@@ -167,7 +89,7 @@ def process(package: Traversable, *, ignore: Sequence[str] = ()) -> ProcessRetur
     completed: dict[str, bool | None] = {}
 
     # Run all the checks in topological order
-    ts = TopologicalSorter(graph)
+    ts = graphlib.TopologicalSorter(graph)
     for name in ts.static_order():
         if all(completed.get(n, False) for n in graph[name]):
             completed[name] = apply_fixtures(fixtures, tasks[name].check)

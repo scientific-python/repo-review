@@ -7,6 +7,7 @@ import pytest
 
 import scikit_hep_repo_review.processor
 from scikit_hep_repo_review._compat.importlib.resources.abc import Traversable
+from scikit_hep_repo_review.checks import collect_checks
 
 
 class D100:
@@ -51,7 +52,7 @@ def test_load_entry_point(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(
         importlib.metadata, "entry_points", lambda group: [ep]  # noqa: ARG005
     )
-    checks = scikit_hep_repo_review.processor.collect_checks({"package": Path(".")})
+    checks = collect_checks({"package": Path(".")})
 
     assert len(checks) == 2
     assert "D100" in checks

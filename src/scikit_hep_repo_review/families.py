@@ -1,17 +1,28 @@
 from __future__ import annotations
 
-from typing import TypedDict
+import importlib.metadata
+import typing
 
-__all__ = ["Family", "get_familes"]
+__all__ = ["Family", "collect_families", "get_familes"]
 
 
 def __dir__() -> list[str]:
     return __all__
 
 
-class Family(TypedDict, total=False):
+class Family(typing.TypedDict, total=False):
     name: str  # defaults to key
     order: int  # defaults to 0
+
+
+def collect_families() -> dict[str, Family]:
+    return {
+        name: family
+        for ep in importlib.metadata.entry_points(
+            group="scikit_hep_repo_review.families"
+        )
+        for name, family in ep.load()().items()
+    }
 
 
 def get_familes() -> dict[str, Family]:
