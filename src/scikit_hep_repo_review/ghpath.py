@@ -11,6 +11,12 @@ from typing import Literal
 
 from ._compat.importlib.resources.abc import Traversable
 
+__all__ = ["GHPath"]
+
+
+def __dir__() -> list[str]:
+    return __all__
+
 
 @dataclasses.dataclass(frozen=True, kw_only=True)
 class GHPath(Traversable):
