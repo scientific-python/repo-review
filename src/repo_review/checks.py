@@ -4,7 +4,7 @@ import importlib.metadata
 from collections.abc import Mapping, Set
 from typing import Any, ClassVar, Protocol
 
-from ..fixtures import apply_fixtures
+from .fixtures import apply_fixtures
 
 __all__ = ["Check", "collect_checks", "is_allowed"]
 
@@ -19,8 +19,7 @@ class Check(Protocol):
 
 def collect_checks(fixtures: Mapping[str, Any]) -> dict[str, Check]:
     check_functions = (
-        ep.load()
-        for ep in importlib.metadata.entry_points(group="repo_review.checks")
+        ep.load() for ep in importlib.metadata.entry_points(group="repo_review.checks")
     )
 
     return {
