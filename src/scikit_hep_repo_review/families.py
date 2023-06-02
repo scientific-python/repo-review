@@ -19,7 +19,7 @@ def collect_families() -> dict[str, Family]:
     return {
         name: family
         for ep in importlib.metadata.entry_points(
-            group="scikit_hep_repo_review.families"
+            group="repo_review.families"
         )
         for name, family in ep.load()().items()
     }
