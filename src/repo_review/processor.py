@@ -80,19 +80,26 @@ def process(package: Traversable, *, ignore: Sequence[str] = ()) -> ProcessRetur
     config = pyproject(package).get("tool", {}).get("repo-review", {})
     skip_checks = set(ignore) | set(config.get("ignore", ()))
 
+    # Make list of filtered checks to run
     tasks: dict[str, Check] = {
         n: r for n, r in checks.items() if is_allowed(skip_checks, n)
     }
+    # Make a graph of the check's interdependencies
     graph: dict[str, set[str]] = {
         n: getattr(t, "requires", set()) for n, t in tasks.items()
     }
-    completed: dict[str, bool | None] = {}
+    # Keep track of which checks have been completed
+    completed: dict[str, str | None] = {}
 
-    # Run all the checks in topological order
+    # Run all the checks in topological order based on their dependencies
     ts = graphlib.TopologicalSorter(graph)
     for name in ts.static_order():
         if all(completed.get(n, False) for n in graph[name]):
-            completed[name] = apply_fixtures(fixtures, tasks[name].check)
+            result = apply_fixtures(fixtures, tasks[name].check)
+            if isinstance(result, bool):
+                completed[name] = "" if result else tasks[name].check.__doc__
+            else:
+                completed[name] = result
         else:
             completed[name] = None
 
@@ -102,9 +109,9 @@ def process(package: Traversable, *, ignore: Sequence[str] = ()) -> ProcessRetur
         tasks.items(),
         key=lambda x: (families[x[1].family].get("order", 0), x[1].family, x[0]),
     ):
-        result = completed[task_name]
+        result = None if completed[task_name] is None else not completed[task_name]
         doc = check.__doc__ or ""
-        err_msg = check.check.__doc__ or ""
+        err_msg = completed[task_name] or ""
 
         result_list.append(
             Result(
