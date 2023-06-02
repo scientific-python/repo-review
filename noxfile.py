@@ -17,7 +17,7 @@ def run(session: nox.Session) -> None:
     """
 
     session.install("-e", ".[cli]")
-    session.run("python", "-m", "scikit_hep_repo_review", *session.posargs)
+    session.run("python", "-m", "repo_review", *session.posargs)
 
 
 @nox.session

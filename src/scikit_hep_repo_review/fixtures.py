@@ -71,6 +71,6 @@ def collect_fixtures() -> dict[str, Callable[[Traversable], Any]]:
     return {
         ep.name: ep.load()
         for ep in importlib.metadata.entry_points(
-            group="scikit_hep_repo_review.fixtures"
+            group="repo_review.fixtures"
         )
     }

@@ -4,9 +4,9 @@ from pathlib import Path
 
 import pytest
 
-import scikit_hep_repo_review as m
-from scikit_hep_repo_review.ghpath import GHPath
-from scikit_hep_repo_review.processor import process
+import repo_review as m
+from repo_review.ghpath import GHPath
+from repo_review.processor import process
 
 DIR = Path(__file__).parent.resolve()
 
@@ -17,7 +17,8 @@ def test_version():
 
 @pytest.mark.skip(reason="Can be rate limited")
 def test_pyodide():
-    package = GHPath(repo="scikit-hep/repo-review", branch="main")
+    pytest.importorskip("sp_repo_review")
+    package = GHPath(repo="scientific-python/repo-review", branch="main")
     results = process(package)
     assert results
 

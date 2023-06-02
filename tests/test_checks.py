@@ -5,9 +5,9 @@ from types import ModuleType
 
 import pytest
 
-import scikit_hep_repo_review.processor
-from scikit_hep_repo_review._compat.importlib.resources.abc import Traversable
-from scikit_hep_repo_review.checks import collect_checks
+import repo_review.processor
+from repo_review._compat.importlib.resources.abc import Traversable
+from repo_review.checks import collect_checks
 
 
 class D100:
@@ -41,7 +41,7 @@ def test_no_checks(monkeypatch: pytest.MonkeyPatch) -> None:
         importlib.metadata, "entry_points", lambda group: []  # noqa: ARG005
     )
 
-    _, results = scikit_hep_repo_review.processor.process(Path("."))
+    _, results = repo_review.processor.process(Path("."))
     assert len(results) == 0
 
 
@@ -62,11 +62,11 @@ def test_load_entry_point(monkeypatch: pytest.MonkeyPatch) -> None:
 
 def test_custom_checks(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(
-        scikit_hep_repo_review.processor,
+        repo_review.processor,
         "collect_checks",
         lambda _: {"D100": D100, "D200": D200},
     )
-    _, results = scikit_hep_repo_review.processor.process(Path("."))
+    _, results = repo_review.processor.process(Path("."))
 
     assert len(results) == 2
     assert results[0].name == "D100"
@@ -78,11 +78,11 @@ def test_custom_checks(monkeypatch: pytest.MonkeyPatch) -> None:
 
 def test_ignore_filter_single(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(
-        scikit_hep_repo_review.processor,
+        repo_review.processor,
         "collect_checks",
         lambda _: {"D100": D100, "D200": D200},
     )
-    _, results = scikit_hep_repo_review.processor.process(Path("."), ignore=["D100"])
+    _, results = repo_review.processor.process(Path("."), ignore=["D100"])
 
     assert len(results) == 1
     assert results[0].name == "D200"
@@ -91,10 +91,10 @@ def test_ignore_filter_single(monkeypatch: pytest.MonkeyPatch) -> None:
 
 def test_ignore_filter_letter(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(
-        scikit_hep_repo_review.processor,
+        repo_review.processor,
         "collect_checks",
         lambda _: {"D100": D100, "D200": D200},
     )
-    _, results = scikit_hep_repo_review.processor.process(Path("."), ignore=["D"])
+    _, results = repo_review.processor.process(Path("."), ignore=["D"])
 
     assert not results

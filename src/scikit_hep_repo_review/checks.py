@@ -20,7 +20,7 @@ class Check(Protocol):
 def collect_checks(fixtures: Mapping[str, Any]) -> dict[str, Check]:
     check_functions = (
         ep.load()
-        for ep in importlib.metadata.entry_points(group="scikit_hep_repo_review.checks")
+        for ep in importlib.metadata.entry_points(group="repo_review.checks")
     )
 
     return {

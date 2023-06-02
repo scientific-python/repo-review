@@ -4,12 +4,9 @@ build-backend = "hatchling.build"
 
 
 [project]
-name = "scikit_hep_repo_review"
+name = "repo_review"
 authors = [
   { name = "Henry Schreiner", email = "henryfs@princeton.edu" },
-]
-maintainers = [
-  { name = "The Scikit-HEP admins", email = "scikit-hep-admins@googlegroups.com" },
 ]
 license = { file = "LICENSE" }
 
@@ -54,32 +51,18 @@ dev = [
 ]
 
 [project.urls]
-homepage = "https://github.com/Scikit-HEP/repo-review"
-webpage = "https://scikit-hep.github.io/repo-review"
+homepage = "https://github.com/scientific-python/repo-review"
+webpage = "https://scientific-python.github.io/repo-review"
 
 [project.scripts]
-scikit-hep-repo-review = "scikit_hep_repo_review.__main__:main"
+repo-review = "repo_review.__main__:main"
 
-[project.entry-points."scikit_hep_repo_review.checks"]
-general = "scikit_hep_repo_review.checks.general:repo_review_checks"
-pyproject = "scikit_hep_repo_review.checks.pyproject:repo_review_checks"
-precommit = "scikit_hep_repo_review.checks.precommit:repo_review_checks"
-ruff = "scikit_hep_repo_review.checks.ruff:repo_review_checks"
-mypy = "scikit_hep_repo_review.checks.mypy:repo_review_checks"
-github = "scikit_hep_repo_review.checks.github:repo_review_checks"
-
-[project.entry-points."scikit_hep_repo_review.fixtures"]
-pyproject = "scikit_hep_repo_review.fixtures:pyproject"
-package = "scikit_hep_repo_review.fixtures:package"
-workflows = "scikit_hep_repo_review.checks.github:workflows"
-dependabot = "scikit_hep_repo_review.checks.github:dependabot"
-precommit = "scikit_hep_repo_review.checks.precommit:precommit"
-
-[project.entry-points."scikit_hep_repo_review.families"]
-scikit-hep = "scikit_hep_repo_review.families:get_familes"
+[project.entry-points."repo_review.fixtures"]
+pyproject = "repo_review.fixtures:pyproject"
+package = "repo_review.fixtures:package"
 
 [tool.hatch]
-version.path = "src/scikit_hep_repo_review/__init__.py"
+version.path = "src/repo_review/__init__.py"
 
 
 [tool.pytest.ini_options]
@@ -105,12 +88,12 @@ warn_unreachable = true
 disallow_untyped_defs = false
 
 [[tool.mypy.overrides]]
-module = "scikit_hep_repo_review.*"
+module = "repo_review.*"
 disallow_untyped_defs = true
 
 [tool.pylint]
 master.py-version = "3.10"
-master.ignore-paths= ["src/scikit_hep_repo_review/_version.py"]
+master.ignore-paths= ["src/repo_review/_version.py"]
 reports.output-format = "colorized"
 similarities.ignore-imports = "yes"
 messages_control.disable = [
@@ -171,8 +154,8 @@ flake8-unused-arguments.ignore-variadic-names = true
 "typing.Mapping".msg = "Use collections.abc.Mapping instead."
 "typing.Sequence".msg = "Use collections.abc.Sequence instead."
 "typing.Set".msg = "Use collections.abc.Set instead."
-"importlib.abc".msg = "Use scikit_hep_repo_review._compat.importlib.resources.abc instead."
-"importlib.resources.abc".msg = "Use scikit_hep_repo_review._compat.importlib.resources.abc instead."
+"importlib.abc".msg = "Use repo_review._compat.importlib.resources.abc instead."
+"importlib.resources.abc".msg = "Use repo_review._compat.importlib.resources.abc instead."
 
 [tool.ruff.per-file-ignores]
-"src/scikit_hep_repo_review/_compat/**.py" = ["TID251"]
+"src/repo_review/_compat/**.py" = ["TID251"]

@@ -3,19 +3,20 @@ import subprocess
 import pytest
 
 pytest.importorskip("rich")
+pytest.importorskip("sp_repo_review")
 
 
 def test_cmd_help():
-    subprocess.run(["scikit-hep-repo-review", "--help"], check=True)
+    subprocess.run(["repo-review", "--help"], check=True)
 
 
 def test_cmd_basic():
-    subprocess.run(["scikit-hep-repo-review", "."], check=True)
+    subprocess.run(["repo-review", "."], check=True)
 
 
 def test_cmd_html():
-    subprocess.run(["scikit-hep-repo-review", ".", "--format", "html"], check=True)
+    subprocess.run(["repo-review", ".", "--format", "html"], check=True)
 
 
 def test_cmd_json():
-    subprocess.run(["scikit-hep-repo-review", ".", "--format", "json"], check=True)
+    subprocess.run(["repo-review", ".", "--format", "json"], check=True)
