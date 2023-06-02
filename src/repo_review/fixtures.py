@@ -70,7 +70,5 @@ def apply_fixtures(computed_fixtures: Mapping[str, Any], func: Callable[..., T])
 def collect_fixtures() -> dict[str, Callable[[Traversable], Any]]:
     return {
         ep.name: ep.load()
-        for ep in importlib.metadata.entry_points(
-            group="repo_review.fixtures"
-        )
+        for ep in importlib.metadata.entry_points(group="repo_review.fixtures")
     }

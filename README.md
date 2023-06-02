@@ -1,4 +1,4 @@
-# Scikit-HEP repo-review
+# repo-review
 
 [![Actions Status][actions-badge]][actions-link]
 [![Code style: black][black-badge]][black-link]
@@ -6,35 +6,18 @@
 [![PyPI version][pypi-version]][pypi-link]
 [![PyPI platforms][pypi-platforms]][pypi-link]
 
-[![Scikit-HEP][sk-badge]](https://scikit-hep.org/)
-
 This tool can check the style of a repository. Use like this:
 
 ```bash
-pipx run 'scikit-hep-repo-review[cli]' <path to repository>
+pipx run 'repo-review[cli]' <path to repository>
 ```
 
 This will produce a list of results - green checkmarks mean this rule is
 followed, red x’s mean the rule is not. A yellow warning sign means that the
-check was skipped because a previous required check failed. Some checks will
-fail, that’s okay - the goal is bring all possible issues to your attention,
-not to force compliance with arbitrary checks. Eventually there might be a way
-to mark checks as ignored.
+check was skipped because a previous required check failed.
 
-For example, `GH101` expects all your action files to have a nice `name:`
-field. If you are happy with the file-based names you see in CI, you should
-feel free to simply ignore this check (just visually ignore it for the moment,
-a way to specify ignored checks will likely be added eventually).
-
-All checks are mentioned at least in some way in the [Scikit-HEP Developer
-Guidelines][]. You should read that first - if you are not attempting to follow
-them, some of the checks might not work. For example, the guidelines specify
-pytest configuration be placed in `pyproject.toml`. If you place it somewhere
-else, then all the pytest checks will be skipped.
-
-You are not required to be in Scikit-HEP to find this useful, however -
-examples of repositories that at least partially follow the guidelines include
-`pypa/cibuildwheel`, `pypa/build`, and `pybind/pybind11`.
+Checks are defined by plugins. `sp-repo-review` provides checks based on
+the [Scientific-Python Development Pages][] at [scientific-python/cookie][].
 
 ### Development
 
@@ -83,12 +66,12 @@ interface for a High Energy Physics package in Scikit-HEP.
 This project inspired [abSENSE](https://princetonuniversity.github.io/abSENSE/), an
 web interface to abSENSE.
 
-[actions-badge]: https://github.com/scikit-hep/repo-review/workflows/CI/badge.svg
-[actions-link]: https://github.com/scikit-hep/repo-review/actions
+[actions-badge]: https://github.com/scientific-python/repo-review/workflows/CI/badge.svg
+[actions-link]: https://github.com/scientific-python/repo-review/actions
 [black-badge]: https://img.shields.io/badge/code%20style-black-000000.svg
 [black-link]: https://github.com/psf/black
-[pypi-link]: https://pypi.org/project/scikit-hep-repo-review/
-[pypi-platforms]: https://img.shields.io/pypi/pyversions/scikit-hep-repo-review
-[pypi-version]: https://badge.fury.io/py/scikit-hep-repo-review.svg
-[sk-badge]: https://scikit-hep.org/assets/images/Scikit--HEP-Project-blue.svg
-[scikit-hep developer guidelines]: https://scikit-hep.org/developer
+[pypi-link]: https://pypi.org/project/repo-review/
+[pypi-platforms]: https://img.shields.io/pypi/pyversions/repo-review
+[pypi-version]: https://badge.fury.io/py/repo-review.svg
+[scientific-python development guidelines]: https://learn.scientific-python.org/development
+[scientific-python/cookie]: https://github.com/scientific-python/cookie

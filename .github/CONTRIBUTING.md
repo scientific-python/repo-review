@@ -1,7 +1,7 @@
-See the [Scikit-HEP Developer introduction][skhep-dev-intro] for a
+See the [Scientific-Python Development Pages][] for a
 detailed description of best practices for developing Scikit-HEP packages.
 
-[skhep-dev-intro]: https://scikit-hep.org/developer/intro
+[scientific-python development pages]: https://learn.scientific-python.org/development
 
 # Quick development
 
