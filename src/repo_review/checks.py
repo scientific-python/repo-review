@@ -13,7 +13,7 @@ class Check(Protocol):
     family: ClassVar[str]
     requires: ClassVar[Set[str]] = frozenset()
 
-    def check(self) -> bool | None:
+    def check(self) -> bool | None | str:
         ...
 
 

@@ -1,7 +1,9 @@
+import dataclasses
 import importlib.metadata
 import sys
 from pathlib import Path
 from types import ModuleType
+from typing import ClassVar
 
 import pytest
 
@@ -34,6 +36,17 @@ class D200:
         """
 
         return True
+
+
+@dataclasses.dataclass(frozen=True, kw_only=True)
+class C100:
+    "Can compute custom output strings"
+    fail: bool
+    family: ClassVar[str] = "custom"
+
+    def check(self) -> str:
+        "Never see me"
+        return "I'm a custom error message" if self.fail else ""
 
 
 def test_no_checks(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -93,8 +106,29 @@ def test_ignore_filter_letter(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(
         repo_review.processor,
         "collect_checks",
-        lambda _: {"D100": D100, "D200": D200},
+        lambda _: {"D100": D100(), "D200": D200()},
     )
     _, results = repo_review.processor.process(Path("."), ignore=["D"])
 
     assert not results
+
+
+def test_string_result(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(
+        repo_review.processor,
+        "collect_checks",
+        lambda _: {"C100": C100(fail=False), "C101": C100(fail=True)},
+    )
+    _, results = repo_review.processor.process(Path("."))
+
+    assert len(results) == 2
+    check_c100 = results[0]
+    check_c101 = results[1]
+
+    assert check_c100.name == "C100"
+    assert check_c100.result is True
+    assert not check_c100.err_msg
+
+    assert check_c101.name == "C101"
+    assert check_c101.result is False
+    assert check_c101.err_msg == "I'm a custom error message"
