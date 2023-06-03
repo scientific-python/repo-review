@@ -13,7 +13,7 @@ nox.options.sessions = ["lint", "pylint", "tests"]
 @nox.session(reuse_venv=True)
 def run(session: nox.Session) -> None:
     """
-    Run the program
+    Run the program.
     """
 
     session.install("-e", ".[cli]")

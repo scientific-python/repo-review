@@ -4,7 +4,7 @@ import graphlib
 import importlib.metadata
 import inspect
 import typing
-from collections.abc import Callable, Mapping
+from collections.abc import Callable, Mapping, Set
 from typing import Any
 
 from ._compat import tomllib
@@ -12,7 +12,6 @@ from ._compat.importlib.resources.abc import Traversable
 
 __all__ = [
     "pyproject",
-    "package",
     "compute_fixtures",
     "apply_fixtures",
     "collect_fixtures",
@@ -24,6 +23,9 @@ def __dir__() -> list[str]:
 
 
 def pyproject(package: Traversable) -> dict[str, Any]:
+    """
+    The pyproject.toml structure from the package.
+    """
     pyproject_path = package.joinpath("pyproject.toml")
     if pyproject_path.is_file():
         with pyproject_path.open("rb") as f:
@@ -31,21 +33,17 @@ def pyproject(package: Traversable) -> dict[str, Any]:
     return {}
 
 
-def package(package: Traversable) -> Traversable:
-    return package
-
-
 def compute_fixtures(
-    package: Traversable, fixtures: Mapping[str, Callable[..., Any]]
+    root: Traversable, package: Traversable, fixtures: Mapping[str, Callable[..., Any]]
 ) -> dict[str, Any]:
-    results: dict[str, Any] = {"package": package}
-    graph = {
-        name: set() if name == "package" else inspect.signature(fix).parameters.keys()
-        for name, fix in fixtures.items()
+    results: dict[str, Any] = {"root": root, "package": package}
+    graph: dict[str, Set[str]] = {"root": set(), "package": set()}
+    graph |= {
+        name: inspect.signature(fix).parameters.keys() for name, fix in fixtures.items()
     }
     ts = graphlib.TopologicalSorter(graph)
     for fixture_name in ts.static_order():
-        if fixture_name == "package":
+        if fixture_name in {"package", "root"}:
             continue
         func = fixtures[fixture_name]
         signature = inspect.signature(func)

@@ -114,14 +114,21 @@ def to_html(families: Mapping[str, Family], processed: list[Result]) -> str:
     help="Ignore a check or checks, comma separated.",
     default="",
 )
+@click.option(
+    "--package-dir",
+    "-p",
+    help="Python package subdirectory",
+    default="",
+)
 def main(
     package: Path,
     output: Path | None,
     format: Literal["rich", "json", "html"],
     ignore: str,
+    package_dir: str,
 ) -> None:
     """
-    Pass in a local Path or gh:org/repo@branch[:root].
+    Pass in a local Path or gh:org/repo@branch.
     """
     ignore_list = [x.strip() for x in ignore.split(",")]
 
@@ -131,9 +138,9 @@ def main(
         ghpackage = GHPath(repo=org_repo, branch=branch, path=p[0] if p else "")
         if format == "rich":
             rich.print(f"[bold]Processing [blue]{package}[/blue] from GitHub\n")
-        families, processed = process(ghpackage, ignore=ignore_list)
+        families, processed = process(ghpackage, ignore=ignore_list, subdir=package_dir)
     else:
-        families, processed = process(package, ignore=ignore_list)
+        families, processed = process(package, ignore=ignore_list, subdir=package_dir)
 
     if format == "rich":
         rich_printer(families, processed, output=output)
