@@ -7,7 +7,7 @@ import pytest
 
 from repo_review._compat.importlib.resources.abc import Traversable
 from repo_review.checks import collect_checks
-from repo_review.fixtures import apply_fixtures, compute_fixtures, package
+from repo_review.fixtures import apply_fixtures, compute_fixtures
 
 
 class D100:
@@ -54,7 +54,9 @@ def get_checks(some_bool: bool) -> dict[str, type]:
 
 def test_process_fixtures() -> None:
     fixtures = compute_fixtures(
-        Path("."), {"simple": simple, "nothing": nothing, "not_simple": not_simple}
+        Path("."),
+        Path("."),
+        {"simple": simple, "nothing": nothing, "not_simple": not_simple},
     )
 
     assert apply_fixtures(fixtures, nothing) == 42
@@ -65,17 +67,17 @@ def test_process_fixtures() -> None:
 def test_process_fixtures_with_package() -> None:
     fixtures = compute_fixtures(
         Path("."),
+        Path("."),
         {
             "simple": simple,
             "nothing": nothing,
             "not_simple": not_simple,
-            "package": package,
         },
     )
 
     assert apply_fixtures(fixtures, nothing) == 42
     assert apply_fixtures(fixtures, simple) == "."
-    assert apply_fixtures(fixtures, package) == Path(".")
+    assert apply_fixtures(fixtures, lambda package: package) == Path(".")  # type: ignore[no-any-return]
     assert apply_fixtures(fixtures, not_simple) == ". ."
 
 

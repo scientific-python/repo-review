@@ -49,21 +49,29 @@ class ProcessReturn(typing.NamedTuple):
     results: list[Result]
 
 
-def process(package: Traversable, *, ignore: Sequence[str] = ()) -> ProcessReturn:
+def process(
+    root: Traversable, *, ignore: Sequence[str] = (), subdir: str = ""
+) -> ProcessReturn:
     """
     Process the package and return a dictionary of results.
 
     Parameters
     ----------
-    package: Traversable | Path
-        The Path(like) package to process
+    root: Traversable | Path
+        The Path(like) to the repository to process
 
     ignore: Sequence[str]
         A list of checks to ignore
+
+    subidr: str
+        The path to the package in the subdirectory, if not at the root of the repository.
     """
+
+    package = root.joinpath(subdir) if subdir else root
+
     # Collect the fixtures
     fixture_functions = collect_fixtures()
-    fixtures = compute_fixtures(package, fixture_functions)
+    fixtures = compute_fixtures(root, package, fixture_functions)
 
     # Collect the checks
     checks = collect_checks(fixtures)
@@ -94,7 +102,7 @@ def process(package: Traversable, *, ignore: Sequence[str] = ()) -> ProcessRetur
     # Run all the checks in topological order based on their dependencies
     ts = graphlib.TopologicalSorter(graph)
     for name in ts.static_order():
-        if all(completed.get(n, False) for n in graph[name]):
+        if all(completed.get(n, "") == "" for n in graph[name]):  # noqa: PLC1901
             result = apply_fixtures(fixtures, tasks[name].check)
             if isinstance(result, bool):
                 completed[name] = "" if result else tasks[name].check.__doc__

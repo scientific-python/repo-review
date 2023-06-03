@@ -59,7 +59,6 @@ repo-review = "repo_review.__main__:main"
 
 [project.entry-points."repo_review.fixtures"]
 pyproject = "repo_review.fixtures:pyproject"
-package = "repo_review.fixtures:package"
 
 [tool.hatch]
 version.path = "src/repo_review/__init__.py"
@@ -67,7 +66,7 @@ version.path = "src/repo_review/__init__.py"
 
 [tool.pytest.ini_options]
 minversion = "7.0"
-addopts = ["-ra", "--strict-markers", "--strict-config"]
+addopts = ["-ra", "--strict-markers", "--strict-config", "--import-mode=importlib"]
 xfail_strict = true
 log_cli_level = "INFO"
 filterwarnings = [
@@ -75,6 +74,7 @@ filterwarnings = [
   'ignore:(ast.Str|Attribute s|ast.NameConstant|ast.Num) is deprecated:DeprecationWarning:_pytest',
 ]
 testpaths = ["tests"]
+pythonpath = ["tests/test_utilities"]
 
 
 [tool.mypy]
