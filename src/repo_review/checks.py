@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import importlib.metadata
 from collections.abc import Mapping, Set
-from typing import Any, ClassVar, Protocol
+from typing import Any, Protocol
 
 from .fixtures import apply_fixtures
 
@@ -10,8 +10,9 @@ __all__ = ["Check", "collect_checks", "is_allowed"]
 
 
 class Check(Protocol):
-    family: ClassVar[str]
-    requires: ClassVar[Set[str]] = frozenset()
+    family: str
+    requires: Set[str] = frozenset()
+    url: str = ""
 
     def check(self) -> bool | None | str:
         ...
