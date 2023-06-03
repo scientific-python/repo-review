@@ -29,6 +29,7 @@ class ResultDict(typing.TypedDict):
     description: str
     result: bool | None
     err_msg: str
+    url: str
 
 
 @dataclasses.dataclass(frozen=True, kw_only=True)
@@ -38,6 +39,7 @@ class Result:
     description: str
     result: bool | None
     err_msg: str = ""
+    url: str = ""
 
     def err_markdown(self) -> str:
         result: str = md.render(self.err_msg).strip()
@@ -120,6 +122,7 @@ def process(package: Traversable, *, ignore: Sequence[str] = ()) -> ProcessRetur
                 description=doc,
                 result=result,
                 err_msg=textwrap.dedent(err_msg.format(cls=check)),
+                url=getattr(check, "url", ""),
             )
         )
 

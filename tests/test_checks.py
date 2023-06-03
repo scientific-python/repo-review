@@ -15,6 +15,7 @@ from repo_review.checks import collect_checks
 class D100:
     "Was passed correctly"
     family = "pyproject"
+    url = "https://example.com"
 
     @staticmethod
     def check(package: Traversable) -> bool:
@@ -84,8 +85,10 @@ def test_custom_checks(monkeypatch: pytest.MonkeyPatch) -> None:
     assert len(results) == 2
     assert results[0].name == "D100"
     assert results[0].result
+    assert results[0].url == "https://example.com"
     assert results[1].name == "D200"
     assert results[1].result
+    assert not results[1].url
     assert len(results) == 2
 
 
