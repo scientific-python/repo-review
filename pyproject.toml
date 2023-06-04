@@ -10,7 +10,7 @@ authors = [
 ]
 license = { file = "LICENSE" }
 
-description = "Review repos for compliance to the Scikit-HEP developer guidelines"
+description = "Framework that can run checks on repos"
 readme = "README.md"
 
 requires-python = ">=3.10"
@@ -42,12 +42,20 @@ dependencies = [
 cli = [
   "click>=8",
   "rich>=12.2",
+  "rich-click",
 ]
 test = [
   "pytest >=7",
 ]
 dev = [
-  "pytest >=7",
+  "repo-review[test,cli]",
+]
+docs = [
+  "repo-review[cli]",
+  "furo",
+  "myst_parser >=0.13",
+  "sphinx >=4.0",
+  "sphinxcontrib-programoutput",
 ]
 
 [project.urls]
@@ -108,6 +116,7 @@ messages_control.disable = [
   "invalid-name",
   "redefined-outer-name",
   "no-member",  # better handled by mypy, etc.
+  "used-before-assignment",  # False positive on conditional import
 ]
 
 

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import argparse
 import shutil
 from pathlib import Path
 
@@ -69,6 +70,25 @@ def serve(session: nox.Session) -> None:
     Serve the webapp.
     """
 
-    session.cd("docs")
+    session.cd("webapp")
     session.log("Serving on http://localhost:8080")
     session.run("python3", "-m", "http.server", "8080")
+
+
+@nox.session(reuse_venv=True)
+def docs(session: nox.Session) -> None:
+    """
+    Build the docs. Pass "--serve" to serve.
+    """
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--serve", action="store_true", help="Serve after building")
+    args = parser.parse_args(session.posargs)
+
+    session.install(".[docs]")
+    session.chdir("docs")
+    session.run("sphinx-build", "-M", "html", ".", "_build")
+
+    if args.serve:
+        session.log("Launching docs at http://localhost:8000/ - use Ctrl-C to quit")
+        session.run("python", "-m", "http.server", "8000", "-d", "_build/html")
