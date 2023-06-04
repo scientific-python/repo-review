@@ -5,11 +5,16 @@ import functools
 import io
 import itertools
 import json
+import typing
 from collections.abc import Mapping
 from pathlib import Path
 from typing import Literal
 
-import click
+if typing.TYPE_CHECKING:
+    import click
+else:
+    import rich_click as click
+
 import markdown_it
 import rich.console
 import rich.markdown
@@ -117,7 +122,7 @@ def to_html(families: Mapping[str, Family], processed: list[Result]) -> str:
 @click.option(
     "--package-dir",
     "-p",
-    help="Python package subdirectory",
+    help="Path to python package.",
     default="",
 )
 def main(

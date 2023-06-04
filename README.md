@@ -6,24 +6,33 @@
 [![PyPI version][pypi-version]][pypi-link]
 [![PyPI platforms][pypi-platforms]][pypi-link]
 
-This tool can check the style of a repository. Use like this:
+<!-- SPHINX-START -->
 
-```bash
-pipx run 'repo-review[cli]' <path to repository>
-```
+This is a framework for building checks designed to check to see if a
+repository follows guidelines. By itself, it does nothing - it requires at
+least one plugin to be installed..
 
-This will produce a list of results - green checkmarks mean this rule is
-followed, red x’s mean the rule is not. A yellow warning sign means that the
-check was skipped because a previous required check failed.
+With one or more plugins, it will produce a list of results - green checkmarks
+mean this rule is followed, red x’s mean the rule is not. A yellow warning sign
+means that the check was skipped because a previous required check failed.
 
-Checks are defined by plugins. `sp-repo-review` provides checks based on
-the [Scientific-Python Development Pages][] at [scientific-python/cookie][].
+`sp-repo-review` provides checks based on the
+[Scientific-Python Development Guide][] at [scientific-python/cookie][].
 
-### Development
+## Running repo-review
+
+Repo-review supports running multiple ways:
+
+- From the command line on a local folder
+- From the command line on a remote repository on GitHub
+- From WebAssembly in Pyodide
+
+## Development of repo-review and plugins
 
 This repository is intended to be fun to develop - it requires and uses Python
 3.10, and uses a lot of the new features in 3.9 and 3.10. It's maybe not
-entirely conventional, but it's fun.
+entirely conventional, but it enables very simple plugin development. It works
+locally, remotely, and in WebAssembly (using Pyodide).
 
 There are a few key designs that are very useful and make this possible. First,
 all paths are handled as Traversables. This allows a simple Traversable
@@ -58,13 +67,15 @@ get a `None` result and the check method will not run. The front-end (Rich
 powered CLI or Pyodide webapp) will render the markdown-formatted check
 docstring only if the result is `False`.
 
-# Links
+## Links
 
 This project inspired [Try-PyHF](https://kratsg.github.io/try-pyhf/), an
 interface for a High Energy Physics package in Scikit-HEP.
 
 This project inspired [abSENSE](https://princetonuniversity.github.io/abSENSE/), an
 web interface to abSENSE.
+
+This was developed for [Scikit-HEP][] before moving to Scientific-Python.
 
 [actions-badge]: https://github.com/scientific-python/repo-review/workflows/CI/badge.svg
 [actions-link]: https://github.com/scientific-python/repo-review/actions
@@ -73,5 +84,6 @@ web interface to abSENSE.
 [pypi-link]: https://pypi.org/project/repo-review/
 [pypi-platforms]: https://img.shields.io/pypi/pyversions/repo-review
 [pypi-version]: https://badge.fury.io/py/repo-review.svg
-[scientific-python development guidelines]: https://learn.scientific-python.org/development
+[scientific-python development guide]: https://learn.scientific-python.org/development
 [scientific-python/cookie]: https://github.com/scientific-python/cookie
+[scikit-hep]: https://scikit-hep.org
