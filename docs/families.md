@@ -34,3 +34,9 @@ families = "my_plugin_package.my_family_module:get_families"
 ```
 
 The entry-point name doesn't matter.
+
+```{admonition} Fixtures
+Unlike almost all other parts of the API, the family function does not support
+fixtures. This could be added if there is a need, but usually not needed - if a
+check is not present from a family, the family will not be displayed.
+```
