@@ -148,10 +148,10 @@ def process(
             Result(
                 family=check.family,
                 name=task_name,
-                description=doc,
+                description=doc.format(self=check, name=task_name),
                 result=result,
                 err_msg=textwrap.dedent(err_msg.format(self=check, name=task_name)),
-                url=getattr(check, "url", ""),
+                url=getattr(check, "url", "").format(self=check, name=task_name),
             )
         )
 
