@@ -95,9 +95,9 @@ Here is the suggested function for the above example:
 
 ```python
 def repo_review_checks() -> dict[str, General | PyProject]:
-    return {p.__name__: p() for p in General.__subclasses__()} | {
-        p.__name__: p() for p in PyProject.__subclasses__()
-    }
+    general = {p.__name__: p() for p in General.__subclasses__()}
+    pyproject = {p.__name__: p() for p in PyProject.__subclasses__()}
+    return general | pyproject
 ```
 
 You tell repo review to use this function via an entry-point:

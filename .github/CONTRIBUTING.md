@@ -3,7 +3,7 @@ detailed description of best practices for developing Scikit-HEP packages.
 
 [scientific-python development pages]: https://learn.scientific-python.org/development
 
-# Quick development
+## Quick development
 
 The fastest way to start with development is to use nox. If you don't have nox,
 you can use `pipx run nox` to run it without installing, or `pipx install nox`.
@@ -26,7 +26,9 @@ $ nox -s build  # Make an SDist and wheel
 Nox handles everything for you, including setting up an temporary virtual
 environment for each run.
 
-# Setting up a development environment manually
+You can also use `nox -s run -- .` to run an example set of checks on a repo.
+
+## Setting up a development environment manually
 
 You can set up a development environment by running:
 
@@ -56,7 +58,7 @@ pre-commit install # Will install a pre-commit hook into the git repo
 
 You can also/alternatively run `pre-commit run` (changes only) or `pre-commit run --all-files` to check even without installing the hook.
 
-# Testing
+## Testing
 
 Use pytest to run the unit checks:
 
@@ -64,7 +66,7 @@ Use pytest to run the unit checks:
 pytest
 ```
 
-# Building docs
+## Building docs
 
 You can build the docs using:
 
@@ -78,7 +80,7 @@ You can see a preview with:
 nox -s docs -- serve
 ```
 
-# Pre-commit
+## Pre-commit
 
 This project uses pre-commit for all style checking. While you can run it with
 nox, this is such an important tool that it deserves to be installed on its
@@ -89,3 +91,8 @@ pre-commit run -a
 ```
 
 to check all files.
+
+## Running DevContainer
+
+You can use DevContainer, such as in GitHub Codespaces or locally. Nox and a
+local install will be available.
