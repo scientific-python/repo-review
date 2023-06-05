@@ -62,7 +62,7 @@ def test_empty_pyproject() -> None:
         == 1
     )
     assert (
-        sum(result.result for result in results if isinstance(result.result, bool)) == 4
+        sum(result.result for result in results if isinstance(result.result, bool)) == 6
     )
     assert (
         sum(result.result is None for result in results if result.family == "general")

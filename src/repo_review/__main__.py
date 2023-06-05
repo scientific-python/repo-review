@@ -44,20 +44,30 @@ def rich_printer(
         family_name = families[family].get("name", family)
         tree = rich.tree.Tree(f"[bold]{family_name}[/bold]:")
         for result in results_list:
+            color = (
+                "yellow"
+                if result.result is None
+                else "green"
+                if result.result
+                else "red"
+            )
+            description = (
+                f"[link={result.url}]{result.description}[/link]"
+                if result.url
+                else result.description
+            )
             msg = rich.text.Text()
             msg.append(result.name, style="bold")
             msg.append(" ")
+            msg.append(rich.text.Text.from_markup(description, style=color))
             if result.result is None:
-                msg.append(result.description, style="yellow")
                 msg.append(" [skipped]", style="yellow bold")
                 tree.add(msg)
             elif result.result:
-                msg.append(f"{result.description}? ", style="green")
-                msg.append(rich.text.Text.from_markup(":white_check_mark:"))
+                msg.append(rich.text.Text.from_markup(" :white_check_mark:"))
                 tree.add(msg)
             else:
-                msg.append(f"{result.description}? ", style="red")
-                msg.append(rich.text.Text.from_markup(":x:"))
+                msg.append(rich.text.Text.from_markup(" :x:"))
                 detail = rich.markdown.Markdown(result.err_msg)
                 msg_grp = rich.console.Group(msg, detail)
                 tree.add(msg_grp)
@@ -95,14 +105,19 @@ def to_html(families: Mapping[str, Family], processed: list[Result]) -> str:
                 if result.result
                 else "Failed"
             )
-            print(f'<tr style: "color: {color}">')
+            description = (
+                f'<a href="{result.url}">{result.description}</a>'
+                if result.url
+                else result.description
+            )
+            print(f'<tr style="color: {color};">')
             print(f'<td><span role="img" aria-label="{result_txt}">{icon}</span></td>')
             print(f"<td>{result.name}</td>")
             if result.result is None or result.result:
-                print(f"<td>{result.description}</td>")
+                print(f"<td>{description}</td>")
             else:
                 print("<td>")
-                print(result.description)
+                print(description)
                 print("<br/>")
                 print(md.render(result.err_msg))
                 print("</td>")
