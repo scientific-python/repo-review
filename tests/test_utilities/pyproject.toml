@@ -1,1 +1,16 @@
+[build-system]
+requires = ["flit-core"]
+build-backend = "flit_core.buildapi"
+
+[project]
+name = "pyproject"
+version = "0.0.1"
+classfiers = [
+    "Private :: Do Not Upload",
+]
+description = "Simple repo-review example for testing"
+
+[project.entry-points."repo_review.checks"]
+pyproject = "pyproject:repo_review_checks"
+
 [tool.example]

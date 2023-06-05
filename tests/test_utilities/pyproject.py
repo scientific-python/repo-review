@@ -71,6 +71,7 @@ class PP002(PyProject):
     "Has a proper build-system table"
 
     requires = {"PY001"}
+    url = "https://packaging.python.org/en/latest/specifications/declaring-build-dependencies"
 
     @staticmethod
     def check(pyproject: dict[str, Any]) -> bool:
