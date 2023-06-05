@@ -26,7 +26,7 @@ import rich.tree
 from ._compat.importlib.resources.abc import Traversable
 from .families import Family
 from .ghpath import GHPath
-from .processor import Result, as_simple_dict, process
+from .processor import Result, _collect_all, as_simple_dict, process
 
 rich.traceback.install(suppress=[click, rich], show_locals=True, width=None)
 
@@ -78,15 +78,25 @@ def to_html(families: Mapping[str, Family], processed: list[Result]) -> str:
         family_name = families[family].get("name", family)
         print(f"<h2>{family_name}</h2>")
         print("<table>")
-        print("<tr><th>Result</th><th>Name</th><th>Description</th></tr>")
+        print("<tr><th>?</th><th>Name</th><th>Description</th></tr>")
         for result in results_list:
-            print("<tr>")
-            if result.result is None:
-                print("<td>Skipped</td>")
-            elif result.result:
-                print("<td>Passed</td>")
-            else:
-                print("<td>Failed</td>")
+            color = (
+                "orange"
+                if result.result is None
+                else "green"
+                if result.result
+                else "red"
+            )
+            icon = "⚠️" if result.result is None else "✅" if result.result else "❌"
+            result_txt = (
+                "Skipped"
+                if result.result is None
+                else "Passed"
+                if result.result
+                else "Failed"
+            )
+            print(f'<tr style: "color: {color}">')
+            print(f'<td><span role="img" aria-label="{result_txt}">{icon}</span></td>')
             print(f"<td>{result.name}</td>")
             if result.result is None or result.result:
                 print(f"<td>{result.description}</td>")
@@ -98,6 +108,10 @@ def to_html(families: Mapping[str, Family], processed: list[Result]) -> str:
                 print("</td>")
             print("</tr>")
         print("</table>")
+
+    if len(processed) == 0:
+        print('<span style="color: red;">No checks ran.</span>')
+
     return out.getvalue()
 
 
@@ -145,6 +159,11 @@ def main(
     ignore_list = {x.strip() for x in ignore.split(",") if x}
     select_list = {x.strip() for x in select.split(",") if x}
 
+    _, checks, _ = _collect_all(package, subdir=package_dir)
+    if len(checks) == 0:
+        msg = "No checks registered. Please install a repo-review plugin."
+        raise click.ClickException(msg)
+
     if str(package).startswith("gh:"):
         _, org_repo_branch, *p = str(package).split(":", maxsplit=2)
         org_repo, branch = org_repo_branch.split("@", maxsplit=1)
@@ -158,6 +177,8 @@ def main(
 
     if format == "rich":
         rich_printer(families, processed, output=output)
+        if len(processed) == 0:
+            rich.print("[bold red]No checks ran[/bold red]")
     elif format == "json":
         j = json.dumps(
             {"families": families, "checks": as_simple_dict(processed)}, indent=2
@@ -172,6 +193,11 @@ def main(
             output.write_text(html)
         else:
             rich.print(html)
+
+    if any(p.result is False for p in processed):
+        raise SystemExit(2)
+    if len(processed) == 0:
+        raise SystemExit(2)
 
 
 if __name__ == "__main__":
