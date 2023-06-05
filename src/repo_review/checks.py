@@ -11,8 +11,8 @@ __all__ = ["Check", "collect_checks", "is_allowed"]
 
 class Check(Protocol):
     family: str
-    requires: Set[str] = frozenset()
-    url: str = ""
+    requires: Set[str] = frozenset()  # Optional
+    url: str = ""  # Optional
 
     def check(self) -> bool | None | str:
         ...

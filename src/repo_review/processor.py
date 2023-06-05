@@ -105,17 +105,13 @@ def process(
     """
     package = root.joinpath(subdir) if subdir else root
 
-    fixtures, checks, families = _collect_all(root, subdir)
+    fixtures, tasks, families = _collect_all(root, subdir)
 
     # Collect our own config
     config = pyproject(package).get("tool", {}).get("repo-review", {})
     select_checks = select if select else set(config.get("select", ()))
     skip_checks = ignore if ignore else set(config.get("ignore", ()))
 
-    # Make list of filtered checks to run
-    tasks: dict[str, Check] = {
-        n: r for n, r in checks.items() if is_allowed(select_checks, skip_checks, n)
-    }
     # Make a graph of the check's interdependencies
     graph: dict[str, set[str]] = {
         n: getattr(t, "requires", set()) for n, t in tasks.items()
@@ -145,13 +141,16 @@ def process(
         doc = check.__doc__ or ""
         err_msg = completed[task_name] or ""
 
+        if not is_allowed(select_checks, skip_checks, task_name):
+            continue
+
         result_list.append(
             Result(
                 family=check.family,
                 name=task_name,
                 description=doc,
                 result=result,
-                err_msg=textwrap.dedent(err_msg.format(cls=check)),
+                err_msg=textwrap.dedent(err_msg.format(self=check, name=task_name)),
                 url=getattr(check, "url", ""),
             )
         )
