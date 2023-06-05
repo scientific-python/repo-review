@@ -5,6 +5,7 @@ import graphlib
 import textwrap
 import typing
 from collections.abc import Set
+from typing import Any
 
 import markdown_it
 
@@ -13,7 +14,14 @@ from .checks import Check, collect_checks, is_allowed
 from .families import Family, collect_families
 from .fixtures import apply_fixtures, collect_fixtures, compute_fixtures, pyproject
 
-__all__ = ["Result", "ResultDict", "ProcessReturn", "process", "as_simple_dict"]
+__all__ = [
+    "Result",
+    "ResultDict",
+    "ProcessReturn",
+    "process",
+    "as_simple_dict",
+    "_collect_all",
+]
 
 
 def __dir__() -> list[str]:
@@ -51,6 +59,29 @@ class ProcessReturn(typing.NamedTuple):
     results: list[Result]
 
 
+def _collect_all(
+    root: Traversable, subdir: str = ""
+) -> tuple[dict[str, Any], dict[str, Check], dict[str, Family]]:
+    package = root.joinpath(subdir) if subdir else root
+
+    # Collect the fixtures
+    fixture_functions = collect_fixtures()
+    fixtures = compute_fixtures(root, package, fixture_functions)
+
+    # Collect the checks
+    checks = collect_checks(fixtures)
+
+    # Collect families.
+    families = collect_families()
+
+    # These are optional, so fill in missing families.
+    for name in {c.family for c in checks.values()}:
+        if name not in families:
+            families[name] = Family()
+
+    return fixtures, checks, families
+
+
 def process(
     root: Traversable,
     *,
@@ -72,23 +103,9 @@ def process(
     subidr: str
         The path to the package in the subdirectory, if not at the root of the repository.
     """
-
     package = root.joinpath(subdir) if subdir else root
 
-    # Collect the fixtures
-    fixture_functions = collect_fixtures()
-    fixtures = compute_fixtures(root, package, fixture_functions)
-
-    # Collect the checks
-    checks = collect_checks(fixtures)
-
-    # Collect families.
-    families = collect_families()
-
-    # These are optional, so fill in missing families.
-    for name in {c.family for c in checks.values()}:
-        if name not in families:
-            families[name] = Family()
+    fixtures, checks, families = _collect_all(root, subdir)
 
     # Collect our own config
     config = pyproject(package).get("tool", {}).get("repo-review", {})
