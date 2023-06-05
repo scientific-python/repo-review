@@ -98,7 +98,7 @@ def test_ignore_filter_single(monkeypatch: pytest.MonkeyPatch) -> None:
         "collect_checks",
         lambda _: {"D100": D100, "D200": D200},
     )
-    _, results = repo_review.processor.process(Path("."), ignore=["D100"])
+    _, results = repo_review.processor.process(Path("."), ignore={"D100"})
 
     assert len(results) == 1
     assert results[0].name == "D200"
@@ -111,9 +111,31 @@ def test_ignore_filter_letter(monkeypatch: pytest.MonkeyPatch) -> None:
         "collect_checks",
         lambda _: {"D100": D100(), "D200": D200()},
     )
-    _, results = repo_review.processor.process(Path("."), ignore=["D"])
+    _, results = repo_review.processor.process(Path("."), ignore={"D"})
 
     assert not results
+
+
+def test_select_filter_letter(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(
+        repo_review.processor,
+        "collect_checks",
+        lambda _: {"D100": D100(), "D200": D200(), "C100": C100(fail=True)},
+    )
+    _, results = repo_review.processor.process(Path("."), select={"D"})
+
+    assert len(results) == 2
+
+
+def test_select_filter_exact(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(
+        repo_review.processor,
+        "collect_checks",
+        lambda _: {"D100": D100(), "D200": D200()},
+    )
+    _, results = repo_review.processor.process(Path("."), select={"D100"})
+
+    assert len(results) == 1
 
 
 def test_string_result(monkeypatch: pytest.MonkeyPatch) -> None:

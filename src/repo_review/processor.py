@@ -4,7 +4,7 @@ import dataclasses
 import graphlib
 import textwrap
 import typing
-from collections.abc import Sequence
+from collections.abc import Set
 
 import markdown_it
 
@@ -52,7 +52,11 @@ class ProcessReturn(typing.NamedTuple):
 
 
 def process(
-    root: Traversable, *, ignore: Sequence[str] = (), subdir: str = ""
+    root: Traversable,
+    *,
+    select: Set[str] = frozenset(),
+    ignore: Set[str] = frozenset(),
+    subdir: str = "",
 ) -> ProcessReturn:
     """
     Process the package and return a dictionary of results.
@@ -88,11 +92,12 @@ def process(
 
     # Collect our own config
     config = pyproject(package).get("tool", {}).get("repo-review", {})
-    skip_checks = set(ignore) | set(config.get("ignore", ()))
+    select_checks = select if select else set(config.get("select", ()))
+    skip_checks = ignore if ignore else set(config.get("ignore", ()))
 
     # Make list of filtered checks to run
     tasks: dict[str, Check] = {
-        n: r for n, r in checks.items() if is_allowed(skip_checks, n)
+        n: r for n, r in checks.items() if is_allowed(select_checks, skip_checks, n)
     }
     # Make a graph of the check's interdependencies
     graph: dict[str, set[str]] = {

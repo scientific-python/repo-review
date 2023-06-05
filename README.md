@@ -24,13 +24,28 @@ means that the check was skipped because a previous required check failed.
 Repo-review supports running multiple ways:
 
 - From the command line on a local folder
-- From the command line on a remote repository on GitHub
-- From WebAssembly in Pyodide
+- From the command line on a remote repository on GitHub (`gh:org/repo@branch`)
+- From WebAssembly in Pyodide (example in `docs/index.html`)
+
+If the root of a package is not the repository root, pass `--package-dir a/b/c`.
+
+## Configuration
+
+Repo-review supports configuration via `pyproject.toml`:
+
+```toml
+[tool.repo-review]
+select = ["A", "B", "C100"]
+ignore = ["A100"]
+```
+
+If `--select` or `--ignore` are given on the command line, they will override
+the `pyproject.toml` config.
 
 ## Development of repo-review and plugins
 
-This repository is intended to be fun to develop - it requires and uses Python
-3.10, and uses a lot of the new features in 3.9 and 3.10. It's maybe not
+This repository is intended to be fun and easy to develop - it requires and uses
+Python 3.10, and uses a lot of the new features in 3.9 and 3.10. It's maybe not
 entirely conventional, but it enables very simple plugin development. It works
 locally, remotely, and in WebAssembly (using Pyodide).
 

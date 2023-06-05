@@ -23,6 +23,7 @@ import rich.text
 import rich.traceback
 import rich.tree
 
+from ._compat.importlib.resources.abc import Traversable
 from .families import Family
 from .ghpath import GHPath
 from .processor import Result, as_simple_dict, process
@@ -115,6 +116,11 @@ def to_html(families: Mapping[str, Family], processed: list[Result]) -> str:
     help="Select output format.",
 )
 @click.option(
+    "--select",
+    help="Only run certain checks, comma separated. All checks run if empty.",
+    default="",
+)
+@click.option(
     "--ignore",
     help="Ignore a check or checks, comma separated.",
     default="",
@@ -126,26 +132,29 @@ def to_html(families: Mapping[str, Family], processed: list[Result]) -> str:
     default="",
 )
 def main(
-    package: Path,
+    package: Traversable,
     output: Path | None,
     format: Literal["rich", "json", "html"],
+    select: str,
     ignore: str,
     package_dir: str,
 ) -> None:
     """
     Pass in a local Path or gh:org/repo@branch.
     """
-    ignore_list = [x.strip() for x in ignore.split(",")]
+    ignore_list = {x.strip() for x in ignore.split(",") if x}
+    select_list = {x.strip() for x in select.split(",") if x}
 
     if str(package).startswith("gh:"):
         _, org_repo_branch, *p = str(package).split(":", maxsplit=2)
         org_repo, branch = org_repo_branch.split("@", maxsplit=1)
-        ghpackage = GHPath(repo=org_repo, branch=branch, path=p[0] if p else "")
+        package = GHPath(repo=org_repo, branch=branch, path=p[0] if p else "")
         if format == "rich":
             rich.print(f"[bold]Processing [blue]{package}[/blue] from GitHub\n")
-        families, processed = process(ghpackage, ignore=ignore_list, subdir=package_dir)
-    else:
-        families, processed = process(package, ignore=ignore_list, subdir=package_dir)
+
+    families, processed = process(
+        package, select=select_list, ignore=ignore_list, subdir=package_dir
+    )
 
     if format == "rich":
         rich_printer(families, processed, output=output)

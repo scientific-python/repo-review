@@ -30,13 +30,18 @@ def collect_checks(fixtures: Mapping[str, Any]) -> dict[str, Check]:
     }
 
 
-def is_allowed(ignore_list: Set[str], name: str) -> bool:
+def is_allowed(select_list: Set[str], ignore_list: Set[str], name: str) -> bool:
     """
-    Skips the check if the name is in the ignore list or if the name without
-    the number is in the ignore list.
+    Skips the check if the name is in the ignore list or if the name without the
+    number is in the ignore list. If the select list is not empty, only runs the
+    check if the name or name without the number is in the select list.
     """
-    if name in ignore_list:
+    if (
+        select_list
+        and name not in select_list
+        and name.rstrip("0123456789") not in select_list
+    ):
         return False
-    if name.rstrip("0123456789") in ignore_list:
+    if name in ignore_list or name.rstrip("0123456789") in ignore_list:
         return False
     return True
