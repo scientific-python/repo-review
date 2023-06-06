@@ -140,6 +140,7 @@ def to_html(families: Mapping[str, Family], processed: list[Result]) -> str:
 )
 @click.option(
     "--format",
+    "format_opt",
     type=click.Choice(["rich", "json", "html"]),
     default="rich",
     help="Select output format.",
@@ -160,13 +161,20 @@ def to_html(families: Mapping[str, Family], processed: list[Result]) -> str:
     help="Path to python package.",
     default="",
 )
+@click.option(
+    "--list/--no-list",
+    "list_opt",
+    help="List all checks and exit",
+    default=False,
+)
 def main(
     package: Traversable,
     output: Path | None,
-    format: Literal["rich", "json", "html"],
+    format_opt: Literal["rich", "json", "html"],
     select: str,
     ignore: str,
     package_dir: str,
+    list_opt: bool,
 ) -> None:
     """
     Pass in a local Path or gh:org/repo@branch.
@@ -174,27 +182,35 @@ def main(
     ignore_list = {x.strip() for x in ignore.split(",") if x}
     select_list = {x.strip() for x in select.split(",") if x}
 
-    _, checks, _ = _collect_all(package, subdir=package_dir)
+    _, checks, families = _collect_all(package, subdir=package_dir)
     if len(checks) == 0:
         msg = "No checks registered. Please install a repo-review plugin."
         raise click.ClickException(msg)
+
+    if list_opt:
+        for family, grp in itertools.groupby(checks.items(), key=lambda x: x[1].family):
+            rich.print(f'  [dim]# {families[family].get("name", family)}')
+            for code, check in grp:
+                rich.print(f'  "{code}",  [dim]# {check.__doc__}')
+
+        raise SystemExit(0)
 
     if str(package).startswith("gh:"):
         _, org_repo_branch, *p = str(package).split(":", maxsplit=2)
         org_repo, branch = org_repo_branch.split("@", maxsplit=1)
         package = GHPath(repo=org_repo, branch=branch, path=p[0] if p else "")
-        if format == "rich":
+        if format_opt == "rich":
             rich.print(f"[bold]Processing [blue]{package}[/blue] from GitHub\n")
 
     families, processed = process(
         package, select=select_list, ignore=ignore_list, subdir=package_dir
     )
 
-    if format == "rich":
+    if format_opt == "rich":
         rich_printer(families, processed, output=output)
         if len(processed) == 0:
             rich.print("[bold red]No checks ran[/bold red]")
-    elif format == "json":
+    elif format_opt == "json":
         j = json.dumps(
             {"families": families, "checks": as_simple_dict(processed)}, indent=2
         )
@@ -202,7 +218,7 @@ def main(
             output.write_text(j)
         else:
             rich.print_json(j)
-    elif format == "html":
+    elif format_opt == "html":
         html = to_html(families, processed)
         if output:
             output.write_text(html)

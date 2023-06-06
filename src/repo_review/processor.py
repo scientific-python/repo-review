@@ -4,8 +4,8 @@ import dataclasses
 import graphlib
 import textwrap
 import typing
-from collections.abc import Set
-from typing import Any
+from collections.abc import Mapping, Set
+from typing import Any, TypeVar
 
 import markdown_it
 
@@ -59,6 +59,26 @@ class ProcessReturn(typing.NamedTuple):
     results: list[Result]
 
 
+class HasFamily(typing.Protocol):
+    @property
+    def family(self) -> str:
+        ...
+
+
+T = TypeVar("T", bound=HasFamily)
+
+
+def _sort_by_family(
+    families: Mapping[str, Family], dict_has_family: Mapping[str, T]
+) -> dict[str, T]:
+    return dict(
+        sorted(
+            dict_has_family.items(),
+            key=lambda x: (families[x[1].family].get("order", 0), x[1].family, x[0]),
+        )
+    )
+
+
 def _collect_all(
     root: Traversable, subdir: str = ""
 ) -> tuple[dict[str, Any], dict[str, Check], dict[str, Family]]:
@@ -78,6 +98,9 @@ def _collect_all(
     for name in {c.family for c in checks.values()}:
         if name not in families:
             families[name] = Family()
+
+    # Sort results
+    checks = _sort_by_family(families, checks)
 
     return fixtures, checks, families
 
@@ -133,10 +156,7 @@ def process(
 
     # Collect the results
     result_list = []
-    for task_name, check in sorted(
-        tasks.items(),
-        key=lambda x: (families[x[1].family].get("order", 0), x[1].family, x[0]),
-    ):
+    for task_name, check in _sort_by_family(families, tasks).items():
         result = None if completed[task_name] is None else not completed[task_name]
         doc = check.__doc__ or ""
         err_msg = completed[task_name] or ""
