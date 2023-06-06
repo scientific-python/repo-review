@@ -9,7 +9,7 @@
       src="https://cdn.jsdelivr.net/pyodide/v0.23.2/full/pyodide.js"
       crossorigin
     ></script>
-    <!-- Production
+    <!-- Production -->
     <script
       src="https://unpkg.com/react@18/umd/react.production.min.js"
       crossorigin
@@ -22,7 +22,7 @@
       src="https://unpkg.com/@mui/material@v5.13.3/umd/material-ui.production.min.js"
       crossorigin
     ></script>
-    -->
+    <!-- Development
     <script
       src="https://unpkg.com/react@18/umd/react.development.js"
       crossorigin
@@ -35,7 +35,7 @@
       src="https://unpkg.com/@mui/material@v5.13.3/umd/material-ui.development.js"
       crossorigin
     ></script>
-    ->
+    -->
 
     <!-- Can remove this for a pre-processor -->
     <script
@@ -60,7 +60,12 @@
     <div id="root">Loading...</div>
     <script type="text/babel">
       const root = ReactDOM.createRoot(document.getElementById("root"));
-      root.render(<App header={true} />);
+      root.render(
+        <App
+          header={true}
+          deps={["sp_repo_review==2023.06.01", "repo-review==0.7.0b4"]}
+        />,
+      );
     </script>
   </body>
 </html>
