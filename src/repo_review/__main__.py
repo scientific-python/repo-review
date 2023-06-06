@@ -1,8 +1,5 @@
 from __future__ import annotations
 
-import builtins
-import functools
-import io
 import itertools
 import json
 import typing
@@ -15,7 +12,6 @@ if typing.TYPE_CHECKING:
 else:
     import rich_click as click
 
-import markdown_it
 import rich.console
 import rich.markdown
 import rich.terminal_theme
@@ -26,6 +22,7 @@ import rich.tree
 from ._compat.importlib.resources.abc import Traversable
 from .families import Family
 from .ghpath import GHPath
+from .html import to_html
 from .processor import Result, _collect_all, as_simple_dict, process
 
 rich.traceback.install(suppress=[click, rich], show_locals=True, width=None)
@@ -77,57 +74,6 @@ def rich_printer(
 
     if output is not None:
         console.save_svg(str(output), theme=rich.terminal_theme.DEFAULT_TERMINAL_THEME)
-
-
-def to_html(families: Mapping[str, Family], processed: list[Result]) -> str:
-    out = io.StringIO()
-    print = functools.partial(builtins.print, file=out)
-    md = markdown_it.MarkdownIt()
-
-    for family, results_list in itertools.groupby(processed, lambda r: r.family):
-        family_name = families[family].get("name", family)
-        print(f"<h2>{family_name}</h2>")
-        print("<table>")
-        print("<tr><th>?</th><th>Name</th><th>Description</th></tr>")
-        for result in results_list:
-            color = (
-                "orange"
-                if result.result is None
-                else "green"
-                if result.result
-                else "red"
-            )
-            icon = "⚠️" if result.result is None else "✅" if result.result else "❌"
-            result_txt = (
-                "Skipped"
-                if result.result is None
-                else "Passed"
-                if result.result
-                else "Failed"
-            )
-            description = (
-                f'<a href="{result.url}">{result.description}</a>'
-                if result.url
-                else result.description
-            )
-            print(f'<tr style="color: {color};">')
-            print(f'<td><span role="img" aria-label="{result_txt}">{icon}</span></td>')
-            print(f"<td>{result.name}</td>")
-            if result.result is None or result.result:
-                print(f"<td>{description}</td>")
-            else:
-                print("<td>")
-                print(description)
-                print("<br/>")
-                print(md.render(result.err_msg))
-                print("</td>")
-            print("</tr>")
-        print("</table>")
-
-    if len(processed) == 0:
-        print('<span style="color: red;">No checks ran.</span>')
-
-    return out.getvalue()
 
 
 @click.command(context_settings={"help_option_names": ["-h", "--help"]})

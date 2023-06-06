@@ -152,18 +152,17 @@ function Results(props) {
   );
 }
 
-async function prepare_pyodide() {
+async function prepare_pyodide(deps) {
+  const deps_str = deps.map((i) => `"${i}"`).join(", ");
   const pyodide = await loadPyodide();
 
   await pyodide.loadPackage("micropip");
   await pyodide.runPythonAsync(`
         import micropip
-        await micropip.install(["sp_repo_review==2023.06.01", "repo-review==0.7.0b4"])
+        await micropip.install([${deps_str}])
     `);
   return pyodide;
 }
-
-const pyodide_promise = prepare_pyodide();
 
 function MyThemeProvider(props) {
   const prefersDarkMode = MaterialUI.useMediaQuery(
@@ -199,6 +198,7 @@ class App extends React.Component {
       err_msg: "",
       url: "",
     };
+    this.pyodide_promise = prepare_pyodide(props.deps);
   }
 
   handleCompute() {
@@ -221,7 +221,7 @@ class App extends React.Component {
       progress: true,
     });
     const state = this.state;
-    pyodide_promise.then((pyodide) => {
+    this.pyodide_promise.then((pyodide) => {
       var families_checks;
       try {
         families_checks = pyodide.runPython(`
