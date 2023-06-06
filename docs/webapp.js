@@ -14,14 +14,8 @@ function Heading(props) {
             component="div"
             sx={{ flexGrow: 1 }}
           >
-            SP-Repo-Review
+            Repo-Review
           </MaterialUI.Typography>
-          <MaterialUI.Button
-            href="https://learn.scientific-python.org/development"
-            color="inherit"
-          >
-            Developer Guidelines
-          </MaterialUI.Button>
           <MaterialUI.Button
             href="https://github.com/scientific-python/repo-review"
             color="inherit"
@@ -189,11 +183,12 @@ function MyThemeProvider(props) {
 class App extends React.Component {
   constructor(props) {
     super(props);
+    const deps_str = props.deps.map((i) => `"${i}"`).join(", ");
     this.state = {
       results: [],
       repo: urlParams.get("repo") || "",
       branch: urlParams.get("branch") || "",
-      msg: DEFAULT_MSG,
+      msg: `${DEFAULT_MSG} Packages: ${deps_str}`,
       progress: false,
       err_msg: "",
       url: "",
