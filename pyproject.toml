@@ -46,6 +46,7 @@ cli = [
 ]
 test = [
   "pytest >=7",
+  "sp-repo-review",
 ]
 dev = [
   "repo-review[test,cli]",

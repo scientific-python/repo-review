@@ -71,7 +71,7 @@ def serve(session: nox.Session) -> None:
     Serve the webapp.
     """
 
-    session.cd("webapp")
+    session.cd("docs")
     session.log("Serving on http://localhost:8080")
     session.run("python3", "-m", "http.server", "8080")
 

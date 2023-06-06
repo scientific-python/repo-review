@@ -14,11 +14,17 @@ def patch_entry_points(monkeypatch: pytest.MonkeyPatch) -> None:
         group="repo_review.checks",
         value="pyproject:repo_review_checks",
     )
-    monkeypatch.setattr(
-        importlib.metadata,
-        "entry_points",
-        lambda group: [ep] if group == "repo_review.checks" else orig_ep(group=group),
-    )
+
+    def new_ep(*, group: str) -> list[importlib.metadata.EntryPoint]:
+        if group == "repo_review.checks":
+            return [ep]
+        if group in {"repo_review.fixtures", "repo_review.families"}:
+            return [
+                e for e in orig_ep(group=group) if e.module.startswith("repo_review.")
+            ]
+        return orig_ep(group=group)
+
+    monkeypatch.setattr(importlib.metadata, "entry_points", new_ep)
 
 
 def test_pyproject() -> None:
