@@ -14,7 +14,7 @@ provided by the checks.
 This webapp can be embedded into an existing webpage if you set
 `header={false}`. You can set your own deps with `deps = {["...", "..."]}`.
 
-## Custom App
+## Custom app
 
 You can also use the `html` output and write your own webapp. You need to provide Pyodide:
 
@@ -52,7 +52,7 @@ result_html_py = pyodide.runPython(`
   GHPath.open_url = staticmethod(open_url)
 
   package = GHPath(repo="${state.repo}", branch="${state.branch}")
-  to_html(process(package))
+  to_html(*process(package))
 `);
 result_html = result_html_py.toString();
 ```
