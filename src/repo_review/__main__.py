@@ -28,6 +28,13 @@ from .ghpath import GHPath
 from .html import to_html
 from .processor import Result, _collect_all, as_simple_dict, process
 
+__all__ = ["main"]
+
+
+def __dir__() -> list[str]:
+    return __all__
+
+
 rich.traceback.install(suppress=[click, rich], show_locals=True, width=None)
 
 
