@@ -1,0 +1,7 @@
+- id: repo-review
+  name: repo-review
+  description: Check for configuration best practices
+  entry: repo-review
+  language: python
+  types_or: [text]
+  minimum_pre_commit_version: 2.9.0
