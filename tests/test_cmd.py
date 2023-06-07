@@ -10,6 +10,18 @@ def test_cmd_help():
     subprocess.run(["repo-review", "--help"], check=True)
 
 
+def test_cmd_help_short():
+    subprocess.run(["repo-review", "-h"], check=True)
+
+
+def test_cmd_version():
+    subprocess.run(["repo-review", "--version"], check=True)
+
+
+def test_cmd_list_all():
+    subprocess.run(["repo-review", "--list-all"], check=True)
+
+
 def test_cmd_basic():
     subprocess.run(["repo-review", "."], check=True)
 
