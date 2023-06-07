@@ -37,16 +37,17 @@ def rich_printer(
     *,
     svg: bool = False,
     stderr: bool = False,
+    color: bool = True,
 ) -> None:
     console = rich.console.Console(
-        record=svg, quiet=svg, stderr=stderr, color_system=None if stderr else "auto"
+        record=svg, quiet=svg, stderr=stderr, color_system="auto" if color else None
     )
 
     for family, results_list in itertools.groupby(processed, lambda r: r.family):
         family_name = families[family].get("name", family)
         tree = rich.tree.Tree(f"[bold]{family_name}[/bold]:")
         for result in results_list:
-            color = (
+            style = (
                 "yellow"
                 if result.result is None
                 else "green"
@@ -61,7 +62,7 @@ def rich_printer(
             msg = rich.text.Text()
             msg.append(result.name, style="bold")
             msg.append(" ")
-            msg.append(rich.text.Text.from_markup(description, style=color))
+            msg.append(rich.text.Text.from_markup(description, style=style))
             if result.result is None:
                 msg.append(" [skipped]", style="yellow bold")
                 tree.add(msg)
@@ -82,10 +83,13 @@ def rich_printer(
 
     if svg:
         str = console.export_svg(theme=rich.terminal_theme.DEFAULT_TERMINAL_THEME)
-        if stderr:
-            print(str, file=sys.stderr)
+        if color:
+            rich.print(
+                rich.syntax.Syntax(str, lexer="xml"),
+                file=sys.stderr if stderr else sys.stdout,
+            )
         else:
-            rich.print(rich.syntax.Syntax(str, lexer="xml"))
+            print(str, file=sys.stderr if stderr else sys.stdout)
 
 
 def display_output(
@@ -94,24 +98,30 @@ def display_output(
     *,
     format_opt: Literal["rich", "json", "html", "svg"],
     stderr: bool,
+    color: bool,
 ) -> None:
     match format_opt:
         case "rich" | "svg":
-            rich_printer(families, processed, svg=format_opt == "svg", stderr=stderr)
+            rich_printer(
+                families, processed, svg=format_opt == "svg", stderr=stderr, color=color
+            )
         case "json":
             j = json.dumps(
                 {"families": families, "checks": as_simple_dict(processed)}, indent=2
             )
-            if stderr:
-                print(j, file=sys.stderr)
-            else:
-                rich.print_json(j)
+            console = rich.console.Console(
+                stderr=stderr, color_system="auto" if color else None
+            )
+            console.print_json(j)
         case "html":
             html = to_html(families, processed)
-            if stderr:
-                print(html, file=sys.stderr)
+            if color:
+                rich.print(
+                    rich.syntax.Syntax(html, lexer="html"),
+                    file=sys.stderr if stderr else sys.stdout,
+                )
             else:
-                rich.print(rich.syntax.Syntax(html, lexer="html"))
+                print(html, file=sys.stderr if stderr else sys.stdout)
         case _:
             assert_never(format_opt)
 
@@ -127,8 +137,9 @@ def display_output(
 )
 @click.option(
     "--stderr",
+    "stderr_fmt",
     type=click.Choice(["rich", "json", "html", "svg"]),
-    help="Select additional output format for stderr. Will not use terminal escape codes.",
+    help="Select additional output format for stderr. Will disable terminal escape codes for stdout for easy redirection.",
 )
 @click.option(
     "--select",
@@ -155,7 +166,7 @@ def display_output(
 def main(
     package: Traversable,
     format_opt: Literal["rich", "json", "html"],
-    stderr: Literal["rich", "json", "html"] | None,
+    stderr_fmt: Literal["rich", "json", "html"] | None,
     select: str,
     ignore: str,
     package_dir: str,
@@ -191,9 +202,17 @@ def main(
         package, select=select_list, ignore=ignore_list, subdir=package_dir
     )
 
-    display_output(families, processed, format_opt=format_opt, stderr=False)
-    if stderr:
-        display_output(families, processed, format_opt=stderr, stderr=True)
+    display_output(
+        families,
+        processed,
+        format_opt=format_opt,
+        stderr=False,
+        color=stderr_fmt is None,
+    )
+    if stderr_fmt:
+        display_output(
+            families, processed, format_opt=stderr_fmt, stderr=True, color=True
+        )
 
     if any(p.result is False for p in processed):
         raise SystemExit(2)

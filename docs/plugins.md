@@ -8,6 +8,19 @@ standardized backend, such as `hatchling`, `flit-core`, `pdm-backend`, or
 `setuptools>=61`. If you are using some other build backend, please adjust
 accordingly.
 
+## Avoiding CLI requirements on WebAssembly usage
+
+Repo-review uses `repo-review[cli]` to keep CLI requirements from being
+included in the base package, and plugins can follow this if they want to be
+used directly:
+
+```toml
+[project.optional-dependencies]
+cli = [
+  "repo-review[cli]",
+]
+```
+
 ## Custom entry-point (optional)
 
 If you want to provide your own CLI name, you can
@@ -52,7 +65,7 @@ a subset of files (which most should).
 
 ## GitHub Actions support
 
-You can add an `actions.yml` file similar to this to natively support GitHub
+You can add an `action.yml` file similar to this to natively support GitHub
 Actions & dependabot:
 
 ```yaml
@@ -78,11 +91,12 @@ runs:
       run: >
         pipx run
         --python '${{ steps.python.outputs.python-path }}'
-        --spec '${{ github.action_path }}'
+        --spec '${{ github.action_path }}[cli]'
         repo-review .
-        --stderr html
+        --format html
+        --stderr rich
         --select "${{ inputs.select }}"
         --ignore "${{ inputs.ignore }}"
         --package-dir "${{ inputs.package-dir }}"
-        2> $GITHUB_STEP_SUMMARY
+        >> $GITHUB_STEP_SUMMARY
 ```
