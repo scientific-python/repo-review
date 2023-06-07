@@ -60,10 +60,11 @@ docs = [
 ]
 
 [project.urls]
-homepage = "https://repo-review.readthedocs.io/"
-source = "https://github.com/scientific-python/repo-review"
-demo = "https://scientific-python.github.io/repo-review"
-changelog = "https://github.com/scientific-python/repo-review/releases"
+Changelog = "https://github.com/scientific-python/repo-review/releases"
+Demo = "https://scientific-python.github.io/repo-review"
+Documentation = "https://repo-review.readthedocs.io/"
+Homepage = "https://repo-review.readthedocs.io/"
+Source = "https://github.com/scientific-python/repo-review"
 
 [project.scripts]
 repo-review = "repo_review.__main__:main"
