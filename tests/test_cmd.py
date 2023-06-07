@@ -15,8 +15,18 @@ def test_cmd_basic():
 
 
 def test_cmd_html():
-    subprocess.run(["repo-review", ".", "--format", "html"], check=True)
+    subprocess.run(
+        ["repo-review", ".", "--format", "html", "--stderr", "html"], check=True
+    )
 
 
 def test_cmd_json():
-    subprocess.run(["repo-review", ".", "--format", "json"], check=True)
+    subprocess.run(
+        ["repo-review", ".", "--format", "json", "--stderr", "json"], check=True
+    )
+
+
+def test_cmd_svg():
+    subprocess.run(
+        ["repo-review", ".", "--format", "svg", "--stderr", "svg"], check=True
+    )

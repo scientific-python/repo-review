@@ -15,6 +15,7 @@ else:
 
 import rich.console
 import rich.markdown
+import rich.syntax
 import rich.terminal_theme
 import rich.text
 import rich.traceback
@@ -37,7 +38,9 @@ def rich_printer(
     svg: bool = False,
     stderr: bool = False,
 ) -> None:
-    console = rich.console.Console(record=svg, quiet=svg, stderr=stderr)
+    console = rich.console.Console(
+        record=svg, quiet=svg, stderr=stderr, color_system=None if stderr else "auto"
+    )
 
     for family, results_list in itertools.groupby(processed, lambda r: r.family):
         family_name = families[family].get("name", family)
@@ -79,7 +82,10 @@ def rich_printer(
 
     if svg:
         str = console.export_svg(theme=rich.terminal_theme.DEFAULT_TERMINAL_THEME)
-        print(str, file=sys.stderr if stderr else sys.stdout)
+        if stderr:
+            print(str, file=sys.stderr)
+        else:
+            rich.print(rich.syntax.Syntax(str, lexer="xml"))
 
 
 def display_output(
@@ -96,10 +102,16 @@ def display_output(
             j = json.dumps(
                 {"families": families, "checks": as_simple_dict(processed)}, indent=2
             )
-            print(j, file=sys.stderr if stderr else sys.stdout)
+            if stderr:
+                print(j, file=sys.stderr)
+            else:
+                rich.print_json(j)
         case "html":
             html = to_html(families, processed)
-            print(html, file=sys.stderr if stderr else sys.stdout)
+            if stderr:
+                print(html, file=sys.stderr)
+            else:
+                rich.print(rich.syntax.Syntax(html, lexer="html"))
         case _:
             assert_never(format_opt)
 
@@ -116,7 +128,7 @@ def display_output(
 @click.option(
     "--stderr",
     type=click.Choice(["rich", "json", "html", "svg"]),
-    help="Select additional output format for stderr.",
+    help="Select additional output format for stderr. Will not use terminal escape codes.",
 )
 @click.option(
     "--select",

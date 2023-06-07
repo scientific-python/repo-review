@@ -76,12 +76,10 @@ runs:
     - name: Run repo-review
       shell: bash
       run: >
-        pipx run
-        --python '${{ steps.python.outputs.python-path }}'
-        --spec '${{ github.action_path }}[cli]'
-        repo-review
-        .
+        repo-review .
+        --stderr html
+        --select "${{ inputs.select }}"
+        --ignore "${{ inputs.ignore }}"
         --package-dir "${{ inputs.package-dir }}"
-        --format split
-        >> $GITHUB_STEP_SUMMARY
+        2> $GITHUB_STEP_SUMMARY
 ```
