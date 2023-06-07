@@ -1,5 +1,5 @@
 [build-system]
-requires = ["hatchling"]
+requires = ["hatchling", "hatch-vcs"]
 build-backend = "hatchling.build"
 
 
@@ -8,30 +8,27 @@ name = "repo_review"
 authors = [
   { name = "Henry Schreiner", email = "henryfs@princeton.edu" },
 ]
-license = { file = "LICENSE" }
-
 description = "Framework that can run checks on repos"
 readme = "README.md"
-
 requires-python = ">=3.10"
-
 classifiers = [
-  "License :: OSI Approved :: BSD License",
-  "Topic :: Scientific/Engineering",
-  "Intended Audience :: Science/Research",
+  "Development Status :: 4 - Beta",
   "Intended Audience :: Developers",
-  "Operating System :: OS Independent",
+  "Intended Audience :: Science/Research",
   "License :: OSI Approved :: BSD License",
-  "Programming Language :: Python",
+  "Operating System :: OS Independent",
+  "Environment :: Console",
+  "Environment :: WebAssembly :: Emscripten",
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
-  "Development Status :: 4 - Beta",
+  "Programming Language :: Python",
+  "Topic :: Software Development :: Quality Assurance",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+  "Typing :: Typed",
 ]
-
 dynamic = ["version"]
-
 dependencies = [
   "markdown-it-py",
   "pyyaml",
@@ -70,8 +67,10 @@ repo-review = "repo_review.__main__:main"
 [project.entry-points."repo_review.fixtures"]
 pyproject = "repo_review.fixtures:pyproject"
 
+
 [tool.hatch]
-version.path = "src/repo_review/__init__.py"
+version.source = "vcs"
+build.hooks.vcs.version-file = "src/repo_review/_version.py"
 
 
 [tool.pytest.ini_options]
