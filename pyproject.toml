@@ -50,11 +50,13 @@ dev = [
   "repo-review[test,cli]",
 ]
 docs = [
-  "repo-review[cli]",
   "furo",
   "myst_parser >=0.13",
+  "repo-review[cli]",
   "sphinx >=4.0",
+  "sphinx-copybutton",
   "sphinxcontrib-programoutput",
+  "sphinxext-opengraph",
 ]
 
 [project.urls]
