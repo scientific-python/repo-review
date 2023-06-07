@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import itertools
 import json
+import sys
 import typing
 from collections.abc import Mapping
 from pathlib import Path
@@ -33,9 +34,13 @@ rich.traceback.install(suppress=[click, rich], show_locals=True, width=None)
 
 
 def rich_printer(
-    families: Mapping[str, Family], processed: list[Result], *, output: Path | None
+    families: Mapping[str, Family],
+    processed: list[Result],
+    *,
+    output: Path | None = None,
+    stderr: bool = False,
 ) -> None:
-    console = rich.console.Console(record=True)
+    console = rich.console.Console(record=True, stderr=stderr)
 
     for family, results_list in itertools.groupby(processed, lambda r: r.family):
         family_name = families[family].get("name", family)
@@ -87,9 +92,9 @@ def rich_printer(
 @click.option(
     "--format",
     "format_opt",
-    type=click.Choice(["rich", "json", "html"]),
+    type=click.Choice(["rich", "json", "html", "split"]),
     default="rich",
-    help="Select output format.",
+    help="Select output format. 'split' produces html on stdout (or to a file), and rich on stderr.",
 )
 @click.option(
     "--select",
@@ -116,7 +121,7 @@ def rich_printer(
 def main(
     package: Traversable,
     output: Path | None,
-    format_opt: Literal["rich", "json", "html"],
+    format_opt: Literal["rich", "json", "html", "split"],
     select: str,
     ignore: str,
     package_dir: str,
@@ -156,7 +161,11 @@ def main(
         rich_printer(families, processed, output=output)
         if len(processed) == 0:
             rich.print("[bold red]No checks ran[/bold red]")
-    elif format_opt == "json":
+    if format_opt == "split":
+        rich_printer(families, processed, stderr=True)
+        if len(processed) == 0:
+            rich.print("[bold red]No checks ran[/bold red]", file=sys.stderr)
+    if format_opt == "json":
         j = json.dumps(
             {"families": families, "checks": as_simple_dict(processed)}, indent=2
         )
@@ -164,12 +173,12 @@ def main(
             output.write_text(j)
         else:
             rich.print_json(j)
-    elif format_opt == "html":
+    if format_opt in {"html", "split"}:
         html = to_html(families, processed)
         if output:
             output.write_text(html)
         else:
-            rich.print(html)
+            print(html)
 
     if any(p.result is False for p in processed):
         raise SystemExit(2)

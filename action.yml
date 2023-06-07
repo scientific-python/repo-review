@@ -39,15 +39,7 @@ runs:
       shell: bash
       run: >
         repo-review .
-        --select "${{ inputs.select }}"
-        --ignore "${{ inputs.ignore }}"
-        --package-dir "${{ inputs.package-dir }}"
-
-    - name: Produce job summary
-      shell: bash
-      run: >
-        repo-review .
-        --format html
+        --format split
         --select "${{ inputs.select }}"
         --ignore "${{ inputs.ignore }}"
         --package-dir "${{ inputs.package-dir }}"
