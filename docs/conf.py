@@ -3,7 +3,7 @@ import importlib.metadata
 project = "repo-review"
 copyright = "2022, Henry Schreiner"
 author = "Henry Schreiner"
-release = importlib.metadata.version("repo-review")
+release = importlib.metadata.version("repo-review").split("+")[0]
 version = ".".join(release.split(".")[:2])
 
 extensions = [
