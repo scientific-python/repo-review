@@ -79,16 +79,6 @@ runs:
         repo-review
         .
         --package-dir "${{ inputs.package-dir }}"
-
-    - name: Produce job summary
-      shell: bash
-      run: >
-        pipx run
-        --python '${{ steps.python.outputs.python-path }}'
-        --spec '${{ github.action_path }}[cli]'
-        repo-review
-        --format html
-        .
-        --package-dir "${{ inputs.package-dir }}"
+        --format split
         >> $GITHUB_STEP_SUMMARY
 ```
