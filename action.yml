@@ -39,8 +39,9 @@ runs:
       shell: bash
       run: >
         repo-review .
-        --stderr html
+        --format html
+        --stderr rich
         --select "${{ inputs.select }}"
         --ignore "${{ inputs.ignore }}"
         --package-dir "${{ inputs.package-dir }}"
-        2> $GITHUB_STEP_SUMMARY
+        >> $GITHUB_STEP_SUMMARY
