@@ -71,10 +71,11 @@ to extract.
 
 Checks can request fixtures (like pytest) as arguments. Check files can add new
 fixtures as needed. Fixtures are are specified with entry points, and take any
-other fixture as arguments as well - the `package` fixture represents the root
-of the package you are checking, and is the basis for all other fixtures.
-Checks are specified via an entrypoint that returns a dict of checks; this also
-can accept fixtures, allowing dynamic check listings.
+other fixture as arguments as well - the `root` and `package` fixtures
+represents the root of the repository and of the package you are checking,
+respectively, and are the basis for all other fixtures. `pyproject` is provided
+as well. Checks are specified via an entrypoint that returns a dict of checks;
+this also can accept fixtures, allowing dynamic check listings.
 
 Check files do not depend on the main library, and can be extended (similar to
 Flake8). You register new check files via entry-points - so extending this is
@@ -85,11 +86,10 @@ Checks are as simple as possible so they are easy to write. A check is a class
 with the name (1-2 letters + number) and a docstring (the check message). It
 should define a set of `requires` with any checks it depends on (by name), and
 have a check classmethod. The docstring of this method is the failure message,
-and supports substitution. Arguments to this method are fixtures, and `package`
-is the built-in one providing the package directory as a Traversable. Any other
-fixtures are available by name. A new fixture is given the package Traversable,
-and can produce anything; fixtures are topologically sorted, pre-computed and
-cached.
+and supports substitution. Arguments to this method are fixtures, and `root` or
+`package` are built-in providing a Traversable. Any other fixtures are available
+by name. A new fixture can use any other fixtures, and can produce anything;
+fixtures are topologically sorted, pre-computed and cached.
 
 The runner will topologically sort the checks, and checks that do not run will
 get a `None` result and the check method will not run. The front-end (Rich

@@ -16,7 +16,7 @@ class Check:
     requires: Set[str] = frozenset()  # Optional
     url: str = ""  # Optional
 
-    def check(self) -> bool | str:
+    def check(self) -> bool | str | None:
         """
         Error message if returns False.
         """
@@ -27,10 +27,10 @@ You need to implement `family`, which is a string indicating which family it is
 grouped under, and `check()`, which can take [](fixtures), and returns `True` if
 the check passes, or `False` if the check fails. If you want a dynamic error
 explanation instead of the `check()` docstring, you can return a non-empty
-string from the check instead of `False`. Docstrings/error messages can access
-their own object with `{self}` and check name with `{name}` (these are processed
-with `.format`, so escape `{}` as `{{}}`). The error message is in markdown
-format.
+string from the check instead of `False`. Returning `None` makes a check
+"skipped". Docstrings/error messages can access their own object with `{self}`
+and check name with `{name}` (these are processed with `.format`, so escape `{}`
+as `{{}}`). The error message is in markdown format.
 
 If the check named in `requires` does not pass, the check is skipped.
 
