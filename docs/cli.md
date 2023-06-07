@@ -9,8 +9,9 @@ Repo-review has a CLI interface.
 There are four output formats; `rich` produces great terminal output, `svg`
 produces an SVG based on the rich output, `html` produces a custom HTML report,
 and `json` produces a output that can be processed easily. To make it easier to
-support tools like GitHub Actions, there is also a `--stderr FORMAT` output option
-that produces the selected format on stderr as well.
+support tools like GitHub Actions, there is also a `--stderr FORMAT` output
+option that produces the selected format on stderr as well, and avoids producing
+terminal escape codes, even if `FORCE_COLOR` is set.
 
 JSON output looks like this:
 
