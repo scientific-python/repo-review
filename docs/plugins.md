@@ -76,6 +76,9 @@ runs:
     - name: Run repo-review
       shell: bash
       run: >
+        pipx run
+        --python '${{ steps.python.outputs.python-path }}'
+        --spec '${{ github.action_path }}'
         repo-review .
         --stderr html
         --select "${{ inputs.select }}"
