@@ -4,7 +4,9 @@
 :maxdepth: 2
 :hidden:
 
+intro
 cli
+plugins
 fixtures
 checks
 families
