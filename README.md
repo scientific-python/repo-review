@@ -1,7 +1,7 @@
 # repo-review
 
 [![Actions Status][actions-badge]][actions-link]
-[![Code style: black][black-badge]][black-link]
+[![Documentation Status][docs-badge]][docs-link]
 
 [![PyPI version][pypi-version]][pypi-link]
 [![PyPI platforms][pypi-platforms]][pypi-link]
@@ -108,11 +108,11 @@ This was developed for [Scikit-HEP][] before moving to Scientific-Python.
 
 [actions-badge]: https://github.com/scientific-python/repo-review/workflows/CI/badge.svg
 [actions-link]: https://github.com/scientific-python/repo-review/actions
-[black-badge]: https://img.shields.io/badge/code%20style-black-000000.svg
-[black-link]: https://github.com/psf/black
 [pypi-link]: https://pypi.org/project/repo-review/
 [pypi-platforms]: https://img.shields.io/pypi/pyversions/repo-review
 [pypi-version]: https://badge.fury.io/py/repo-review.svg
+[docs-badge]: https://readthedocs.org/projects/repo-review/badge/?version=latest
+[docs-link]: https://repo-review.readthedocs.io/en/latest/?badge=latest
 [scientific-python development guide]: https://learn.scientific-python.org/development
 [scientific-python/cookie]: https://github.com/scientific-python/cookie
 [scikit-hep]: https://scikit-hep.org
