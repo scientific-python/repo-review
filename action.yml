@@ -39,7 +39,8 @@ runs:
       shell: bash
       run: >
         repo-review .
-        --format split
+        --format html
+        --stderr rich
         --select "${{ inputs.select }}"
         --ignore "${{ inputs.ignore }}"
         --package-dir "${{ inputs.package-dir }}"

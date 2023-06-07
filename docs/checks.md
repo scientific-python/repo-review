@@ -28,8 +28,9 @@ grouped under, and `check()`, which can take [](fixtures), and returns `True` if
 the check passes, or `False` if the check fails. If you want a dynamic error
 explanation instead of the `check()` docstring, you can return a non-empty
 string from the check instead of `False`. Docstrings/error messages can access
-their own object with `{self}` and name with `{name}`. The error message is in
-markdown format.
+their own object with `{self}` and check name with `{name}` (these are processed
+with `.format`, so escape `{}` as `{{}}`). The error message is in markdown
+format.
 
 If the check named in `requires` does not pass, the check is skipped.
 
@@ -108,3 +109,48 @@ general_pyproject = "my_plugin_package.my_checks_module:repo_review_checks"
 ```
 
 The entry-point name doesn't matter.
+
+## Customizable checks
+
+You can customize checks, as well, using this system. Here is an example,
+using the (synthetic) case were we want to add a check based on the build-backend,
+and we want to require that `tool.<build-backend>` is present, where this
+depends on which build-backend we recognized. (Don't actually do this, you don't
+have to have a tool section to use the backends shown below!)
+
+```python
+import dataclasses
+from typing import ClassVar
+
+
+@dataclasses.dataclass
+class PP003(PyProject):
+    "Has a tool section for the {self.name!r} build backend"
+
+    requires: ClassVar[set[str]] = {"PY001"}
+    url: ClassVar[str] = "https://peps.python.org/pep-0517"
+
+    name: str
+
+    def check(self, pyproject: dict[str, Any]) -> bool:
+        """
+        Must have a {self.name!r} section.
+        """
+        match pyproject:
+            case {"tool": {self.name: object()}}:
+                return True
+            case _:
+                return False
+
+
+def repo_review_checks(pyproject: dict[str, Any]) -> dict[str, PyProject]:
+    backends = {
+        "setuptools.build_api": "setuptools",
+        "scikit_build_core.build": "scikit-build",
+    }
+    match pyproject:
+        case {"build-system": {"build-backend": str(x)}} if x in backends:
+            return {"PP003": PP003(name=backends[x])}
+        case _:
+            return {}
+```
