@@ -44,6 +44,17 @@ ignore = ["A100"]
 If `--select` or `--ignore` are given on the command line, they will override
 the `pyproject.toml` config.
 
+## Comparison to other frameworks
+
+Repo-review was inspired by frameworks like flake8 and Ruff. It is primarily
+different in two ways: It was designed to look at configuration files rather
+than Python files; which means it also only needs a subset of the repository
+(since most files are not configuration files). And it was designed to be
+runnable on external repositories, rather than pre-configured and run from
+inside the repository (which it can be). These differences also power the
+WebAssembly/remote version, which only needs to make a few API calls to look at
+the files that interest the plugin in question.
+
 ## Development of repo-review and plugins
 
 This repository is intended to be fun and easy to develop - it requires and uses

@@ -47,6 +47,9 @@ types_or: [text]
 minimum_pre_commit_version: 2.9.0
 ```
 
+You can also narrow down the `files` / `types_or` if your plugin only supports
+a subset of files (which most should).
+
 ## GitHub Actions support
 
 You can add an `actions.yml` file similar to this to natively support GitHub
