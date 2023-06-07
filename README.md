@@ -14,7 +14,8 @@ least one plugin to be installed.
 
 With one or more plugins, it will produce a list of results - green checkmarks
 mean this rule is followed, red x’s mean the rule is not. A yellow warning sign
-means that the check was skipped because a previous required check failed.
+means that the check was skipped because a previous required check failed. Four
+output formats are supported; `rich`, `svg`, `html`, and `json`.
 
 `sp-repo-review` provides checks based on the
 [Scientific-Python Development Guide][] at [scientific-python/cookie][]. A live

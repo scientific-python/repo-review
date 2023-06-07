@@ -21,6 +21,7 @@ import rich.traceback
 import rich.tree
 
 from ._compat.importlib.resources.abc import Traversable
+from ._compat.typing import assert_never
 from .families import Family
 from .ghpath import GHPath
 from .html import to_html
@@ -28,19 +29,15 @@ from .processor import Result, _collect_all, as_simple_dict, process
 
 rich.traceback.install(suppress=[click, rich], show_locals=True, width=None)
 
-# Use module-level entry names
-# repo_review_fixtures = {"pyproject"}
-# repo_review_checks = set(p.__name___ for p in General.__subclasses__())
-
 
 def rich_printer(
     families: Mapping[str, Family],
     processed: list[Result],
     *,
-    output: Path | None = None,
+    svg: bool = False,
     stderr: bool = False,
 ) -> None:
-    console = rich.console.Console(record=True, stderr=stderr)
+    console = rich.console.Console(record=svg, quiet=svg, stderr=stderr)
 
     for family, results_list in itertools.groupby(processed, lambda r: r.family):
         family_name = families[family].get("name", family)
@@ -77,24 +74,49 @@ def rich_printer(
         console.print(tree)
         console.print()
 
-    if output is not None:
-        console.save_svg(str(output), theme=rich.terminal_theme.DEFAULT_TERMINAL_THEME)
+    if len(processed) == 0:
+        console.print("[bold red]No checks ran")
+
+    if svg:
+        str = console.export_svg(theme=rich.terminal_theme.DEFAULT_TERMINAL_THEME)
+        print(str, file=sys.stderr if stderr else sys.stdout)
+
+
+def display_output(
+    families: Mapping[str, Family],
+    processed: list[Result],
+    *,
+    format_opt: Literal["rich", "json", "html", "svg"],
+    stderr: bool,
+) -> None:
+    match format_opt:
+        case "rich" | "svg":
+            rich_printer(families, processed, svg=format_opt == "svg", stderr=stderr)
+        case "json":
+            j = json.dumps(
+                {"families": families, "checks": as_simple_dict(processed)}, indent=2
+            )
+            print(j, file=sys.stderr if stderr else sys.stdout)
+        case "html":
+            html = to_html(families, processed)
+            print(html, file=sys.stderr if stderr else sys.stdout)
+        case _:
+            assert_never(format_opt)
 
 
 @click.command(context_settings={"help_option_names": ["-h", "--help"]})
 @click.argument("package", type=click.Path(dir_okay=True, path_type=Path))
 @click.option(
-    "--output",
-    type=click.Path(file_okay=True, exists=False, path_type=Path),
-    default=None,
-    help="Write out file. Writes SVG if format is rich.",
-)
-@click.option(
     "--format",
     "format_opt",
-    type=click.Choice(["rich", "json", "html", "split"]),
+    type=click.Choice(["rich", "json", "html", "svg"]),
     default="rich",
-    help="Select output format. 'split' produces html on stdout (or to a file), and rich on stderr.",
+    help="Select output format.",
+)
+@click.option(
+    "--stderr",
+    type=click.Choice(["rich", "json", "html", "svg"]),
+    help="Select additional output format for stderr.",
 )
 @click.option(
     "--select",
@@ -120,8 +142,8 @@ def rich_printer(
 )
 def main(
     package: Traversable,
-    output: Path | None,
-    format_opt: Literal["rich", "json", "html", "split"],
+    format_opt: Literal["rich", "json", "html"],
+    stderr: Literal["rich", "json", "html"] | None,
     select: str,
     ignore: str,
     package_dir: str,
@@ -157,28 +179,9 @@ def main(
         package, select=select_list, ignore=ignore_list, subdir=package_dir
     )
 
-    if format_opt == "rich":
-        rich_printer(families, processed, output=output)
-        if len(processed) == 0:
-            rich.print("[bold red]No checks ran[/bold red]")
-    if format_opt == "split":
-        rich_printer(families, processed, stderr=True)
-        if len(processed) == 0:
-            rich.print("[bold red]No checks ran[/bold red]", file=sys.stderr)
-    if format_opt == "json":
-        j = json.dumps(
-            {"families": families, "checks": as_simple_dict(processed)}, indent=2
-        )
-        if output:
-            output.write_text(j)
-        else:
-            rich.print_json(j)
-    if format_opt in {"html", "split"}:
-        html = to_html(families, processed)
-        if output:
-            output.write_text(html)
-        else:
-            print(html)
+    display_output(families, processed, format_opt=format_opt, stderr=False)
+    if stderr:
+        display_output(families, processed, format_opt=stderr, stderr=True)
 
     if any(p.result is False for p in processed):
         raise SystemExit(2)
