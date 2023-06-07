@@ -4,6 +4,7 @@ project = "repo-review"
 copyright = "2022, Henry Schreiner"
 author = "Henry Schreiner"
 release = importlib.metadata.version("repo-review")
+version = ".".join(release.split(".")[:2])
 
 extensions = [
     "myst_parser",
