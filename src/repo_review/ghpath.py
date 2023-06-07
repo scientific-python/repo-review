@@ -1,4 +1,6 @@
 # pylint: disable=arguments-differ
+# pylint: disable=unused-argument
+# ruff: noqa: ARG002
 
 from __future__ import annotations
 
@@ -11,7 +13,7 @@ from typing import Literal
 
 from ._compat.importlib.resources.abc import Traversable
 
-__all__ = ["GHPath"]
+__all__ = ["GHPath", "EmptyTraversable"]
 
 
 def __dir__() -> list[str]:
@@ -107,3 +109,50 @@ class GHPath(Traversable):
 
     def read_bytes(self) -> bytes:
         return self.open("rb").read()
+
+
+@dataclasses.dataclass(frozen=True, kw_only=True)
+class EmptyTraversable(Traversable):
+    is_a_dir: bool = True
+    _fake_name: str = "not-a-real-path"
+
+    def __str__(self) -> str:
+        return self._fake_name
+
+    @property
+    def name(self) -> str:
+        return self._fake_name
+
+    @typing.overload  # type: ignore[override]
+    def open(self, mode: Literal["r"], encoding: str | None = ...) -> io.StringIO:
+        ...
+
+    @typing.overload
+    def open(self, mode: Literal["rb"]) -> io.BytesIO:
+        ...
+
+    def open(
+        self, mode: Literal["r", "rb"] = "r", encoding: str | None = "utf-8"
+    ) -> io.IOBase:
+        raise FileNotFoundError(self._fake_name)
+
+    def joinpath(self, child: str) -> EmptyTraversable:
+        return self.__class__(is_a_dir=False)
+
+    def __truediv__(self, child: str) -> EmptyTraversable:
+        return self.__class__(is_a_dir=False)
+
+    def iterdir(self) -> Iterator[EmptyTraversable]:
+        yield from ()
+
+    def is_dir(self) -> bool:
+        return self.is_a_dir
+
+    def is_file(self) -> bool:
+        return False
+
+    def read_text(self, encoding: str | None = "utf-8") -> str:
+        raise FileNotFoundError(self._fake_name)
+
+    def read_bytes(self) -> bytes:
+        raise FileNotFoundError(self._fake_name)

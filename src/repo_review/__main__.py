@@ -21,14 +21,31 @@ import rich.text
 import rich.traceback
 import rich.tree
 
+from . import __version__
 from ._compat.importlib.resources.abc import Traversable
 from ._compat.typing import assert_never
 from .families import Family
-from .ghpath import GHPath
+from .ghpath import EmptyTraversable, GHPath
 from .html import to_html
 from .processor import Result, _collect_all, as_simple_dict, process
 
 rich.traceback.install(suppress=[click, rich], show_locals=True, width=None)
+
+
+def list_all(ctx: click.Context, _param: click.Parameter, value: bool) -> None:
+    if not value or ctx.resilient_parsing:
+        return
+
+    _, checks, families = _collect_all(EmptyTraversable())
+    if len(checks) == 0:
+        msg = "No checks registered. Please install a repo-review plugin."
+        raise click.ClickException(msg)
+
+    for family, grp in itertools.groupby(checks.items(), key=lambda x: x[1].family):
+        rich.print(f'  [dim]# {families[family].get("name", family)}')
+        for code, check in grp:
+            rich.print(f'  "{code}",  [dim]# {check.__doc__}')
+    ctx.exit()
 
 
 def rich_printer(
@@ -117,6 +134,7 @@ def display_output(
 
 
 @click.command(context_settings={"help_option_names": ["-h", "--help"]})
+@click.version_option(version=__version__)
 @click.argument("package", type=click.Path(dir_okay=True, path_type=Path))
 @click.option(
     "--format",
@@ -147,10 +165,12 @@ def display_output(
     default="",
 )
 @click.option(
-    "--list/--no-list",
-    "list_opt",
+    "--list-all",
+    is_flag=True,
+    callback=list_all,
+    expose_value=False,
+    is_eager=True,
     help="List all checks and exit",
-    default=False,
 )
 def main(
     package: Traversable,
@@ -159,7 +179,6 @@ def main(
     select: str,
     ignore: str,
     package_dir: str,
-    list_opt: bool,
 ) -> None:
     """
     Pass in a local Path or gh:org/repo@branch.
@@ -167,18 +186,10 @@ def main(
     ignore_list = {x.strip() for x in ignore.split(",") if x}
     select_list = {x.strip() for x in select.split(",") if x}
 
-    _, checks, families = _collect_all(package, subdir=package_dir)
+    _, checks, _ = _collect_all(package, subdir=package_dir)
     if len(checks) == 0:
         msg = "No checks registered. Please install a repo-review plugin."
         raise click.ClickException(msg)
-
-    if list_opt:
-        for family, grp in itertools.groupby(checks.items(), key=lambda x: x[1].family):
-            rich.print(f'  [dim]# {families[family].get("name", family)}')
-            for code, check in grp:
-                rich.print(f'  "{code}",  [dim]# {check.__doc__}')
-
-        raise SystemExit(0)
 
     if str(package).startswith("gh:"):
         _, org_repo_branch, *p = str(package).split(":", maxsplit=2)
@@ -198,7 +209,7 @@ def main(
     if any(p.result is False for p in processed):
         raise SystemExit(2)
     if len(processed) == 0:
-        raise SystemExit(2)
+        raise SystemExit(3)
 
 
 if __name__ == "__main__":
