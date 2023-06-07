@@ -1,5 +1,5 @@
 [build-system]
-requires = ["hatchling"]
+requires = ["hatchling", "hatch-vcs"]
 build-backend = "hatchling.build"
 
 
@@ -70,8 +70,8 @@ repo-review = "repo_review.__main__:main"
 pyproject = "repo_review.fixtures:pyproject"
 
 [tool.hatch]
-version.path = "src/repo_review/__init__.py"
-
+version.source = "vcs"
+build.hooks.vcs.version-file = "src/repo_review/_version.py"
 
 [tool.pytest.ini_options]
 minversion = "7.0"
