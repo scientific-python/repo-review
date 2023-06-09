@@ -20,7 +20,7 @@ output formats are supported; `rich`, `svg`, `html`, and `json`.
 `sp-repo-review` provides checks based on the
 [Scientific-Python Development Guide][] at [scientific-python/cookie][]. A live
 WebAssembly demo using `sp-repo-review` is
-[here](https://scientific-python.github.io/repo-review).
+[here][repo-review-demo].
 
 ## Running repo-review
 
@@ -28,7 +28,7 @@ Repo-review supports running multiple ways:
 
 - From the command line on a local folder
 - From the command line on a remote repository on GitHub (`gh:org/repo@branch`)
-- From WebAssembly in Pyodide (example in `docs/index.html`)
+- From WebAssembly in [Pyodide][] (example in `docs/index.html`)
 
 If the root of a package is not the repository root, pass `--package-dir a/b/c`.
 
@@ -47,21 +47,26 @@ the `pyproject.toml` config.
 
 ## Comparison to other frameworks
 
-Repo-review was inspired by frameworks like flake8 and Ruff. It is primarily
-different in two ways: It was designed to look at configuration files rather
-than Python files; which means it also only needs a subset of the repository
-(since most files are not configuration files). And it was designed to be
-runnable on external repositories, rather than pre-configured and run from
-inside the repository (which it can be). These differences also power the
+Repo-review was inspired by frameworks like [Flake8][] and [Ruff][]. It is
+primarily different in two ways: It was designed to look at configuration files
+rather than Python files; which means it also only needs a subset of the
+repository (since most files are not configuration files). And it was designed
+to be runnable on external repositories, rather than pre-configured and run
+from inside the repository (which it can be). These differences also power the
 WebAssembly/remote version, which only needs to make a few API calls to look at
 the files that interest the plugin in question.
+
+So if you want to lint Python code, use Flake8 or Ruff. But if you want to
+check Flake8 or Ruff's configuration, use repo-review! Generally, repo-review
+plugins are more about requiring things to be present, like making use all your
+repos have some [pre-commit][] check.
 
 ## Development of repo-review and plugins
 
 This repository is intended to be fun and easy to develop - it requires and uses
 Python 3.10, and uses a lot of the new features in 3.9 and 3.10. It's maybe not
 entirely conventional, but it enables very simple plugin development. It works
-locally, remotely, and in WebAssembly (using Pyodide).
+locally, remotely, and in WebAssembly (using [Pyodide][]).
 
 There are a few key designs that are very useful and make this possible. First,
 all paths are handled as Traversables. This allows a simple Traversable
@@ -69,7 +74,7 @@ implementation based on `open_url` to provide a web interface for use in the
 webapp. It also would allow `zipfile.Path` to work just as well, too - no need
 to extract.
 
-Checks can request fixtures (like pytest) as arguments. Check files can add new
+Checks can request fixtures (like [pytest][]) as arguments. Check files can add new
 fixtures as needed. Fixtures are are specified with entry points, and take any
 other fixture as arguments as well - the `root` and `package` fixtures
 represents the root of the repository and of the package you are checking,
@@ -106,13 +111,22 @@ web interface to abSENSE.
 
 This was developed for [Scikit-HEP][] before moving to Scientific-Python.
 
+<!-- prettier-ignore-start -->
+
 [actions-badge]: https://github.com/scientific-python/repo-review/workflows/CI/badge.svg
 [actions-link]: https://github.com/scientific-python/repo-review/actions
+[docs-badge]: https://readthedocs.org/projects/repo-review/badge/?version=latest
+[docs-link]: https://repo-review.readthedocs.io/en/latest/?badge=latest
+[flake8]: https://flake8.pycqa.org
+[pyodide]: https://pyodide.org
 [pypi-link]: https://pypi.org/project/repo-review/
 [pypi-platforms]: https://img.shields.io/pypi/pyversions/repo-review
 [pypi-version]: https://badge.fury.io/py/repo-review.svg
-[docs-badge]: https://readthedocs.org/projects/repo-review/badge/?version=latest
-[docs-link]: https://repo-review.readthedocs.io/en/latest/?badge=latest
+[pytest]: https://pytest.org
+[repo-review-demo]: https://scientific-python.github.io/repo-review
+[ruff]: https://beta.ruff.rs
 [scientific-python development guide]: https://learn.scientific-python.org/development
 [scientific-python/cookie]: https://github.com/scientific-python/cookie
 [scikit-hep]: https://scikit-hep.org
+
+<!-- prettier-ignore-end -->
