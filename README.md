@@ -118,6 +118,7 @@ This was developed for [Scikit-HEP][] before moving to Scientific-Python.
 [docs-badge]: https://readthedocs.org/projects/repo-review/badge/?version=latest
 [docs-link]: https://repo-review.readthedocs.io/en/latest/?badge=latest
 [flake8]: https://flake8.pycqa.org
+[pre-commit]: https://pre-commit.com
 [pyodide]: https://pyodide.org
 [pypi-link]: https://pypi.org/project/repo-review/
 [pypi-platforms]: https://img.shields.io/pypi/pyversions/repo-review
