@@ -8,9 +8,12 @@ version = ".".join(release.split(".")[:2])
 
 extensions = [
     "myst_parser",
+    "sphinx.ext.autodoc",
+    "sphinx.ext.intersphinx",
+    "sphinx_autodoc_typehints",
+    "sphinx_copybutton",
     "sphinxcontrib.programoutput",
     "sphinxext.opengraph",
-    "sphinx_copybutton",
 ]
 
 source_suffix = [".rst", ".md"]
@@ -30,3 +33,15 @@ myst_enable_extensions = [
     "colon_fence",
     "deflist",
 ]
+
+intersphinx_mapping = {
+    "python": ("https://docs.python.org/3", None),
+}
+
+nitpick_ignore = [
+    ("py:class", "_io.StringIO"),
+    ("py:class", "_io.BytesIO"),
+    ("py:class", "repo_review.fixtures.T"),
+]
+
+always_document_param_types = True

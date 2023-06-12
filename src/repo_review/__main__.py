@@ -8,8 +8,10 @@ from collections.abc import Mapping
 from pathlib import Path
 from typing import Literal
 
+import click as orig_click
+
 if typing.TYPE_CHECKING:
-    import click
+    import click  # pylint: disable=reimported
 else:
     import rich_click as click
 
@@ -36,7 +38,7 @@ def __dir__() -> list[str]:
     return __all__
 
 
-rich.traceback.install(suppress=[click, rich], show_locals=True, width=None)
+rich.traceback.install(suppress=[click, rich, orig_click], show_locals=True, width=None)
 
 
 def list_all(ctx: click.Context, _param: click.Parameter, value: bool) -> None:

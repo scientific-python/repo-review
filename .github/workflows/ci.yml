@@ -72,6 +72,29 @@ jobs:
 
       - uses: hynek/build-and-inspect-python-package@v1
 
+  docs:
+    name: Docs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - uses: wntrblm/nox@2023.04.22
+        with:
+          python-versions: "3.11"
+
+      - name: Linkcheck
+        run: nox -s docs -- -b linkcheck
+
+      - name: Build docs with warnings as errors
+        run: nox -s docs -- -W
+
+      - name: Verify no changes required to API docs
+        run: |
+          nox -s build_api_docs
+          git diff --exit-code
+
   action:
     name: Action
     runs-on: ubuntu-latest

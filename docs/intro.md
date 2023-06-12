@@ -27,7 +27,7 @@ Plugins are also encouraged to support pre-commit and GitHub Actions.
 ## Running checks
 
 You can run checks with (`pipx run`) `repo-review <path>` or `python -m
-repo_review <path>`. See [](cli) for command-line options.
+repo_review <path>`. See [](./cli.md) for command-line options.
 
 ## Configuring
 

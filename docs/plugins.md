@@ -1,7 +1,7 @@
 # Writing a plugin
 
-To write a plugin for repo-review, you should provide one or more [](checks).
-You can also add new [](fixtures), and customize [](families) with sorting and
+To write a plugin for repo-review, you should provide one or more [](./checks.md).
+You can also add new [](./fixtures.md), and customize [](./families.md) with sorting and
 nicer display names. When writing a plugin, you should also do a few things
 when setting up the package. These suggestions assume you are using a
 standardized backend, such as `hatchling`, `flit-core`, `pdm-backend`, or

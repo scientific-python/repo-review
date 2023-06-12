@@ -22,9 +22,25 @@ def __dir__() -> list[str]:
 
 @dataclasses.dataclass(frozen=True, kw_only=True)
 class GHPath(Traversable):
+    """
+    This is a Traversable that can be used to navigate a GitHub repo without
+    downloading it.
+
+    :param repo: The repo name, in "org/repo" style.
+    :param branch: The branch name. Required, even if using the default branch.
+    :param path: A sub-path inside the repo. Defaults to the repo root.
+    :param _info: Some internal info stored to keep accesses fast.
+    """
+
+    #: The repository name, in `"org/repo"` style.
     repo: str
+
+    #: The branch name. Required, even if using the default branch.
     branch: str
+
+    #: A path inside the repo
     path: str = ""
+
     _info: list[dict[str, str]] = dataclasses.field(
         hash=False, default_factory=list, repr=False
     )
@@ -54,6 +70,9 @@ class GHPath(Traversable):
 
     @property
     def name(self) -> str:
+        """
+        The final element of the path or the repo name.
+        """
         return (self.path or self.repo).split("/")[-1]
 
     @typing.overload  # type: ignore[override]
@@ -67,6 +86,13 @@ class GHPath(Traversable):
     def open(
         self, mode: Literal["r", "rb"] = "r", encoding: str | None = "utf-8"
     ) -> io.IOBase:
+        """
+        Open the repo. This doesn't support the full collection of options,
+        only utf-8 and binary.
+
+        :param mode: The mode, only ``"r"`` or ``"rb"`` supported.
+        :param encoding: The encoding, only ``"utf-8"`` or ``None`` supported.
+        """
         assert encoding is None or encoding == "utf-8", "Only utf-8 is supported"
         val: io.StringIO = self.open_url(
             f"https://raw.githubusercontent.com/{self.repo}/{self.branch}/{self.path}"
@@ -113,7 +139,18 @@ class GHPath(Traversable):
 
 @dataclasses.dataclass(frozen=True, kw_only=True)
 class EmptyTraversable(Traversable):
+    """
+    This is a Traversable representing an empty directory or a non-existent
+    file.
+
+    :param is_a_dir: True to treat this like an empty dir.
+    :param _fake_name: A customisable fake name.
+    """
+
+    #: True if this is supposed to be a directory
     is_a_dir: bool = True
+
+    #: Customizable fake name
     _fake_name: str = "not-a-real-path"
 
     def __str__(self) -> str:
@@ -121,6 +158,9 @@ class EmptyTraversable(Traversable):
 
     @property
     def name(self) -> str:
+        """
+        Return a dummy name.
+        """
         return self._fake_name
 
     @typing.overload  # type: ignore[override]

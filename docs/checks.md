@@ -24,7 +24,7 @@ class Check:
 ```
 
 You need to implement `family`, which is a string indicating which family it is
-grouped under, and `check()`, which can take [](fixtures), and returns `True` if
+grouped under, and `check()`, which can take [](./fixtures.md), and returns `True` if
 the check passes, or `False` if the check fails. If you want a dynamic error
 explanation instead of the `check()` docstring, you can return a non-empty
 string from the check instead of `False`. Returning `None` makes a check
@@ -89,7 +89,7 @@ Key features:
 
 You register checks with a function that returns a dict of checks, with the code
 of the check (letters + number) as the key, and check instances as the values.
-This function can take [](fixtures), as well, allowing customization of checks
+This function can take [](./fixtures.md), as well, allowing customization of checks
 based on repo properties.
 
 Here is the suggested function for the above example:

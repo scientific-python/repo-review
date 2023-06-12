@@ -31,35 +31,54 @@ def __dir__() -> list[str]:
 md = markdown_it.MarkdownIt()
 
 
-# Helper to get the type in the JSON style returns
 class ResultDict(typing.TypedDict):
-    family: str
-    description: str
-    result: bool | None
-    err_msg: str
-    url: str
+    """
+    Helper to get the type in the JSON style returns. Basically identical to
+    :class:`Result` but in dict form and without the name.
+    """
+
+    family: str  #: The family string
+    description: str  #: The short description of what the check looks for
+    result: bool | None  #: The result, None means skip
+    err_msg: str  #: The error message if the result is false, in markdown format
+    url: str  #: An optional URL (empty string if missing)
 
 
 @dataclasses.dataclass(frozen=True, kw_only=True)
 class Result:
-    family: str
-    name: str
-    description: str
-    result: bool | None
-    err_msg: str = ""
-    url: str = ""
+    """
+    This is the returned value from a processed check.
+    """
+
+    family: str  #: The family string
+    name: str  #: The name of the check
+    description: str  #: The short description of what the check looks for
+    result: bool | None  #: The result, None means skip
+    err_msg: str = ""  #: The error message if the result is false, in markdown format
+    url: str = ""  #: An optional URL (empty string if missing)
 
     def err_markdown(self) -> str:
+        """
+        Produces HTML from the error message, assuming it is in markdown.
+        """
         result: str = md.render(self.err_msg).strip()
         return result.removeprefix("<p>").removesuffix("</p>").strip()
 
 
 class ProcessReturn(typing.NamedTuple):
-    families: dict[str, Family]
-    results: list[Result]
+    """
+    Return type for :func:`process`.
+    """
+
+    families: dict[str, Family]  #: A mapping of family strings to Family info dicts
+    results: list[Result]  #: The results list
 
 
 class HasFamily(typing.Protocol):
+    """
+    Simple Protocol to see if family property is present.
+    """
+
     @property
     def family(self) -> str:
         ...
@@ -115,16 +134,14 @@ def process(
     """
     Process the package and return a dictionary of results.
 
-    Parameters
-    ----------
-    root: Traversable | Path
-        The Path(like) to the repository to process
+    :param root: The Path(like) to the repository to process
 
-    ignore: Sequence[str]
-        A list of checks to ignore
+    :param ignore: A list of checks to ignore
 
-    subidr: str
-        The path to the package in the subdirectory, if not at the root of the repository.
+    :param subdir: The path to the package in the subdirectory, if not at the
+                   root of the repository.
+
+    :return: A dictionary of check results.
     """
     package = root.joinpath(subdir) if subdir else root
 
@@ -179,6 +196,12 @@ def process(
 
 
 def as_simple_dict(results: list[Result]) -> dict[str, ResultDict]:
+    """
+    Convert a results list into a simple dict of dicts structure. The name of
+    the result turns into the key of the outer dict.
+
+    :param results: The list of results.
+    """
     return {
         result.name: typing.cast(
             ResultDict,
