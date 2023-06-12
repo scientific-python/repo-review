@@ -54,6 +54,7 @@ docs = [
   "myst_parser >=0.13",
   "repo-review[cli]",
   "sphinx >=4.0",
+  "sphinx-autodoc-typehints",
   "sphinx-copybutton",
   "sphinxcontrib-programoutput",
   "sphinxext-opengraph",
@@ -125,6 +126,7 @@ messages_control.disable = [
   "redefined-outer-name",
   "no-member",  # better handled by mypy, etc.
   "used-before-assignment",  # False positive on conditional import
+  "unnecessary-ellipsis",  # Not correct for typing
 ]
 
 

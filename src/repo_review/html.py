@@ -20,7 +20,10 @@ def __dir__() -> list[str]:
 
 def to_html(families: Mapping[str, Family], processed: list[Result]) -> str:
     """
-    Convert the results of a repo review to HTML.
+    Convert the results of a repo review (``families``, ``processed``) to HTML.
+
+    :param families: The family mapping.
+    :param processed: The list of processed results.
     """
     out = io.StringIO()
     print = functools.partial(builtins.print, file=out)

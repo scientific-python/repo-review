@@ -1,7 +1,7 @@
 """
 Copyright (c) 2022 Henry Schreiner. All rights reserved.
 
-repo-review: Review repos with a set of checks defined by plugins.
+Review repos with a set of checks defined by plugins.
 """
 
 

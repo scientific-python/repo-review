@@ -10,15 +10,51 @@ __all__ = ["Check", "collect_checks", "is_allowed"]
 
 
 class Check(Protocol):
-    family: str
-    requires: Set[str] = frozenset()  # Optional
-    url: str = ""  # Optional
+    """
+    This is the check Protocol. Since Python doesn't support optional Protocol
+    members, the two optional members are required if you want to use this
+    Protocol in a type checker. The members can be specified as class
+    properties if you want.
+    """
+
+    @property
+    def family(self) -> str:
+        """
+        The family is a string that the checks will be grouped by.
+        """
+
+    @property
+    def requires(self) -> Set[str]:  # Optional
+        """
+        Requires is an (optional) set of checks that must pass for this check
+        to run. Omitting this is like returning `set()`.
+        """
+
+    @property
+    def url(self) -> str:  # Optional
+        """
+        This is an (optional) URL to link to for this check. An empty string is
+        identical to omitting this member.
+        """
 
     def check(self) -> bool | None | str:
+        """
+        This is a check. The docstring is used as the failure message if
+        `False` is returned. Returning None is a skip. Returning `True` (or an
+        empty string) is a pass. Can be a :func:`classmethod` or
+        :func:`staticmethod`. Can take fixtures.
+        """
         ...
 
 
 def collect_checks(fixtures: Mapping[str, Any]) -> dict[str, Check]:
+    """
+    Produces a list of checks based on installed entry points. You must provide
+    the evaluated fixtures so that the check functions have access to the
+    fixtures when they are running.
+
+    :param fixtures: Fully evaluated dict of fixtures.
+    """
     check_functions = (
         ep.load() for ep in importlib.metadata.entry_points(group="repo_review.checks")
     )
@@ -30,18 +66,20 @@ def collect_checks(fixtures: Mapping[str, Any]) -> dict[str, Check]:
     }
 
 
-def is_allowed(select_list: Set[str], ignore_list: Set[str], name: str) -> bool:
+def is_allowed(select: Set[str], ignore: Set[str], name: str) -> bool:
     """
     Skips the check if the name is in the ignore list or if the name without the
     number is in the ignore list. If the select list is not empty, only runs the
     check if the name or name without the number is in the select list.
+
+    :param select: A set of names or prefixes to include.
+    :param ignore: A set of names or prefixes to exclude.
+    :param name: The check to test.
+
+    :return: True if this check is allowed, False otherwise.
     """
-    if (
-        select_list
-        and name not in select_list
-        and name.rstrip("0123456789") not in select_list
-    ):
+    if select and name not in select and name.rstrip("0123456789") not in select:
         return False
-    if name in ignore_list or name.rstrip("0123456789") in ignore_list:
+    if name in ignore or name.rstrip("0123456789") in ignore:
         return False
     return True
