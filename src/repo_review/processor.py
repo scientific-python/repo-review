@@ -4,6 +4,7 @@ import dataclasses
 import graphlib
 import textwrap
 import typing
+import warnings
 from collections.abc import Mapping, Set
 from typing import Any, TypeVar
 
@@ -58,6 +59,13 @@ class Result:
     url: str = ""  #: An optional URL (empty string if missing)
 
     def err_markdown(self) -> str:
+        """
+        DEPRECATED: use err_as_html instead.
+        """
+        warnings.warn("Use err_as_html instead", FutureWarning, stacklevel=2)
+        return self.err_as_html()
+
+    def err_as_html(self) -> str:
         """
         Produces HTML from the error message, assuming it is in markdown.
         """
@@ -134,10 +142,9 @@ def process(
     """
     Process the package and return a dictionary of results.
 
-    :param root: The Path(like) to the repository to process
-
-    :param ignore: A list of checks to ignore
-
+    :param root: The Traversable to the repository to process.
+    :param select: A list of checks to select. All checks selected if empty.
+    :param ignore: A list of checks to ignore.
     :param subdir: The path to the package in the subdirectory, if not at the
                    root of the repository.
 

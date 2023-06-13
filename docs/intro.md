@@ -60,7 +60,7 @@ rather than the framework (repo-review).
 
 ## GitHub Actions
 
-```
+```yaml
 - uses: scientific-python/repo-review@<version>
   with:
     plugins: sp-repo-review

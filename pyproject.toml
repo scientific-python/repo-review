@@ -63,8 +63,8 @@ docs = [
 [project.urls]
 Changelog = "https://github.com/scientific-python/repo-review/releases"
 Demo = "https://scientific-python.github.io/repo-review"
-Documentation = "https://repo-review.readthedocs.io/"
-Homepage = "https://repo-review.readthedocs.io/"
+Documentation = "https://repo-review.readthedocs.io"
+Homepage = "https://repo-review.readthedocs.io"
 Source = "https://github.com/scientific-python/repo-review"
 
 [project.scripts]
