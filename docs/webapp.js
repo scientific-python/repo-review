@@ -260,7 +260,7 @@ class App extends React.Component {
           name: val.name.toString(),
           description: val.description.toString(),
           state: val.result,
-          err_msg: val.err_markdown().toString(),
+          err_msg: val.err_as_html().toString(),
           url: val.url.toString(),
         });
       }
