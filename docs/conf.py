@@ -1,4 +1,5 @@
 import importlib.metadata
+import os
 
 project = "repo-review"
 copyright = "2022, Henry Schreiner"
@@ -13,6 +14,7 @@ extensions = [
     "sphinx_autodoc_typehints",
     "sphinx_copybutton",
     "sphinxcontrib.programoutput",
+    "sphinx_github_changelog",
     "sphinxext.opengraph",
 ]
 
@@ -45,3 +47,5 @@ nitpick_ignore = [
 ]
 
 always_document_param_types = True
+
+sphinx_github_changelog_token = os.environ.get("GITHUB_API_TOKEN")

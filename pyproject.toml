@@ -58,6 +58,7 @@ docs = [
   "sphinx-copybutton",
   "sphinxcontrib-programoutput",
   "sphinxext-opengraph",
+  "sphinx-github-changelog",
 ]
 
 [project.urls]
