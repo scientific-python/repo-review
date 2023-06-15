@@ -4,7 +4,6 @@ import dataclasses
 import graphlib
 import textwrap
 import typing
-import warnings
 from collections.abc import Mapping, Set
 from typing import Any, TypeVar
 
@@ -57,13 +56,6 @@ class Result:
     result: bool | None  #: The result, None means skip
     err_msg: str = ""  #: The error message if the result is false, in markdown format
     url: str = ""  #: An optional URL (empty string if missing)
-
-    def err_markdown(self) -> str:
-        """
-        DEPRECATED: use err_as_html instead.
-        """
-        warnings.warn("Use err_as_html instead", FutureWarning, stacklevel=2)
-        return self.err_as_html()
 
     def err_as_html(self) -> str:
         """

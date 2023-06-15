@@ -11,6 +11,7 @@ fixtures
 checks
 families
 webapp
+changelog
 ```
 
 ```{toctree}
