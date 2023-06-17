@@ -63,10 +63,11 @@ repos have some [pre-commit][] check.
 
 ## Development of repo-review and plugins
 
-This repository is intended to be fun and easy to develop - it requires and uses
-Python 3.10, and uses a lot of the new features in 3.9 and 3.10. It's maybe not
-entirely conventional, but it enables very simple plugin development. It works
-locally, remotely, and in WebAssembly (using [Pyodide][]).
+This project is intended to be fun and easy to develop and design checks for -
+it requires and uses Python 3.10, and uses a lot of the new features in 3.9 and
+3.10. It's maybe not entirely conventional, but it enables very simple plugin
+development. It works locally, remotely, and in WebAssembly (using
+[Pyodide][]).
 
 There are a few key designs that are very useful and make this possible. First,
 all paths are handled as Traversables. This allows a simple Traversable

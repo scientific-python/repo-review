@@ -38,8 +38,8 @@ dependencies = [
 
 [project.optional-dependencies]
 cli = [
-  "click>=8",
-  "rich>=12.2",
+  "click >=8",
+  "rich >=12.2",
   "rich-click",
 ]
 test = [
