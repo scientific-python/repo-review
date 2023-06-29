@@ -6,7 +6,7 @@ from typing import Any, Protocol
 
 from .fixtures import apply_fixtures
 
-__all__ = ["Check", "collect_checks", "is_allowed"]
+__all__ = ["Check", "collect_checks", "is_allowed", "get_check_url"]
 
 
 class Check(Protocol):
@@ -83,3 +83,17 @@ def is_allowed(select: Set[str], ignore: Set[str], name: str) -> bool:
     if name in ignore or name.rstrip("0123456789") in ignore:
         return False
     return True
+
+
+def get_check_url(name: str, check: Check) -> str:
+    """
+    Get the url from a check instance. Will return an empty string if missing.
+    Will process string via format.
+
+    :param name: The name of the check (letters and number)
+    :param check: The check to process.
+    :return: The final URL.
+
+    .. versionadded:: 0.8
+    """
+    return getattr(check, "url", "").format(self=check, name=name)

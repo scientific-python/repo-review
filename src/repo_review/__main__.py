@@ -26,7 +26,8 @@ import rich.tree
 from . import __version__
 from ._compat.importlib.resources.abc import Traversable
 from ._compat.typing import assert_never
-from .families import Family
+from .checks import get_check_url
+from .families import Family, get_family_name
 from .ghpath import GHPath
 from .html import to_html
 from .processor import Result, as_simple_dict, collect_all, process
@@ -53,9 +54,11 @@ def list_all(ctx: click.Context, _param: click.Parameter, value: bool) -> None:
     for family, grp in itertools.groupby(
         collected.checks.items(), key=lambda x: x[1].family
     ):
-        rich.print(f'  [dim]# {collected.families[family].get("name", family)}')
+        rich.print(f"  [dim]# {get_family_name(collected.families, family)}")
         for code, check in grp:
-            rich.print(f'  "{code}",  [dim]# {check.__doc__}')
+            url = get_check_url(code, check)
+            link = f"[link={url}]{code}[/link]" if url else code
+            rich.print(f'  "{link}",  [dim]# {check.__doc__}')
     ctx.exit()
 
 
@@ -72,7 +75,7 @@ def rich_printer(
     )
 
     for family, results_list in itertools.groupby(processed, lambda r: r.family):
-        family_name = families[family].get("name", family)
+        family_name = get_family_name(families, family)
         tree = rich.tree.Tree(f"[bold]{family_name}[/bold]:")
         for result in results_list:
             style = (
