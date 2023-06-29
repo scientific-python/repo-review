@@ -26,7 +26,7 @@ import rich.tree
 from . import __version__
 from ._compat.importlib.resources.abc import Traversable
 from ._compat.typing import assert_never
-from .checks import get_check_url
+from .checks import get_check_description, get_check_url
 from .families import Family, get_family_name
 from .ghpath import GHPath
 from .html import to_html
@@ -57,8 +57,11 @@ def list_all(ctx: click.Context, _param: click.Parameter, value: bool) -> None:
         rich.print(f"  [dim]# {get_family_name(collected.families, family)}")
         for code, check in grp:
             url = get_check_url(code, check)
+            doc = get_check_description(code, check)
             link = f"[link={url}]{code}[/link]" if url else code
-            rich.print(f'  "{link}",  [dim]# {check.__doc__}')
+            comment = f" [dim]# {doc}" if doc else ""
+            rich.print(f'  "{link}",{comment}')
+
     ctx.exit()
 
 

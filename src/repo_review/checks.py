@@ -97,3 +97,17 @@ def get_check_url(name: str, check: Check) -> str:
     .. versionadded:: 0.8
     """
     return getattr(check, "url", "").format(self=check, name=name)
+
+
+def get_check_description(name: str, check: Check) -> str:
+    """
+    Get the doc from a check instance. Will return an empty string if missing.
+    Will process string via format.
+
+    :param name: The name of the check (letters and number)
+    :param check: The check to process.
+    :return: The final doc.
+
+    .. versionadded:: 0.8
+    """
+    return (check.__doc__ or "").format(self=check, name=name)

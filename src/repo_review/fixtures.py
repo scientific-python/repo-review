@@ -47,6 +47,8 @@ def list_all(root: Traversable) -> bool:
     :param root: The root fixture.
 
     :return: True only if trying to make a list of all checks/fixtures/families.
+
+    .. versionadded:: 0.8
     """
 
     return isinstance(root, EmptyTraversable)

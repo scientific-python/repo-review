@@ -29,7 +29,7 @@ the check passes, or `False` if the check fails. If you want a dynamic error
 explanation instead of the `check()` docstring, you can return a non-empty
 string from the check instead of `False`. Returning `None` makes a check
 "skipped". Docstrings/error messages can access their own object with `{self}`
-and check name with `{name}` (these are processed with `.format`, so escape `{}`
+and check name with `{name}` (these are processed with `.format()`, so escape `{}`
 as `{{}}`). The error message is in markdown format.
 
 If the check named in `requires` does not pass, the check is skipped.
@@ -101,7 +101,7 @@ def repo_review_checks() -> dict[str, General | PyProject]:
     return general | pyproject
 ```
 
-You tell repo review to use this function via an entry-point:
+You tell repo-review to use this function via an entry-point:
 
 ```toml
 [project.entry-points."repo_review.checks"]
@@ -161,9 +161,9 @@ If repo-review is listing all checks, a
 {class}`repo_review.ghpath.EmptyTraversable` is passed for `root` and
 `package`. This will appear to be a directory with no contents. If you have
 conditional checks, you should handle this case to support being listed as a
-possible check. As a helper for this case, a `list_all` fixture is provided
-that returns `True` only if a list-all operation is being performed. The above
-can then be written:
+possible check. As a helper for this case, a
+{func}`~repo_review.fixtures.list_all` fixture is provided that returns {obj}`True`
+only if a list-all operation is being performed. The above can then be written:
 
 ```python
 def repo_review_checks(
@@ -182,4 +182,8 @@ def repo_review_checks(
             return {"PP003": PP003(name=backends[x])}
         case _:
             return {}
+```
+
+```{versionadded} 0.8
+The {func}`~repo_review.fixtures.list_all` fixture.
 ```

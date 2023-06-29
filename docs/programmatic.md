@@ -1,6 +1,7 @@
 # Programmatic usage
 
-You can use repo-review from other Python code, as well, such as with [`cog`][].
+You can use repo-review from other Python code, as well, such as with
+[`cog`][]. Also see [](./webapp.md).
 
 ## Processors
 
@@ -43,7 +44,7 @@ This returns a {class}`~repo_review.processor.CollectionReturn`. You can access 
 
 .. versionadded:: 0.8
 
-### Getting the check URL
+### Getting the check properties
 
 A common requirement is getting the url from the
 {class}`~repo_review.checks.Check`. While a
@@ -57,6 +58,14 @@ url = get_check_url(name, check)
 
 .. versionadded:: 0.8
 
+You can also use a helper to get `__doc__` with the correct substitution, as well:
+
+```python
+doc = get_check_description(name, check)
+```
+
+.. versionadded:: 0.8
+
 ### Example: cog
 
 Here's an example of using this to fill out a README with [`cog`][], formatting all possible checks in markdown:
@@ -66,7 +75,7 @@ Here's an example of using this to fill out a README with [`cog`][], formatting 
 import itertools
 
 from repo_review.processor import collect_all
-from repo_review.checks import get_check_url
+from repo_review.checks import get_check_url, get_check_description
 from repo_review.families import get_family_name
 
 collected = collect_all()
@@ -76,7 +85,7 @@ for family, grp in itertools.groupby(collected.checks.items(), key=lambda x: x[1
     for code, check in grp:
         url = get_check_url(code, check)
         link = f"[`{code}`]({url})" if url else f"`{code}`"
-        print(f"- {link}: {check.__doc__}")
+        print(f"- {link}: {get_check_description(code, check)}")
     print()
 ]]] -->
 <!-- [[[end]]] -->
