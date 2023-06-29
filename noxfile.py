@@ -92,7 +92,7 @@ def docs(session: nox.Session) -> None:
     if args.builder != "html" and args.serve:
         session.error("Must not specify non-HTML builder with --serve")
 
-    session.install(".[docs]")
+    session.install("-e.[docs]")
     session.chdir("docs")
 
     if args.builder == "linkcheck":
@@ -104,6 +104,7 @@ def docs(session: nox.Session) -> None:
     session.run(
         "sphinx-build",
         "-n",  # nitpicky mode
+        "--keep-going",  # show all errors
         "-T",  # full tracebacks
         "-b",
         args.builder,

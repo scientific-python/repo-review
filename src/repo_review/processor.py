@@ -10,17 +10,19 @@ from typing import Any, TypeVar
 import markdown_it
 
 from ._compat.importlib.resources.abc import Traversable
-from .checks import Check, collect_checks, is_allowed
+from .checks import Check, collect_checks, get_check_url, is_allowed
 from .families import Family, collect_families
 from .fixtures import apply_fixtures, collect_fixtures, compute_fixtures, pyproject
+from .ghpath import EmptyTraversable
 
 __all__ = [
+    "CollectionReturn",
+    "ProcessReturn",
     "Result",
     "ResultDict",
-    "ProcessReturn",
-    "process",
     "as_simple_dict",
-    "_collect_all",
+    "collect_all",
+    "process",
 ]
 
 
@@ -70,13 +72,29 @@ class ProcessReturn(typing.NamedTuple):
     Return type for :func:`process`.
     """
 
-    families: dict[str, Family]  #: A mapping of family strings to Family info dicts
+    families: dict[
+        str, Family
+    ]  #: A mapping of family strings to :class:`.Family` info dicts
     results: list[Result]  #: The results list
+
+
+class CollectionReturn(typing.NamedTuple):
+    """
+    Return type for :func:`collect_all`.
+
+    .. versionadded:: 0.8
+    """
+
+    fixtures: dict[str, Any]  #: The computed fixtures, as a :class:`dict`
+    checks: dict[str, Check]  #: The checks dict, sorted by :class:`.Family`.
+    families: dict[
+        str, Family
+    ]  #: A mapping of family strings to :class:`.Family` info dicts
 
 
 class HasFamily(typing.Protocol):
     """
-    Simple Protocol to see if family property is present.
+    Simple :class:`~typing.Protocol` to see if family property is present.
     """
 
     @property
@@ -98,9 +116,23 @@ def _sort_by_family(
     )
 
 
-def _collect_all(
-    root: Traversable, subdir: str = ""
-) -> tuple[dict[str, Any], dict[str, Check], dict[str, Family]]:
+def collect_all(
+    root: Traversable = EmptyTraversable(),  # noqa: B008 (frozen dataclass OK)
+    subdir: str = "",
+) -> CollectionReturn:
+    """
+    Collect all checks. If ``root`` is not passed, then checks are collected
+    with a :class:`~repo_review.ghpath.EmptyTraversable`. Any checks that are
+    returned conditionally based on fixture results might not be collected
+    unless :func:`~repo_review.fixtures.list_all` is used.
+
+    :param root: If passed, this is the root of the repo (for fixture computation).
+    :param subdir: The subdirectory (for fixture computation).
+
+    :return: The collected fixtures, checks, and families.
+
+    .. versionadded:: 0.8
+    """
     package = root.joinpath(subdir) if subdir else root
 
     # Collect the fixtures
@@ -121,7 +153,7 @@ def _collect_all(
     # Sort results
     checks = _sort_by_family(families, checks)
 
-    return fixtures, checks, families
+    return CollectionReturn(fixtures, checks, families)
 
 
 def process(
@@ -144,7 +176,7 @@ def process(
     """
     package = root.joinpath(subdir) if subdir else root
 
-    fixtures, tasks, families = _collect_all(root, subdir)
+    fixtures, tasks, families = collect_all(root, subdir)
 
     # Collect our own config
     config = pyproject(package).get("tool", {}).get("repo-review", {})
@@ -187,7 +219,7 @@ def process(
                 description=doc.format(self=check, name=task_name),
                 result=result,
                 err_msg=textwrap.dedent(err_msg.format(self=check, name=task_name)),
-                url=getattr(check, "url", "").format(self=check, name=task_name),
+                url=get_check_url(task_name, check),
             )
         )
 
