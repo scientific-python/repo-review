@@ -154,3 +154,32 @@ def repo_review_checks(pyproject: dict[str, Any]) -> dict[str, PyProject]:
         case _:
             return {}
 ```
+
+### Handling empty generation
+
+If repo-review is listing all checks, a
+{class}`repo_review.ghpath.EmptyTraversable` is passed for `root` and
+`package`. This will appear to be a directory with no contents. If you have
+conditional checks, you should handle this case to support being listed as a
+possible check. As a helper for this case, a `list_all` fixture is provided
+that returns `True` only if a list-all operation is being performed. The above
+can then be written:
+
+```python
+def repo_review_checks(
+    list_all: bool, pyproject: dict[str, Any]
+) -> dict[str, PyProject]:
+    backends = {
+        "setuptools.build_api": "setuptools",
+        "scikit_build_core.build": "scikit-build",
+    }
+
+    if list_all:
+        return {"PP003": PP003(name="<backend>")}
+
+    match pyproject:
+        case {"build-system": {"build-backend": str(x)}} if x in backends:
+            return {"PP003": PP003(name=backends[x])}
+        case _:
+            return {}
+```

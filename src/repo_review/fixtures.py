@@ -9,9 +9,11 @@ from typing import Any
 
 from ._compat import tomllib
 from ._compat.importlib.resources.abc import Traversable
+from .ghpath import EmptyTraversable
 
 __all__ = [
     "pyproject",
+    "list_all",
     "compute_fixtures",
     "apply_fixtures",
     "collect_fixtures",
@@ -28,12 +30,26 @@ def pyproject(package: Traversable) -> dict[str, Any]:
     empty dict if no pyproject.toml found.
 
     :param package: The package fixture.
+
+    :return: The pyproject.toml dict or an empty dict if no file found.
     """
     pyproject_path = package.joinpath("pyproject.toml")
     if pyproject_path.is_file():
         with pyproject_path.open("rb") as f:
             return tomllib.load(f)
     return {}
+
+
+def list_all(root: Traversable) -> bool:
+    """
+    Fixture: Is True when this is trying to produce a list of all checks.
+
+    :param root: The root fixture.
+
+    :return: True only if trying to make a list of all checks/fixtures/families.
+    """
+
+    return isinstance(root, EmptyTraversable)
 
 
 def compute_fixtures(

@@ -27,9 +27,9 @@ from . import __version__
 from ._compat.importlib.resources.abc import Traversable
 from ._compat.typing import assert_never
 from .families import Family
-from .ghpath import EmptyTraversable, GHPath
+from .ghpath import GHPath
 from .html import to_html
-from .processor import Result, _collect_all, as_simple_dict, process
+from .processor import Result, as_simple_dict, collect_all, process
 
 __all__ = ["main"]
 
@@ -45,13 +45,15 @@ def list_all(ctx: click.Context, _param: click.Parameter, value: bool) -> None:
     if not value or ctx.resilient_parsing:
         return
 
-    _, checks, families = _collect_all(EmptyTraversable())
-    if len(checks) == 0:
+    collected = collect_all()
+    if len(collected.checks) == 0:
         msg = "No checks registered. Please install a repo-review plugin."
         raise click.ClickException(msg)
 
-    for family, grp in itertools.groupby(checks.items(), key=lambda x: x[1].family):
-        rich.print(f'  [dim]# {families[family].get("name", family)}')
+    for family, grp in itertools.groupby(
+        collected.checks.items(), key=lambda x: x[1].family
+    ):
+        rich.print(f'  [dim]# {collected.families[family].get("name", family)}')
         for code, check in grp:
             rich.print(f'  "{code}",  [dim]# {check.__doc__}')
     ctx.exit()
@@ -206,8 +208,8 @@ def main(
     ignore_list = {x.strip() for x in ignore.split(",") if x}
     select_list = {x.strip() for x in select.split(",") if x}
 
-    _, checks, _ = _collect_all(package, subdir=package_dir)
-    if len(checks) == 0:
+    collected = collect_all(package, subdir=package_dir)
+    if len(collected.checks) == 0:
         msg = "No checks registered. Please install a repo-review plugin."
         raise click.ClickException(msg)
 

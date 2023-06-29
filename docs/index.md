@@ -6,6 +6,7 @@
 
 intro
 cli
+programmatic
 plugins
 fixtures
 checks
@@ -15,7 +16,6 @@ changelog
 ```
 
 ```{toctree}
-:maxdepth: 2
 :hidden:
 :caption: API
 
