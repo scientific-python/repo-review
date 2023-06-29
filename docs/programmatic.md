@@ -29,7 +29,9 @@ There's a tiny helper for this, {func}`repo_review.families.get_family_name`:
 family_name = get_family_name(families, family)
 ```
 
-.. versionadded:: 0.8
+```{versionadded} 0.8
+
+```
 
 ## Listing all possible checks
 
@@ -42,7 +44,9 @@ collected = repo_review.processor.collect_all()
 This returns a {class}`~repo_review.processor.CollectionReturn`. You can access the `.checks`,
 `.families`, and `.fixtures`, all are dicts.
 
-.. versionadded:: 0.8
+```{versionadded} 0.8
+
+```
 
 ### Getting the check properties
 
@@ -56,7 +60,9 @@ for this, {func}`repo_review.checks.get_check_url`:
 url = get_check_url(name, check)
 ```
 
-.. versionadded:: 0.8
+```{versionadded} 0.8
+
+```
 
 You can also use a helper to get `__doc__` with the correct substitution, as well:
 
@@ -64,7 +70,9 @@ You can also use a helper to get `__doc__` with the correct substitution, as wel
 doc = get_check_description(name, check)
 ```
 
-.. versionadded:: 0.8
+```{versionadded} 0.8
+
+```
 
 ### Example: cog
 
