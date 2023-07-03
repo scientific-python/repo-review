@@ -77,7 +77,7 @@ def test_process_fixtures_with_package() -> None:
 
     assert apply_fixtures(fixtures, nothing) == 42
     assert apply_fixtures(fixtures, simple) == "."
-    assert apply_fixtures(fixtures, lambda package: package) == Path(".")  # type: ignore[no-any-return]
+    assert apply_fixtures(fixtures, lambda package: package) == Path(".")
     assert apply_fixtures(fixtures, not_simple) == ". ."
 
 

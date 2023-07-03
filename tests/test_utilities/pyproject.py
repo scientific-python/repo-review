@@ -70,7 +70,7 @@ class PyProject:
 class PP002(PyProject):
     "Has a proper build-system table"
 
-    requires = {"PY001"}
+    requires = frozenset(("PY001",))
     url = "https://packaging.python.org/en/latest/specifications/declaring-build-dependencies"
 
     @staticmethod
@@ -90,7 +90,7 @@ class PP002(PyProject):
 class PP003(PyProject):
     "Does not list wheel as a build-dep"
 
-    requires = {"PY001"}
+    requires = frozenset(("PY001",))
 
     @staticmethod
     def check(pyproject: dict[str, Any]) -> bool:
@@ -110,7 +110,7 @@ class PP003(PyProject):
 class PP301(PyProject):
     "Has pytest in pyproject"
 
-    requires = {"PY001"}
+    requires = frozenset(("PY001",))
 
     @staticmethod
     def check(pyproject: dict[str, Any]) -> bool:
@@ -129,7 +129,7 @@ class PP301(PyProject):
 
 class PP302(PyProject):
     "Sets a minimum pytest to at least 6"
-    requires = {"PP301"}
+    requires = frozenset(("PP301",))
 
     @staticmethod
     def check(pyproject: dict[str, Any]) -> bool:

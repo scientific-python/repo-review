@@ -193,7 +193,7 @@ def process(
     # Run all the checks in topological order based on their dependencies
     ts = graphlib.TopologicalSorter(graph)
     for name in ts.static_order():
-        if all(completed.get(n, "") == "" for n in graph[name]):  # noqa: PLC1901
+        if all(completed.get(n, "") == "" for n in graph[name]):
             result = apply_fixtures(fixtures, tasks[name].check)
             if isinstance(result, bool):
                 completed[name] = "" if result else tasks[name].check.__doc__
