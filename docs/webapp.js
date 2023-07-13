@@ -220,15 +220,15 @@ class App extends React.Component {
       var families_checks;
       try {
         families_checks = pyodide.runPython(`
-            from pyodide.http import open_url
-            from repo_review.processor import process
-            from repo_review.ghpath import GHPath
+          from pyodide.http import open_url
+          from repo_review.processor import process
+          from repo_review.ghpath import GHPath
 
-            GHPath.open_url = staticmethod(open_url)
+          GHPath.open_url = staticmethod(open_url)
 
-            package = GHPath(repo="${state.repo}", branch="${state.branch}")
-            process(package)
-        `);
+          package = GHPath(repo="${state.repo}", branch="${state.branch}")
+          process(package)
+          `);
       } catch (e) {
         if (e.message.includes("KeyError: 'tree'")) {
           this.setState({
@@ -240,7 +240,7 @@ class App extends React.Component {
         }
         this.setState({
           progress: false,
-          err_msg: e.message,
+          err_msg: `<pre><code>${e.message}</code><pre>`,
         });
         return;
       }
@@ -349,8 +349,9 @@ class App extends React.Component {
                   component="div"
                   color="error"
                 >
-                  {" "}
-                  {this.state.err_msg}{" "}
+                  <span
+                    dangerouslySetInnerHTML={{ __html: this.state.err_msg }}
+                  />
                 </MaterialUI.Typography>
               )}
             </MaterialUI.Box>
