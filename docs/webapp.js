@@ -304,6 +304,10 @@ class App extends React.Component {
               helperText="e.g. scikit-hep/hist"
               variant="outlined"
               autoFocus={true}
+              onKeyDown={(e) => {
+                if (event.keyCode === 13)
+                  document.getElementById("branch-select").focus();
+              }}
               onInput={(e) => this.setState({ repo: e.target.value })}
               defaultValue={urlParams.get("repo")}
               sx={{ flexGrow: 3 }}
@@ -313,6 +317,9 @@ class App extends React.Component {
               id="branch-select"
               options={common_branches}
               freeSolo={true}
+              onKeyDown={(e) => {
+                if (event.keyCode === 13) this.handleCompute();
+              }}
               onInputChange={(e, value) => this.setState({ branch: value })}
               defaultValue={urlParams.get("branch")}
               renderInput={(params) => (
