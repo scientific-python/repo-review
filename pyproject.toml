@@ -31,7 +31,7 @@ classifiers = [
 dynamic = ["version"]
 dependencies = [
   "markdown-it-py",
-  "pyyaml==5.3.1",
+  "pyyaml!=6.0.0", # pyyaml 6 is broken with cython 3
   "tomli; python_version < '3.11'",
   "typing-extensions; python_version < '3.11'",
 ]
