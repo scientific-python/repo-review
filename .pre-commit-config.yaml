@@ -54,7 +54,7 @@ repos:
         files: (src|web|tests)
         args: []
         additional_dependencies:
-          - click
+          - click>=8.1.5
           - markdown-it-py
           - pytest
           - rich
