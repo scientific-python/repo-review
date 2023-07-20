@@ -88,7 +88,6 @@ xfail_strict = true
 log_cli_level = "INFO"
 filterwarnings = [
   'error',
-  'ignore:(ast.Str|Attribute s|ast.NameConstant|ast.Num) is deprecated:DeprecationWarning:_pytest',
 ]
 testpaths = ["tests"]
 pythonpath = ["tests/test_utilities"]
