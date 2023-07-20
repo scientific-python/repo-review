@@ -92,7 +92,9 @@ def docs(session: nox.Session) -> None:
     if args.builder != "html" and args.serve:
         session.error("Must not specify non-HTML builder with --serve")
 
-    session.install("-e.[docs]")
+    extra_installs = ["sphinx-autobuild"] if args.serve else []
+
+    session.install("-e.[docs]", *extra_installs)
     session.chdir("docs")
 
     if args.builder == "linkcheck":
@@ -101,21 +103,19 @@ def docs(session: nox.Session) -> None:
         )
         return
 
-    session.run(
-        "sphinx-build",
+    shared_args = (
         "-n",  # nitpicky mode
-        "--keep-going",  # show all errors
         "-T",  # full tracebacks
-        "-b",
-        args.builder,
+        f"-b={args.builder}",
         ".",
         f"_build/{args.builder}",
         *posargs,
     )
 
     if args.serve:
-        session.log("Launching docs at http://localhost:8000/ - use Ctrl-C to quit")
-        session.run("python", "-m", "http.server", "8000", "-d", "_build/html")
+        session.run("sphinx-autobuild", *shared_args)
+    else:
+        session.run("sphinx-build", "--keep-going", *shared_args)
 
 
 @nox.session
