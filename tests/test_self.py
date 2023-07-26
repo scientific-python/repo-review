@@ -28,7 +28,7 @@ def patch_entry_points(monkeypatch: pytest.MonkeyPatch) -> None:
 
 
 def test_pyproject() -> None:
-    families, results = repo_review.processor.process(Path("."))
+    families, results = repo_review.processor.process(Path())
 
     assert families == {"general": {}, "pyproject": {}}
     assert len(results) == 9
@@ -57,7 +57,7 @@ def test_no_pyproject() -> None:
 
 def test_empty_pyproject() -> None:
     families, results = repo_review.processor.process(
-        Path("."), subdir="tests/test_utilities"
+        Path(), subdir="tests/test_utilities"
     )
 
     assert families == {"general": {}, "pyproject": {}}

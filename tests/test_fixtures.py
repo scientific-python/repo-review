@@ -20,7 +20,7 @@ class D100:
         Requires Path(".") to be passed
         """
 
-        return package == Path(".")
+        return package == Path()
 
 
 class D200:
@@ -54,8 +54,8 @@ def get_checks(some_bool: bool) -> dict[str, type]:
 
 def test_process_fixtures() -> None:
     fixtures = compute_fixtures(
-        Path("."),
-        Path("."),
+        Path(),
+        Path(),
         {"simple": simple, "nothing": nothing, "not_simple": not_simple},
     )
 
@@ -66,8 +66,8 @@ def test_process_fixtures() -> None:
 
 def test_process_fixtures_with_package() -> None:
     fixtures = compute_fixtures(
-        Path("."),
-        Path("."),
+        Path(),
+        Path(),
         {
             "simple": simple,
             "nothing": nothing,
@@ -77,7 +77,7 @@ def test_process_fixtures_with_package() -> None:
 
     assert apply_fixtures(fixtures, nothing) == 42
     assert apply_fixtures(fixtures, simple) == "."
-    assert apply_fixtures(fixtures, lambda package: package) == Path(".")
+    assert apply_fixtures(fixtures, lambda package: package) == Path()
     assert apply_fixtures(fixtures, not_simple) == ". ."
 
 
@@ -89,5 +89,5 @@ def test_process_checks(monkeypatch: pytest.MonkeyPatch, some_bool: bool) -> Non
     monkeypatch.setattr(
         importlib.metadata, "entry_points", lambda group: [ep]  # noqa: ARG005
     )
-    checks = collect_checks({"package": Path("."), "some_bool": some_bool})
+    checks = collect_checks({"package": Path(), "some_bool": some_bool})
     assert len(checks) == 1 + some_bool
