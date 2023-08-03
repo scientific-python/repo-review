@@ -32,6 +32,11 @@ string from the check instead of `False`. Returning `None` makes a check
 and check name with `{name}` (these are processed with `.format()`, so escape `{}`
 as `{{}}`). The error message is in markdown format.
 
+```{versionchanged} 0.9
+The string return value is not processed via `.format`. You can use `self` and
+the `name` fixture directly when constructing the return string.
+```
+
 If the check named in `requires` does not pass, the check is skipped.
 
 A suggested convention for easily writing checks is as follows:
