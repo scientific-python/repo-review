@@ -8,7 +8,7 @@ from collections.abc import Mapping
 
 import markdown_it
 
-from .families import Family, get_family_name
+from .families import Family, get_family_description, get_family_name
 from .processor import Result
 
 __all__ = ["to_html"]
@@ -32,6 +32,8 @@ def to_html(families: Mapping[str, Family], processed: list[Result]) -> str:
     for family, results_list in itertools.groupby(processed, lambda r: r.family):
         family_name = get_family_name(families, family)
         print(f"<h2>{family_name}</h2>")
+        if description := get_family_description(families, family):
+            print(md.render(description))
         print("<table>")
         print("<tr><th>?</th><th>Name</th><th>Description</th></tr>")
         for result in results_list:

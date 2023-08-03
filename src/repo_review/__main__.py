@@ -27,7 +27,7 @@ from . import __version__
 from ._compat.importlib.resources.abc import Traversable
 from ._compat.typing import assert_never
 from .checks import get_check_description, get_check_url
-from .families import Family, get_family_name
+from .families import Family, get_family_description, get_family_name
 from .ghpath import GHPath
 from .html import to_html
 from .processor import Result, as_simple_dict, collect_all, process
@@ -78,8 +78,19 @@ def rich_printer(
     )
 
     for family, results_list in itertools.groupby(processed, lambda r: r.family):
+        # Compute the family name and optional description
         family_name = get_family_name(families, family)
-        tree = rich.tree.Tree(f"[bold]{family_name}[/bold]:")
+        rich_family_name = rich.text.Text.from_markup(f"[bold]{family_name}[/bold]:")
+        family_description = get_family_description(families, family)
+        if family_description:
+            rich_description = rich.markdown.Markdown(family_description)
+            rich_family = rich.console.Group(
+                rich_family_name, rich_description, rich.console.NewLine()
+            )
+            tree = rich.tree.Tree(rich_family)
+        else:
+            tree = rich.tree.Tree(rich_family_name)
+
         for result in results_list:
             style = (
                 "yellow"

@@ -145,3 +145,12 @@ def repo_review_checks() -> dict[str, PyProject | General]:
     return {p.__name__: p() for p in PyProject.__subclasses__()} | {
         p.__name__: p() for p in General.__subclasses__()
     }
+
+
+def repo_review_families(pyproject: dict[str, Any]) -> dict[str, dict[str, str]]:
+    return {
+        "pyproject": {
+            "name": "PyProject",
+            "description": f"Has {pyproject.get('build-system', {}).get('build-backend', 'unknown')} backend",
+        }
+    }

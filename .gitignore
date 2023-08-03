@@ -141,3 +141,4 @@ cython_debug/
 src/*/_version.py
 
 node_modules/
+/.vscode

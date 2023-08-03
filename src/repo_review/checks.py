@@ -9,6 +9,10 @@ from .fixtures import apply_fixtures
 __all__ = ["Check", "collect_checks", "is_allowed", "get_check_url"]
 
 
+def __dir__() -> list[str]:
+    return __all__
+
+
 class Check(Protocol):
     """
     This is the check Protocol. Since Python doesn't support optional Protocol
