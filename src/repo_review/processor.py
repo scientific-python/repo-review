@@ -210,7 +210,7 @@ def process(
                     ""
                     if result
                     else (tasks[name].check.__doc__ or "Check failed").format(
-                        name=name, self=tasks[name].check
+                        name=name, self=tasks[name]
                     )
                 )
             else:
