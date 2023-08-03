@@ -216,7 +216,7 @@ def process(
             Result(
                 family=check.family,
                 name=task_name,
-                description=doc.format(self=check, name=task_name),
+                description=doc.format(self=check, name=task_name).strip(),
                 result=result,
                 err_msg=textwrap.dedent(err_msg.format(self=check, name=task_name)),
                 url=get_check_url(task_name, check),
