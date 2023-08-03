@@ -1,6 +1,8 @@
 # Families
 
-Families are a set of simple strings that group together similar checks. You can provide a nicer user experience, however, by adding a mapping of information for repo-review to improve the ordering and display of families.
+Families are a set of simple strings that group together similar checks. You can
+provide a nicer user experience, however, by adding a mapping of information for
+repo-review to improve the ordering and display of families.
 
 You can construct a dict with the following optional keys:
 
@@ -8,6 +10,15 @@ You can construct a dict with the following optional keys:
 class Family(typing.TypedDict, total=False):
     name: str  # defaults to key
     order: int  # defaults to 0
+    description: str  # defaults to empty
+```
+
+The `name` will be shown instead if given. The families will be sorted by
+`order` then key. And a `description` will be shown after the name if provided;
+it is expected to be in markdown format.
+
+```{versionadded} 0.9
+Descriptions are now supported.
 ```
 
 Then you can provide a function that maps family strings to this extra information:
@@ -26,6 +37,11 @@ def get_familes() -> dict[str, Family]:
     }
 ```
 
+```{versionchanged} 0.9
+You can request fixtures for this function, like all the other collection functions.
+This allows dynamic descriptions based on repo contents.
+```
+
 And finally, you register this function as an entry-point:
 
 ```toml
@@ -34,9 +50,3 @@ families = "my_plugin_package.my_family_module:get_families"
 ```
 
 The entry-point name doesn't matter.
-
-```{admonition} Fixtures
-Unlike almost all other parts of the API, the family function does not support
-fixtures. This could be added if there is a need, but usually not needed - if a
-check is not present from a family, the family will not be displayed.
-```

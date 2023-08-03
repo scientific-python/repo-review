@@ -23,6 +23,7 @@ __all__ = [
     "as_simple_dict",
     "collect_all",
     "process",
+    "md_as_html",
 ]
 
 
@@ -31,6 +32,16 @@ def __dir__() -> list[str]:
 
 
 md = markdown_it.MarkdownIt()
+
+
+def md_as_html(md_text: str) -> str:
+    """
+    Heler function that converts markdown text to HTML. Strips paragraph tags from the result.
+
+    :param md_text: The markdown text to convert.
+    """
+    result: str = md.render(md_text).strip()
+    return result.removeprefix("<p>").removesuffix("</p>").strip()
 
 
 class ResultDict(typing.TypedDict):
@@ -63,8 +74,7 @@ class Result:
         """
         Produces HTML from the error message, assuming it is in markdown.
         """
-        result: str = md.render(self.err_msg).strip()
-        return result.removeprefix("<p>").removesuffix("</p>").strip()
+        return md_as_html(self.err_msg)
 
 
 class ProcessReturn(typing.NamedTuple):
@@ -143,7 +153,7 @@ def collect_all(
     checks = collect_checks(fixtures)
 
     # Collect families.
-    families = collect_families()
+    families = collect_families(fixtures)
 
     # These are optional, so fill in missing families.
     for name in {c.family for c in checks.values()}:

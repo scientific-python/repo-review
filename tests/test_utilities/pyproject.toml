@@ -12,5 +12,7 @@ description = "Simple repo-review example for testing"
 
 [project.entry-points."repo_review.checks"]
 pyproject = "pyproject:repo_review_checks"
+[project.entry-points."repo_review.families"]
+pyproject = "pyproject:repo_review_families"
 
 [tool.example]
