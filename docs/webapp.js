@@ -226,15 +226,8 @@ class App extends React.Component {
       try {
         families_checks = pyodide.runPython(`
           from pyodide.http import open_url
-          from repo_review.processor import process
+          from repo_review.processor import process, md_as_html
           from repo_review.ghpath import GHPath
-          import markdown_it
-
-          md = markdown_it.MarkdownIt()
-
-          def md_as_html(md_text):
-              result = md.render(md_text).strip()
-              return result.removeprefix("<p>").removesuffix("</p>").strip()
 
           GHPath.open_url = staticmethod(open_url)
 
