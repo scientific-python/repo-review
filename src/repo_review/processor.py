@@ -194,9 +194,15 @@ def process(
     ts = graphlib.TopologicalSorter(graph)
     for name in ts.static_order():
         if all(completed.get(n, "") == "" for n in graph[name]):
-            result = apply_fixtures(fixtures, tasks[name].check)
+            result = apply_fixtures({"name": name, **fixtures}, tasks[name].check)
             if isinstance(result, bool):
-                completed[name] = "" if result else tasks[name].check.__doc__
+                completed[name] = (
+                    ""
+                    if result
+                    else (tasks[name].check.__doc__ or "Check failed").format(
+                        name=name, self=tasks[name].check
+                    )
+                )
             else:
                 completed[name] = result
         else:
@@ -218,7 +224,7 @@ def process(
                 name=task_name,
                 description=doc.format(self=check, name=task_name).strip(),
                 result=result,
-                err_msg=textwrap.dedent(err_msg.format(self=check, name=task_name)),
+                err_msg=textwrap.dedent(err_msg),
                 url=get_check_url(task_name, check),
             )
         )

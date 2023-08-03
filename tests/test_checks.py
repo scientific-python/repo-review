@@ -45,9 +45,9 @@ class C100:
     fail: bool
     family: ClassVar[str] = "custom"
 
-    def check(self) -> str:
+    def check(self, name: str) -> str:
         "Never see me"
-        return "I'm a custom error message" if self.fail else ""
+        return f"I'm a custom error message from {name}" if self.fail else ""
 
 
 def test_no_checks(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -156,4 +156,4 @@ def test_string_result(monkeypatch: pytest.MonkeyPatch) -> None:
 
     assert check_c101.name == "C101"
     assert check_c101.result is False
-    assert check_c101.err_msg == "I'm a custom error message"
+    assert check_c101.err_msg == "I'm a custom error message from C101"
