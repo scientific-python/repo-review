@@ -180,3 +180,7 @@ flake8-unused-arguments.ignore-variadic-names = true
 [tool.ruff.per-file-ignores]
 "src/repo_review/_compat/**.py" = ["TID251"]
 "src/**/__main__.py" = ["T20"]
+
+
+[tool.repo-review]
+ignore = ["PC110"]
