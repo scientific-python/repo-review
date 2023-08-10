@@ -19,22 +19,25 @@ output formats are supported; `rich`, `svg`, `html`, and `json`.
 
 `sp-repo-review` provides checks based on the
 [Scientific-Python Development Guide][] at [scientific-python/cookie][]. A live
-WebAssembly demo using `sp-repo-review` is
+WebAssembly demo using [sp-repo-review][] is
 [here][repo-review-demo].
 
 ## Running repo-review
 
 Repo-review supports running multiple ways:
 
-- From the command line on a local folder
+- [From the command line][cli] on a local folder
 - From the command line on a remote repository on GitHub (`gh:org/repo@branch`)
-- From WebAssembly in [Pyodide][] (example in `docs/index.html`)
+- [From WebAssembly][webapp] in [Pyodide][] (example in `docs/index.html`)
+- [From pre-commit][intro-pre-commit]
+- [From GitHub Actions][intro-github-actions]
+- [From Python][programmatic-usage]
 
 If the root of a package is not the repository root, pass `--package-dir a/b/c`.
 
 ## Configuration
 
-Repo-review supports configuration via `pyproject.toml`:
+Repo-review [supports configuration][intro-configuring] via `pyproject.toml`:
 
 ```toml
 [tool.repo-review]
@@ -67,7 +70,7 @@ This project is intended to be fun and easy to develop and design checks for -
 it requires and uses Python 3.10, and uses a lot of the new features in 3.9 and
 3.10. It's maybe not entirely conventional, but it enables very simple plugin
 development. It works locally, remotely, and in WebAssembly (using
-[Pyodide][]).
+[Pyodide][]). [See the docs][writing-a-plugin].
 
 There are a few key designs that are very useful and make this possible. First,
 all paths are handled as Traversables. This allows a simple Traversable
@@ -75,13 +78,14 @@ implementation based on `open_url` to provide a web interface for use in the
 webapp. It also would allow `zipfile.Path` to work just as well, too - no need
 to extract.
 
-Checks can request fixtures (like [pytest][]) as arguments. Check files can add new
-fixtures as needed. Fixtures are are specified with entry points, and take any
-other fixture as arguments as well - the `root` and `package` fixtures
-represents the root of the repository and of the package you are checking,
-respectively, and are the basis for all other fixtures. `pyproject` is provided
-as well. Checks are specified via an entrypoint that returns a dict of checks;
-this also can accept fixtures, allowing dynamic check listings.
+[Checks][] can request [fixtures][] (like [pytest][]) as arguments. Check files
+can add new fixtures as needed. Fixtures are are specified with entry points,
+and take any other fixture as arguments as well - the `root` and `package`
+fixtures represents the root of the repository and of the package you are
+checking, respectively, and are the basis for the other fixtures, which are
+topologically sorted and cached. `pyproject` is provided as well. Checks are
+specified via an entrypoint that returns a dict of checks; this can also can
+accept fixtures, allowing dynamic check listings.
 
 Check files do not depend on the main library, and can be extended (similar to
 Flake8). You register new check files via entry-points - so extending this is
@@ -101,6 +105,16 @@ The runner will topologically sort the checks, and checks that do not run will
 get a `None` result and the check method will not run. The front-end (Rich
 powered CLI or Pyodide webapp) will render the markdown-formatted check
 docstring only if the result is `False`.
+
+Checks are organized by [Families][]. A plugin can customize the display name,
+change the sort order, and add an optional (dynamic) description. Like the other
+collection functions, the family entry-point also supports fixtures.
+
+## Plugins
+
+Feel free to request your plugin be added to this list.
+
+- [sp-repo-review][]: Checks based on the [Scientific-Python Development Guide][].
 
 ## Links
 
@@ -130,5 +144,19 @@ This was developed for [Scikit-HEP][] before moving to Scientific-Python.
 [scientific-python development guide]: https://learn.scientific-python.org/development
 [scientific-python/cookie]: https://github.com/scientific-python/cookie
 [scikit-hep]: https://scikit-hep.org
+
+[intro-precommit]: https://repo-review.readthedocs.io/en/latest/intro.html#pre-commit
+[intro-github-actions]: https://repo-review.readthedocs.io/en/latest/intro.html#github-actions
+[cli]: https://repo-review.readthedocs.io/en/latest/cli.html
+[programmatic-usage]: https://repo-review.readthedocs.io/en/latest/programmatic.html
+[webapp]: https://repo-review.readthedocs.io/en/latest/webapp.html
+[intro-configuring]: https://repo-review.readthedocs.io/en/latest/intro.html#configuring
+[writing-a-plugin]: https://repo-review.readthedocs.io/en/latest/plugins.html
+[fixtures]: https://repo-review.readthedocs.io/en/latest/fixtures.html
+[checks]: https://repo-review.readthedocs.io/en/latest/checks.html
+[families]: https://repo-review.readthedocs.io/en/latest/families.html
+[changelog]: https://repo-review.readthedocs.io/en/latest/changelog.html
+[api]: https://repo-review.readthedocs.io/en/latest/api/repo_review.html
+
 
 <!-- prettier-ignore-end -->

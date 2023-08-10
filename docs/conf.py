@@ -61,6 +61,8 @@ sphinx_github_changelog_token = os.environ.get("GITHUB_API_TOKEN")
 commit = os.environ.get("READTHEDOCS_GIT_COMMIT_HASH", "main")
 code_url = "https://github.com/scientific-python/repo-review/blob"
 
+linkcheck_ignore = [r"https://pypi.org/project/repo-review/v0\.[23456]"]
+
 
 def linkcode_resolve(domain: str, info: dict[str, str]) -> str | None:
     if domain != "py":
