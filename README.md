@@ -144,8 +144,9 @@ This was developed for [Scikit-HEP][] before moving to Scientific-Python.
 [scientific-python development guide]: https://learn.scientific-python.org/development
 [scientific-python/cookie]: https://github.com/scientific-python/cookie
 [scikit-hep]: https://scikit-hep.org
+[sp-repo-review]: https://pypi.org/project/sp-repo-review
 
-[intro-precommit]: https://repo-review.readthedocs.io/en/latest/intro.html#pre-commit
+[intro-pre-commit]: https://repo-review.readthedocs.io/en/latest/intro.html#pre-commit
 [intro-github-actions]: https://repo-review.readthedocs.io/en/latest/intro.html#github-actions
 [cli]: https://repo-review.readthedocs.io/en/latest/cli.html
 [programmatic-usage]: https://repo-review.readthedocs.io/en/latest/programmatic.html
