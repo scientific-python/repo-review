@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import itertools
-import json
 import sys
 import typing
 from collections.abc import Mapping
@@ -16,6 +15,7 @@ else:
     import rich_click as click
 
 import rich.console
+import rich.json
 import rich.markdown
 import rich.syntax
 import rich.terminal_theme
@@ -183,11 +183,14 @@ def display_output(
             }
             if header:
                 d = {header: d}
-            j = json.dumps(d, indent=2)
+            j = rich.json.JSON.from_data(d)
             console = rich.console.Console(
                 stderr=stderr, color_system="auto" if color else None
             )
-            console.print_json(j)
+            if header:
+                console.print(j.__rich__()[2:-2], end="")
+            else:
+                console.print(j)
         case "html":
             html = to_html(families, processed, status)
             if header:
@@ -252,7 +255,7 @@ def display_output(
     help="Show all (default), or just errors, or errors and skips",
 )
 def main(
-    packages: list[Traversable],
+    packages: list[Path],
     format_opt: Formats,
     stderr_fmt: Formats | None,
     select: str,
@@ -264,7 +267,17 @@ def main(
     Pass in a local Path or gh:org/repo@branch.
     """
 
-    for package in packages:
+    if len(packages) > 1:
+        stdout = rich.console.Console(
+            color_system="auto" if stderr_fmt is None else None
+        )
+        stderr = rich.console.Console(color_system="auto", stderr=True)
+        if format_opt == "json":
+            stdout.print("{")
+        if stderr_fmt == "json":
+            stderr.print("{")
+
+    for n, package in enumerate(packages):
         on_each(
             package,
             format_opt,
@@ -275,10 +288,22 @@ def main(
             header=package.name if len(packages) > 1 else "",
             show=show,
         )
+        if len(packages) > 1:
+            is_before_end = n < len(packages) - 1
+            if format_opt == "json":
+                stdout.print("," if is_before_end else "")
+            if stderr_fmt == "json":
+                stderr.print("," if is_before_end else "")
+
+    if len(packages) > 1:
+        if format_opt == "json":
+            stdout.print("}")
+        if stderr_fmt == "json":
+            stderr.print("}")
 
 
 def on_each(
-    package: Traversable,
+    package: Path,
     format_opt: Literal["rich", "json", "html", "svg"],
     stderr_fmt: Literal["rich", "json", "html", "svg"] | None,
     select: str,
