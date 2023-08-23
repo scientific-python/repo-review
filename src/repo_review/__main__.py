@@ -211,6 +211,12 @@ def display_output(
     is_eager=True,
     help="List all checks and exit",
 )
+@click.option(
+    "--show",
+    type=click.Choice(["all", "err", "errskip"]),
+    default="all",
+    help="Show all (default), or just errors, or errors and skips",
+)
 def main(
     package: Traversable,
     format_opt: Literal["rich", "json", "html"],
@@ -218,6 +224,7 @@ def main(
     select: str,
     ignore: str,
     package_dir: str,
+    show: Literal["all", "err", "errskip"],
 ) -> None:
     """
     Pass in a local Path or gh:org/repo@branch.
@@ -240,6 +247,17 @@ def main(
     families, processed = process(
         package, select=select_list, ignore=ignore_list, subdir=package_dir
     )
+
+    if show != "all":
+        processed = [r for r in processed if r.result is not False]
+        if show == "err":
+            processed = [r for r in processed if r.result is not None]
+        known_families = {r.family for r in processed}
+        families = {
+            k: v
+            for k, v in families.items()
+            if k in known_families or v.get("description", "")
+        }
 
     display_output(
         families,
