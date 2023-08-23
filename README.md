@@ -115,6 +115,7 @@ collection functions, the family entry-point also supports fixtures.
 Feel free to request your plugin be added to this list.
 
 - [sp-repo-review][]: Checks based on the [Scientific-Python Development Guide][].
+- [validate-pyproject][]: Adds a check to validate pyproject sections, also supports plugins.
 
 ## Links
 
@@ -145,6 +146,7 @@ This was developed for [Scikit-HEP][] before moving to Scientific-Python.
 [scientific-python/cookie]: https://github.com/scientific-python/cookie
 [scikit-hep]: https://scikit-hep.org
 [sp-repo-review]: https://pypi.org/project/sp-repo-review
+[validate-pyproject]: https://validate-pyproject.readthedocs.io
 
 [intro-pre-commit]: https://repo-review.readthedocs.io/en/latest/intro.html#pre-commit
 [intro-github-actions]: https://repo-review.readthedocs.io/en/latest/intro.html#github-actions
