@@ -42,3 +42,11 @@ def test_cmd_svg():
     subprocess.run(
         ["repo-review", ".", "--format", "svg", "--stderr", "svg"], check=True
     )
+
+
+def test_cmd_show_only_err():
+    subprocess.run(["repo-review", ".", "--show", "err"], check=True)
+
+
+def test_cmd_show_only_errskip():
+    subprocess.run(["repo-review", ".", "--show", "errskip"], check=True)
