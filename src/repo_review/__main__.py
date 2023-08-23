@@ -32,7 +32,7 @@ from .ghpath import GHPath
 from .html import to_html
 from .processor import Result, as_simple_dict, collect_all, process
 
-__all__ = ["main"]
+__all__ = ["main", "Formats", "Show", "Status"]
 
 
 def __dir__() -> list[str]:
@@ -40,6 +40,10 @@ def __dir__() -> list[str]:
 
 
 rich.traceback.install(suppress=[click, rich, orig_click], show_locals=True, width=None)
+
+Status = Literal["empty", "passed", "skips", "errors"]
+Formats = Literal["rich", "json", "html", "svg"]
+Show = Literal["all", "err", "errskip"]
 
 
 def list_all(ctx: click.Context, _param: click.Parameter, value: bool) -> None:
@@ -72,6 +76,7 @@ def rich_printer(
     svg: bool = False,
     stderr: bool = False,
     color: bool = True,
+    status: Status,
 ) -> None:
     console = rich.console.Console(
         record=svg, quiet=svg, stderr=stderr, color_system="auto" if color else None
@@ -124,7 +129,12 @@ def rich_printer(
         console.print()
 
     if len(processed) == 0:
-        console.print("[bold red]No checks ran")
+        if status == "empty":
+            console.print("[bold red]No checks ran")
+        elif status == "passed":
+            console.print("[bold green]All checks passed")
+        elif status == "skips":
+            console.print("[bold green]All checks passed [yellow](with some skips)")
 
     if svg:
         str = console.export_svg(theme=rich.terminal_theme.DEFAULT_TERMINAL_THEME)
@@ -141,25 +151,36 @@ def display_output(
     families: Mapping[str, Family],
     processed: list[Result],
     *,
-    format_opt: Literal["rich", "json", "html", "svg"],
+    format_opt: Formats,
     stderr: bool,
     color: bool,
+    status: Status,
 ) -> None:
     match format_opt:
         case "rich" | "svg":
             rich_printer(
-                families, processed, svg=format_opt == "svg", stderr=stderr, color=color
+                families,
+                processed,
+                svg=format_opt == "svg",
+                stderr=stderr,
+                color=color,
+                status=status,
             )
         case "json":
             j = json.dumps(
-                {"families": families, "checks": as_simple_dict(processed)}, indent=2
+                {
+                    "status": status,
+                    "families": families,
+                    "checks": as_simple_dict(processed),
+                },
+                indent=2,
             )
             console = rich.console.Console(
                 stderr=stderr, color_system="auto" if color else None
             )
             console.print_json(j)
         case "html":
-            html = to_html(families, processed)
+            html = to_html(families, processed, status)
             if color:
                 rich.print(
                     rich.syntax.Syntax(html, lexer="html"),
@@ -219,12 +240,12 @@ def display_output(
 )
 def main(
     package: Traversable,
-    format_opt: Literal["rich", "json", "html"],
-    stderr_fmt: Literal["rich", "json", "html"] | None,
+    format_opt: Formats,
+    stderr_fmt: Formats | None,
     select: str,
     ignore: str,
     package_dir: str,
-    show: Literal["all", "err", "errskip"],
+    show: Show,
 ) -> None:
     """
     Pass in a local Path or gh:org/repo@branch.
@@ -248,6 +269,14 @@ def main(
         package, select=select_list, ignore=ignore_list, subdir=package_dir
     )
 
+    status: Status = "passed" if processed else "empty"
+    for result in processed:
+        if result.result is False:
+            status = "errors"
+            break
+        if result.result is None:
+            status = "skips"
+
     if show != "all":
         processed = [r for r in processed if r.result is not False]
         if show == "err":
@@ -265,15 +294,21 @@ def main(
         format_opt=format_opt,
         stderr=False,
         color=stderr_fmt is None,
+        status=status,
     )
     if stderr_fmt:
         display_output(
-            families, processed, format_opt=stderr_fmt, stderr=True, color=True
+            families,
+            processed,
+            format_opt=stderr_fmt,
+            stderr=True,
+            color=True,
+            status=status,
         )
 
-    if any(p.result is False for p in processed):
+    if status == "errors":
         raise SystemExit(2)
-    if len(processed) == 0:
+    if status == "empty":
         raise SystemExit(3)
 
 

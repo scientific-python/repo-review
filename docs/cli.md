@@ -17,6 +17,7 @@ JSON output looks like this:
 
 ```json
 {
+  "status": "passed",
   "families": {
     "pyproject": {},
     "general": {}

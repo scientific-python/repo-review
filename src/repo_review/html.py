@@ -4,12 +4,16 @@ import builtins
 import functools
 import io
 import itertools
+import typing
 from collections.abc import Mapping
 
 import markdown_it
 
 from .families import Family, get_family_description, get_family_name
 from .processor import Result
+
+if typing.TYPE_CHECKING:
+    from .__main__ import Status
 
 __all__ = ["to_html"]
 
@@ -18,12 +22,17 @@ def __dir__() -> list[str]:
     return __all__
 
 
-def to_html(families: Mapping[str, Family], processed: list[Result]) -> str:
+def to_html(
+    families: Mapping[str, Family], processed: list[Result], status: Status = "empty"
+) -> str:
     """
     Convert the results of a repo review (``families``, ``processed``) to HTML.
 
     :param families: The family mapping.
     :param processed: The list of processed results.
+    :param status: A string indicating the reason behind being empty. Will
+                   assume no checks ran if not given. This is only needed if
+                   you are filtering the results before calling this function.
     """
     out = io.StringIO()
     print = functools.partial(builtins.print, file=out)
@@ -72,6 +81,13 @@ def to_html(families: Mapping[str, Family], processed: list[Result]) -> str:
         print("</table>")
 
     if len(processed) == 0:
-        print('<span style="color: red;">No checks ran.</span>')
+        if status == "empty":
+            print('<span style="color: red;">No checks ran.</span>')
+        elif status == "passed":
+            print('<span style="color: red;">All checks passed.</span>')
+        elif status == "skips":
+            print(
+                '<span style="color: red;">All checks passed.</span> <span style="color: yellow;">(some checks skipped)</span>'
+            )
 
     return out.getvalue()
