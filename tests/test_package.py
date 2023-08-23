@@ -24,8 +24,6 @@ def test_local():
     assert "BSD License" in results.families["general"]["description"]
     assert "[tool.repo-review]" in results.families["validate-pyproject"]["description"]
     for result in results.results:
-        if result.name in {"PC111"}:  # TODO: update after next sp-repo-review release
-            continue
         assert result.result
 
 
