@@ -6,6 +6,14 @@ repo\_review package
    :undoc-members:
    :show-inheritance:
 
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   repo_review.resources
+
 Submodules
 ----------
 
@@ -53,6 +61,14 @@ repo\_review.processor module
 -----------------------------
 
 .. automodule:: repo_review.processor
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+repo\_review.schema module
+--------------------------
+
+.. automodule:: repo_review.schema
    :members:
    :undoc-members:
    :show-inheritance:

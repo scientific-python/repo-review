@@ -1,0 +1,24 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "https://github.com/scientific-python/repo-review/blob/main/src/repo_review/resources/repo-review.schema.json",
+  "description": "Repo-review's settings.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "select": {
+      "$ref": "#/$defs/checks"
+    },
+    "ignore": {
+      "$ref": "#/$defs/checks"
+    }
+  },
+  "$defs": {
+    "checks": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[A-Z]+[0-9]*$"
+      }
+    }
+  }
+}
