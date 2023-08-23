@@ -44,7 +44,7 @@ cli = [
 ]
 test = [
   "pytest >=7",
-  "sp-repo-review >=2023.8.3",
+  "sp-repo-review >=2023.08.23",
   "validate-pyproject >=0.14",
 ]
 dev = [
