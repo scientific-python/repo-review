@@ -44,7 +44,8 @@ cli = [
 ]
 test = [
   "pytest >=7",
-  "sp-repo-review",
+  "sp-repo-review >=2023.8.3",
+  "validate-pyproject >=0.14",
 ]
 dev = [
   "repo-review[test,cli]",
@@ -74,6 +75,9 @@ repo-review = "repo_review.__main__:main"
 [project.entry-points."repo_review.fixtures"]
 pyproject = "repo_review.fixtures:pyproject"
 list_all = "repo_review.fixtures:list_all"
+
+[project.entry-points."validate_pyproject.tool_schema"]
+repo-review = "repo_review.schema:get_schema"
 
 
 [tool.hatch]
