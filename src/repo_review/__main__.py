@@ -239,7 +239,7 @@ def display_output(
     help="Show all (default), or just errors, or errors and skips",
 )
 def main(
-    package: Traversable,
+    package: Path,
     format_opt: Formats,
     stderr_fmt: Formats | None,
     select: str,
@@ -250,6 +250,8 @@ def main(
     """
     Pass in a local Path or gh:org/repo@branch.
     """
+    base_package: Traversable
+
     ignore_list = {x.strip() for x in ignore.split(",") if x}
     select_list = {x.strip() for x in select.split(",") if x}
 
@@ -261,12 +263,17 @@ def main(
     if str(package).startswith("gh:"):
         _, org_repo_branch, *p = str(package).split(":", maxsplit=2)
         org_repo, branch = org_repo_branch.split("@", maxsplit=1)
-        package = GHPath(repo=org_repo, branch=branch, path=p[0] if p else "")
+        base_package = GHPath(repo=org_repo, branch=branch, path=p[0] if p else "")
         if format_opt == "rich":
             rich.print(f"[bold]Processing [blue]{package}[/blue] from GitHub\n")
+    elif package.name == "pyproject.toml" and package.is_file():
+        # Special case for passing a path to a pyproject.toml
+        base_package = package.parent
+    else:
+        base_package = package
 
     families, processed = process(
-        package, select=select_list, ignore=ignore_list, subdir=package_dir
+        base_package, select=select_list, ignore=ignore_list, subdir=package_dir
     )
 
     status: Status = "passed" if processed else "empty"
