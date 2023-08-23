@@ -30,6 +30,10 @@ def test_cmd_pyproject():
     subprocess.run(["repo-review", "pyproject.toml"], check=True)
 
 
+def test_cmd_dual():
+    subprocess.run(["repo-review", "../repo-review", "../repo-review"], check=True)
+
+
 def test_cmd_html():
     subprocess.run(
         ["repo-review", ".", "--format", "html", "--stderr", "html"], check=True

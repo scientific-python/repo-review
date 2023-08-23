@@ -6,7 +6,7 @@ import sys
 import typing
 from collections.abc import Mapping
 from pathlib import Path
-from typing import Literal
+from typing import Any, Literal
 
 import click as orig_click
 
@@ -77,10 +77,14 @@ def rich_printer(
     stderr: bool = False,
     color: bool = True,
     status: Status,
+    header: str = "",
 ) -> None:
     console = rich.console.Console(
         record=svg, quiet=svg, stderr=stderr, color_system="auto" if color else None
     )
+
+    if header:
+        console.print(rich.markdown.Markdown(f"# {header}"))
 
     for family, results_list in itertools.groupby(processed, lambda r: r.family):
         # Compute the family name and optional description
@@ -128,6 +132,9 @@ def rich_printer(
         console.print(tree)
         console.print()
 
+    if header:
+        console.print()
+
     if len(processed) == 0:
         if status == "empty":
             console.print("[bold red]No checks ran")
@@ -155,6 +162,7 @@ def display_output(
     stderr: bool,
     color: bool,
     status: Status,
+    header: str,
 ) -> None:
     match format_opt:
         case "rich" | "svg":
@@ -165,22 +173,25 @@ def display_output(
                 stderr=stderr,
                 color=color,
                 status=status,
+                header=header,
             )
         case "json":
-            j = json.dumps(
-                {
-                    "status": status,
-                    "families": families,
-                    "checks": as_simple_dict(processed),
-                },
-                indent=2,
-            )
+            d: dict[str, Any] = {
+                "status": status,
+                "families": families,
+                "checks": as_simple_dict(processed),
+            }
+            if header:
+                d = {header: d}
+            j = json.dumps(d, indent=2)
             console = rich.console.Console(
                 stderr=stderr, color_system="auto" if color else None
             )
             console.print_json(j)
         case "html":
             html = to_html(families, processed, status)
+            if header:
+                html = f"<h1>{header}</h1>\n{html}\n"
             if color:
                 rich.print(
                     rich.syntax.Syntax(html, lexer="html"),
@@ -194,7 +205,9 @@ def display_output(
 
 @click.command(context_settings={"help_option_names": ["-h", "--help"]})
 @click.version_option(version=__version__)
-@click.argument("package", type=click.Path(dir_okay=True, path_type=Path))
+@click.argument(
+    "packages", type=click.Path(dir_okay=True, path_type=Path), nargs=-1, required=True
+)
 @click.option(
     "--format",
     "format_opt",
@@ -239,7 +252,7 @@ def display_output(
     help="Show all (default), or just errors, or errors and skips",
 )
 def main(
-    package: Path,
+    packages: list[Traversable],
     format_opt: Formats,
     stderr_fmt: Formats | None,
     select: str,
@@ -250,6 +263,31 @@ def main(
     """
     Pass in a local Path or gh:org/repo@branch.
     """
+
+    for package in packages:
+        on_each(
+            package,
+            format_opt,
+            stderr_fmt,
+            select,
+            ignore,
+            package_dir,
+            header=package.name if len(packages) > 1 else "",
+            show=show,
+        )
+
+
+def on_each(
+    package: Traversable,
+    format_opt: Literal["rich", "json", "html", "svg"],
+    stderr_fmt: Literal["rich", "json", "html", "svg"] | None,
+    select: str,
+    ignore: str,
+    package_dir: str,
+    *,
+    header: str,
+    show: Show,
+) -> None:
     base_package: Traversable
 
     ignore_list = {x.strip() for x in ignore.split(",") if x}
@@ -302,6 +340,7 @@ def main(
         stderr=False,
         color=stderr_fmt is None,
         status=status,
+        header=header,
     )
     if stderr_fmt:
         display_output(
@@ -311,6 +350,7 @@ def main(
             stderr=True,
             color=True,
             status=status,
+            header=header,
         )
 
     if status == "errors":
