@@ -26,7 +26,7 @@ WebAssembly demo using [sp-repo-review][] is
 
 Repo-review supports running multiple ways:
 
-- [From the command line][cli] on a local folder
+- [From the command line][cli] on a local folder (or multiple folders)
 - From the command line on a remote repository on GitHub (`gh:org/repo@branch`)
 - [From WebAssembly][webapp] in [Pyodide][] (example in `docs/index.html`)
 - [From pre-commit][intro-pre-commit]
@@ -116,6 +116,9 @@ Feel free to request your plugin be added to this list.
 
 - [sp-repo-review][]: Checks based on the [Scientific-Python Development Guide][].
 - [validate-pyproject][]: Adds a check to validate pyproject sections, also supports plugins.
+
+`repo-review` itself also acts as a plugin for [validate-pyproject][], allowing
+you to validate the `[tool.repo-review]` section of your `pyproject.toml`.
 
 ## Links
 
