@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import itertools
+import json
 import sys
 import typing
 from collections.abc import Mapping
@@ -187,15 +188,21 @@ def display_output(
             }
             if header:
                 d = {header: d}
-            j = rich.json.JSON.from_data(d)
-            console = rich.console.Console(
-                stderr=stderr, color_system="auto" if color else None
-            )
-            if header:
-                # We strip off beginning and ending brackets
-                console.print(j.__rich__()[2:-2], end="")
+
+            if color and output.isatty():
+                j = rich.json.JSON.from_data(d)
+                console = rich.console.Console(stderr=stderr, color_system="auto")
+                if header:
+                    # We strip off beginning and ending brackets
+                    console.print(j.__rich__()[2:-2], end="")
+                else:
+                    console.print(j)
             else:
-                console.print(j)
+                # Rich wraps json, which breaks it
+                if header:
+                    print(json.dumps(d, indent=2)[2:-2])
+                else:
+                    print(json.dumps(d, indent=2))
         case "html":
             html = to_html(families, processed, status)
             if header:
