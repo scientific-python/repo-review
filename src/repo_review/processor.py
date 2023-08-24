@@ -139,7 +139,8 @@ def collect_all(
     :param root: If passed, this is the root of the repo (for fixture computation).
     :param subdir: The subdirectory (for fixture computation).
 
-    :return: The collected fixtures, checks, and families.
+    :return: The collected fixtures, checks, and families. Families is
+             guaranteed to include all families and be in order.
 
     .. versionadded:: 0.8
     """
@@ -182,7 +183,8 @@ def process(
     :param subdir: The path to the package in the subdirectory, if not at the
                    root of the repository.
 
-    :return: A dictionary of check results.
+    :return: The families and a list of checks. Families is guaranteed to
+             include all families and be in order.
     """
     package = root.joinpath(subdir) if subdir else root
 

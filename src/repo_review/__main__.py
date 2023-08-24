@@ -6,7 +6,7 @@ import sys
 import typing
 from collections.abc import Mapping
 from pathlib import Path
-from typing import Literal
+from typing import Any, Literal
 
 import click as orig_click
 
@@ -16,6 +16,7 @@ else:
     import rich_click as click
 
 import rich.console
+import rich.json
 import rich.markdown
 import rich.syntax
 import rich.terminal_theme
@@ -77,16 +78,22 @@ def rich_printer(
     stderr: bool = False,
     color: bool = True,
     status: Status,
+    header: str = "",
 ) -> None:
     console = rich.console.Console(
         record=svg, quiet=svg, stderr=stderr, color_system="auto" if color else None
     )
 
-    for family, results_list in itertools.groupby(processed, lambda r: r.family):
-        # Compute the family name and optional description
+    if header:
+        console.print(rich.markdown.Markdown(f"# {header}"))
+
+    for family in families:
         family_name = get_family_name(families, family)
-        rich_family_name = rich.text.Text.from_markup(f"[bold]{family_name}[/bold]:")
         family_description = get_family_description(families, family)
+        family_results = [r for r in processed if r.family == family]
+
+        # Compute the family name and optional description
+        rich_family_name = rich.text.Text.from_markup(f"[bold]{family_name}[/bold]:")
         if family_description:
             rich_description = rich.markdown.Markdown(family_description)
             rich_family = rich.console.Group(
@@ -96,7 +103,7 @@ def rich_printer(
         else:
             tree = rich.tree.Tree(rich_family_name)
 
-        for result in results_list:
+        for result in family_results:
             style = (
                 "yellow"
                 if result.result is None
@@ -125,7 +132,11 @@ def rich_printer(
                 msg_grp = rich.console.Group(msg, detail)
                 tree.add(msg_grp)
 
-        console.print(tree)
+        if family_results or family_description:
+            console.print(tree)
+            console.print()
+
+    if header:
         console.print()
 
     if len(processed) == 0:
@@ -155,7 +166,9 @@ def display_output(
     stderr: bool,
     color: bool,
     status: Status,
+    header: str,
 ) -> None:
+    output = sys.stderr if stderr else sys.stdout
     match format_opt:
         case "rich" | "svg":
             rich_printer(
@@ -165,36 +178,55 @@ def display_output(
                 stderr=stderr,
                 color=color,
                 status=status,
+                header=header,
             )
         case "json":
-            j = json.dumps(
-                {
-                    "status": status,
-                    "families": families,
-                    "checks": as_simple_dict(processed),
-                },
-                indent=2,
-            )
-            console = rich.console.Console(
-                stderr=stderr, color_system="auto" if color else None
-            )
-            console.print_json(j)
+            d: dict[str, Any] = {
+                "status": status,
+                "families": families,
+                "checks": as_simple_dict(processed),
+            }
+            if header:
+                d = {header: d}
+
+            if color and output.isatty():
+                j = rich.json.JSON.from_data(d)
+                console = rich.console.Console(stderr=stderr, color_system="auto")
+                if header:
+                    # We strip off beginning and ending brackets
+                    console.print(j.__rich__()[2:-2], end="")
+                else:
+                    console.print(j)
+            else:
+                # Rich wraps json, which breaks it
+                if header:
+                    print(json.dumps(d, indent=2)[2:-2])
+                else:
+                    print(json.dumps(d, indent=2))
         case "html":
             html = to_html(families, processed, status)
-            if color:
+            if header:
+                failures = sum(r.result is False for r in processed)
+                status_msg = f"({failures} failed)" if failures else "(all passed)"
+                html = f"<details><summary><h2>{header}</h2>: {status_msg}</summary>\n{html}</details>\n"
+            if color and output.isatty():
+                # We check isatty even though Rich does too because Rich
+                # injects a ton of ending whitespace even going to a file
                 rich.print(
                     rich.syntax.Syntax(html, lexer="html"),
-                    file=sys.stderr if stderr else sys.stdout,
+                    file=output,
                 )
             else:
-                print(html, file=sys.stderr if stderr else sys.stdout)
+                print(html, file=output)
         case _:
             assert_never(format_opt)
 
 
 @click.command(context_settings={"help_option_names": ["-h", "--help"]})
 @click.version_option(version=__version__)
-@click.argument("package", type=click.Path(dir_okay=True, path_type=Path))
+@click.argument(
+    "packages", type=click.Path(dir_okay=True, path_type=Path), nargs=-1, required=True
+)
 @click.option(
     "--format",
     "format_opt",
@@ -239,7 +271,7 @@ def display_output(
     help="Show all (default), or just errors, or errors and skips",
 )
 def main(
-    package: Path,
+    packages: list[Path],
     format_opt: Formats,
     stderr_fmt: Formats | None,
     select: str,
@@ -250,6 +282,57 @@ def main(
     """
     Pass in a local Path or gh:org/repo@branch.
     """
+
+    if len(packages) > 1:
+        stdout = rich.console.Console(
+            color_system="auto" if stderr_fmt is None else None
+        )
+        stderr = rich.console.Console(color_system="auto", stderr=True)
+        if format_opt == "json":
+            stdout.print("{")
+        if stderr_fmt == "json":
+            stderr.print("{")
+
+    result = 0
+    for n, package in enumerate(packages):
+        result |= on_each(
+            package,
+            format_opt,
+            stderr_fmt,
+            select,
+            ignore,
+            package_dir,
+            add_header=len(packages) > 1,
+            show=show,
+        )
+        if len(packages) > 1:
+            is_before_end = n < len(packages) - 1
+            if format_opt == "json":
+                stdout.print("," if is_before_end else "")
+            if stderr_fmt == "json":
+                stderr.print("," if is_before_end else "")
+
+    if len(packages) > 1:
+        if format_opt == "json":
+            stdout.print("}")
+        if stderr_fmt == "json":
+            stderr.print("}")
+
+    if result:
+        raise SystemExit(result)
+
+
+def on_each(
+    package: Path,
+    format_opt: Literal["rich", "json", "html", "svg"],
+    stderr_fmt: Literal["rich", "json", "html", "svg"] | None,
+    select: str,
+    ignore: str,
+    package_dir: str,
+    *,
+    add_header: bool,
+    show: Show,
+) -> int:
     base_package: Traversable
 
     ignore_list = {x.strip() for x in ignore.split(",") if x}
@@ -266,11 +349,14 @@ def main(
         base_package = GHPath(repo=org_repo, branch=branch, path=p[0] if p else "")
         if format_opt == "rich":
             rich.print(f"[bold]Processing [blue]{package}[/blue] from GitHub\n")
+        header = org_repo
     elif package.name == "pyproject.toml" and package.is_file():
         # Special case for passing a path to a pyproject.toml
         base_package = package.parent
+        header = package.parent.name
     else:
         base_package = package
+        header = package.name
 
     families, processed = process(
         base_package, select=select_list, ignore=ignore_list, subdir=package_dir
@@ -285,7 +371,7 @@ def main(
             status = "skips"
 
     if show != "all":
-        processed = [r for r in processed if r.result is not False]
+        processed = [r for r in processed if not r.result]
         if show == "err":
             processed = [r for r in processed if r.result is not None]
         known_families = {r.family for r in processed}
@@ -302,6 +388,7 @@ def main(
         stderr=False,
         color=stderr_fmt is None,
         status=status,
+        header=header if add_header else "",
     )
     if stderr_fmt:
         display_output(
@@ -311,12 +398,14 @@ def main(
             stderr=True,
             color=True,
             status=status,
+            header=header if add_header else "",
         )
 
     if status == "errors":
-        raise SystemExit(2)
+        return 3
     if status == "empty":
-        raise SystemExit(3)
+        return 2
+    return 0
 
 
 if __name__ == "__main__":
