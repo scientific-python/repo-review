@@ -199,7 +199,9 @@ def display_output(
         case "html":
             html = to_html(families, processed, status)
             if header:
-                html = f"<h1>{header}</h1>\n{html}<hr/>\n"
+                failures = sum(r.result is False for r in processed)
+                status_msg = f"({failures} failed)" if failures else "(all passed)"
+                html = f"<details><summary><h2>{header}</h2>: {status_msg}</summary>\n{html}</details>\n"
             if color and output.isatty():
                 # We check isatty even though Rich does too because Rich
                 # injects a ton of ending whitespace even going to a file

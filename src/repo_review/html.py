@@ -44,7 +44,7 @@ def to_html(
         family_description = get_family_description(families, family)
         family_results = [r for r in processed if r.family == family]
         if family_results or family_description:
-            print(f"<h2>{family_name}</h2>")
+            print(f"<h3>{family_name}</h3>")
         if family_description:
             print(md.render(family_description))
         if family_results:
