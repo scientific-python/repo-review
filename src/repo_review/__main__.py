@@ -164,6 +164,7 @@ def display_output(
     status: Status,
     header: str,
 ) -> None:
+    output = sys.stderr if stderr else sys.stdout
     match format_opt:
         case "rich" | "svg":
             rich_printer(
@@ -188,6 +189,7 @@ def display_output(
                 stderr=stderr, color_system="auto" if color else None
             )
             if header:
+                # We strip off beginning and ending brackets
                 console.print(j.__rich__()[2:-2], end="")
             else:
                 console.print(j)
@@ -195,13 +197,15 @@ def display_output(
             html = to_html(families, processed, status)
             if header:
                 html = f"<h1>{header}</h1>\n{html}<hr/>\n"
-            if color:
+            if color and output.isatty():
+                # We check isatty even though Rich does too because Rich
+                # injects a ton of ending whitespace even going to a file
                 rich.print(
                     rich.syntax.Syntax(html, lexer="html"),
-                    file=sys.stderr if stderr else sys.stdout,
+                    file=output,
                 )
             else:
-                print(html, file=sys.stderr if stderr else sys.stdout)
+                print(html, file=output)
         case _:
             assert_never(format_opt)
 
