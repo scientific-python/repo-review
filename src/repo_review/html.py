@@ -46,7 +46,7 @@ def to_html(
         if family_results or family_description:
             print(f"<h3>{family_name}</h3>")
         if family_description:
-            print(md.render(family_description))
+            print(md.render(family_description).strip())
         if family_results:
             print("<table>")
             print("<tr><th>?</th><th>Name</th><th>Description</th></tr>")
@@ -58,7 +58,13 @@ def to_html(
                 if result.result
                 else "red"
             )
-            icon = "⚠️" if result.result is None else "✅" if result.result else "❌"
+            icon = (
+                "&#9888;&#65039;"
+                if result.result is None
+                else "&#9989;"
+                if result.result
+                else "&#10060;"
+            )
             result_txt = (
                 "Skipped"
                 if result.result is None
