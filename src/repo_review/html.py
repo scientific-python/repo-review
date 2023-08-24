@@ -3,9 +3,8 @@ from __future__ import annotations
 import builtins
 import functools
 import io
-import itertools
 import typing
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 
 import markdown_it
 
@@ -23,7 +22,9 @@ def __dir__() -> list[str]:
 
 
 def to_html(
-    families: Mapping[str, Family], processed: list[Result], status: Status = "empty"
+    families: Mapping[str, Family],
+    processed: Sequence[Result],
+    status: Status = "empty",
 ) -> str:
     """
     Convert the results of a repo review (``families``, ``processed``) to HTML.
@@ -38,14 +39,18 @@ def to_html(
     print = functools.partial(builtins.print, file=out)
     md = markdown_it.MarkdownIt()
 
-    for family, results_list in itertools.groupby(processed, lambda r: r.family):
+    for family in families:
         family_name = get_family_name(families, family)
-        print(f"<h2>{family_name}</h2>")
-        if description := get_family_description(families, family):
-            print(md.render(description))
-        print("<table>")
-        print("<tr><th>?</th><th>Name</th><th>Description</th></tr>")
-        for result in results_list:
+        family_description = get_family_description(families, family)
+        family_results = [r for r in processed if r.family == family]
+        if family_results or family_description:
+            print(f"<h2>{family_name}</h2>")
+        if family_description:
+            print(md.render(family_description))
+        if family_results:
+            print("<table>")
+            print("<tr><th>?</th><th>Name</th><th>Description</th></tr>")
+        for result in family_results:
             color = (
                 "orange"
                 if result.result is None
@@ -78,7 +83,8 @@ def to_html(
                 print(md.render(result.err_msg))
                 print("</td>")
             print("</tr>")
-        print("</table>")
+        if family_results:
+            print("</table>")
 
     if len(processed) == 0:
         if status == "empty":

@@ -86,11 +86,13 @@ def rich_printer(
     if header:
         console.print(rich.markdown.Markdown(f"# {header}"))
 
-    for family, results_list in itertools.groupby(processed, lambda r: r.family):
-        # Compute the family name and optional description
+    for family in families:
         family_name = get_family_name(families, family)
-        rich_family_name = rich.text.Text.from_markup(f"[bold]{family_name}[/bold]:")
         family_description = get_family_description(families, family)
+        family_results = [r for r in processed if r.family == family]
+
+        # Compute the family name and optional description
+        rich_family_name = rich.text.Text.from_markup(f"[bold]{family_name}[/bold]:")
         if family_description:
             rich_description = rich.markdown.Markdown(family_description)
             rich_family = rich.console.Group(
@@ -100,7 +102,7 @@ def rich_printer(
         else:
             tree = rich.tree.Tree(rich_family_name)
 
-        for result in results_list:
+        for result in family_results:
             style = (
                 "yellow"
                 if result.result is None
@@ -129,8 +131,9 @@ def rich_printer(
                 msg_grp = rich.console.Group(msg, detail)
                 tree.add(msg_grp)
 
-        console.print(tree)
-        console.print()
+        if family_results or family_description:
+            console.print(tree)
+            console.print()
 
     if header:
         console.print()
