@@ -194,7 +194,7 @@ def display_output(
         case "html":
             html = to_html(families, processed, status)
             if header:
-                html = f"<h1>{header}</h1>\n{html}\n"
+                html = f"<h1>{header}</h1>\n{html}<hr/>\n"
             if color:
                 rich.print(
                     rich.syntax.Syntax(html, lexer="html"),
@@ -277,15 +277,16 @@ def main(
         if stderr_fmt == "json":
             stderr.print("{")
 
+    result = 0
     for n, package in enumerate(packages):
-        on_each(
+        result |= on_each(
             package,
             format_opt,
             stderr_fmt,
             select,
             ignore,
             package_dir,
-            header=package.name if len(packages) > 1 else "",
+            add_header=len(packages) > 1,
             show=show,
         )
         if len(packages) > 1:
@@ -301,6 +302,9 @@ def main(
         if stderr_fmt == "json":
             stderr.print("}")
 
+    if result:
+        raise SystemExit(result)
+
 
 def on_each(
     package: Path,
@@ -310,9 +314,9 @@ def on_each(
     ignore: str,
     package_dir: str,
     *,
-    header: str,
+    add_header: bool,
     show: Show,
-) -> None:
+) -> int:
     base_package: Traversable
 
     ignore_list = {x.strip() for x in ignore.split(",") if x}
@@ -329,11 +333,14 @@ def on_each(
         base_package = GHPath(repo=org_repo, branch=branch, path=p[0] if p else "")
         if format_opt == "rich":
             rich.print(f"[bold]Processing [blue]{package}[/blue] from GitHub\n")
+        header = org_repo
     elif package.name == "pyproject.toml" and package.is_file():
         # Special case for passing a path to a pyproject.toml
         base_package = package.parent
+        header = package.parent.name
     else:
         base_package = package
+        header = package.name
 
     families, processed = process(
         base_package, select=select_list, ignore=ignore_list, subdir=package_dir
@@ -348,7 +355,7 @@ def on_each(
             status = "skips"
 
     if show != "all":
-        processed = [r for r in processed if r.result is not False]
+        processed = [r for r in processed if not r.result]
         if show == "err":
             processed = [r for r in processed if r.result is not None]
         known_families = {r.family for r in processed}
@@ -365,7 +372,7 @@ def on_each(
         stderr=False,
         color=stderr_fmt is None,
         status=status,
-        header=header,
+        header=header if add_header else "",
     )
     if stderr_fmt:
         display_output(
@@ -375,13 +382,14 @@ def on_each(
             stderr=True,
             color=True,
             status=status,
-            header=header,
+            header=header if add_header else "",
         )
 
     if status == "errors":
-        raise SystemExit(2)
+        return 3
     if status == "empty":
-        raise SystemExit(3)
+        return 2
+    return 0
 
 
 if __name__ == "__main__":
