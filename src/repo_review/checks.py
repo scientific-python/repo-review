@@ -76,13 +76,18 @@ def is_allowed(select: Set[str], ignore: Set[str], name: str) -> bool:
     number is in the ignore list. If the select list is not empty, only runs the
     check if the name or name without the number is in the select list.
 
-    :param select: A set of names or prefixes to include.
+    :param select: A set of names or prefixes to include. "*" selects all checks.
     :param ignore: A set of names or prefixes to exclude.
     :param name: The check to test.
 
     :return: True if this check is allowed, False otherwise.
     """
-    if select and name not in select and name.rstrip("0123456789") not in select:
+    if (
+        select
+        and name not in select
+        and name.rstrip("0123456789") not in select
+        and "*" not in select
+    ):
         return False
     if name in ignore or name.rstrip("0123456789") in ignore:
         return False
