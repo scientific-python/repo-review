@@ -29,7 +29,7 @@ Repo-review supports running multiple ways:
 - [From the command line][cli] on a local folder (or multiple folders)
 - From the command line on a remote repository on GitHub (`gh:org/repo@branch`)
 - [From WebAssembly][webapp] in [Pyodide][] (example in `docs/index.html`)
-- [From pre-commit][intro-pre-commit]
+- [From pre-commit][intro-pre-commit] (see caveats there)
 - [From GitHub Actions][intro-github-actions]
 - [From Python][programmatic-usage]
 
