@@ -16,7 +16,6 @@ else:
     import rich_click as click
 
 import rich.console
-import rich.json
 import rich.markdown
 import rich.syntax
 import rich.terminal_theme
@@ -187,37 +186,17 @@ def display_output(
                 "checks": as_simple_dict(processed),
             }
             if header:
-                d = {header: d}
-
-            if color and output.isatty():
-                j = rich.json.JSON.from_data(d)
-                console = rich.console.Console(stderr=stderr, color_system="auto")
-                if header:
-                    # We strip off beginning and ending brackets
-                    console.print(j.__rich__()[2:-2], end="")
-                else:
-                    console.print(j)
+                print(json.dumps({header: d}, indent=2)[2:-2], end="", file=output)
             else:
-                # Rich wraps json, which breaks it
-                if header:
-                    print(json.dumps(d, indent=2)[2:-2])
-                else:
-                    print(json.dumps(d, indent=2))
+                print(json.dumps(d, indent=2), file=output)
+
         case "html":
             html = to_html(families, processed, status)
             if header:
                 failures = sum(r.result is False for r in processed)
                 status_msg = f"({failures} failed)" if failures else "(all passed)"
                 html = f"<details><summary><h2>{header}</h2>: {status_msg}</summary>\n{html}</details>\n"
-            if color and output.isatty():
-                # We check isatty even though Rich does too because Rich
-                # injects a ton of ending whitespace even going to a file
-                rich.print(
-                    rich.syntax.Syntax(html, lexer="html"),
-                    file=output,
-                )
-            else:
-                print(html, file=output)
+            print(html, file=output)
         case _:
             assert_never(format_opt)
 
@@ -284,14 +263,10 @@ def main(
     """
 
     if len(packages) > 1:
-        stdout = rich.console.Console(
-            color_system="auto" if stderr_fmt is None else None
-        )
-        stderr = rich.console.Console(color_system="auto", stderr=True)
         if format_opt == "json":
-            stdout.print("{")
+            print("{")
         if stderr_fmt == "json":
-            stderr.print("{")
+            print("{", file=sys.stderr)
 
     result = 0
     for n, package in enumerate(packages):
@@ -308,15 +283,15 @@ def main(
         if len(packages) > 1:
             is_before_end = n < len(packages) - 1
             if format_opt == "json":
-                stdout.print("," if is_before_end else "")
+                print("," if is_before_end else "")
             if stderr_fmt == "json":
-                stderr.print("," if is_before_end else "")
+                print("," if is_before_end else "", file=sys.stderr)
 
     if len(packages) > 1:
         if format_opt == "json":
-            stdout.print("}")
+            print("}")
         if stderr_fmt == "json":
-            stderr.print("}")
+            print("}", file=sys.stderr)
 
     if result:
         raise SystemExit(result)
