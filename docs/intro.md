@@ -48,7 +48,7 @@ You can also use this from pre-commit:
   rev: <version>
   hooks:
     - id: repo-review
-      additional_dependencies: ["sp-repo-review==<version>"]
+      additional_dependencies: ["repo-review[cli]", "sp-repo-review==<version>"]
 ```
 
 (Insert the current version above, and ideally pin the plugin version, as long
@@ -57,6 +57,19 @@ as you have a way to auto-update it.)
 Though check your favorite plugin, which might directly support running from
 pre-commit, and then pre-commit's pinning system will pin on your plugin,
 rather than the framework (repo-review).
+
+:::{warning}
+
+This currently has a couple of weird quirks. Pre-commit will not report the
+correct version for repo-review (it's always 0.1), and it will lose the `cli`
+requirements if you add additional dependencies (which you always do, it's a
+plugin framework, so it needs plugins). To counter this, plugins can avoid
+lower bounds and you can manually add `repo-review[cli]`, as seen above, or
+plugins can provide their own hooks (like sp-repo-review also does).
+
+In the future, a mirror will be set up so that we can avoid these issues.
+
+:::
 
 ## GitHub Actions
 
