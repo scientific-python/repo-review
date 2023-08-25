@@ -138,6 +138,17 @@ def test_select_filter_exact(monkeypatch: pytest.MonkeyPatch) -> None:
     assert len(results) == 1
 
 
+def test_select_filter_all(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(
+        repo_review.processor,
+        "collect_checks",
+        lambda _: {"D100": D100(), "D200": D200(), "C100": C100(fail=True)},
+    )
+    _, results = repo_review.processor.process(Path(), select={"*"})
+
+    assert len(results) == 3
+
+
 def test_string_result(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(
         repo_review.processor,
