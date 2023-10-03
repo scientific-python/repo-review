@@ -88,7 +88,7 @@ Key features:
 - The name of the check class itself is the check code.
 - The check method is a classmethod since it has no state.
 - Likewise, all attributes are set on the class (`family`, `requires`, `url`) since there is no state.
-- `requries` is used so that the pyproject checks are skipped if the pyproject file is missing.
+- `requires` is used so that the pyproject checks are skipped if the pyproject file is missing.
 
 ## Registering checks
 
