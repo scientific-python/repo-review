@@ -17,21 +17,39 @@ mean this rule is followed, red x’s mean the rule is not. A yellow warning sig
 means that the check was skipped because a previous required check failed. Four
 output formats are supported; `rich`, `svg`, `html`, and `json`.
 
-`sp-repo-review` provides checks based on the
-[Scientific-Python Development Guide][] at [scientific-python/cookie][]. A live
-WebAssembly demo using [sp-repo-review][] is
-[here][repo-review-demo].
+## Plugins
+
+These are some known plugins. Feel free to request your plugin be added to this
+list.
+
+- [sp-repo-review][]: Checks based on the [Scientific-Python Development Guide][] at [scientific-python/cookie][].
+- [validate-pyproject][]: Adds a check to validate pyproject sections, also supports plugins.
+
+`repo-review` itself also acts as a plugin for [validate-pyproject][], allowing
+you to validate the `[tool.repo-review]` section of your `pyproject.toml`.
+
+A live WebAssembly demo using [sp-repo-review][] and [validate-pyproject][] is
+[available here][repo-review-demo].
 
 ## Running repo-review
 
 Repo-review supports running multiple ways:
 
-- [From the command line][cli] on a local folder (or multiple folders)
+- [From the command line][cli] on a local folder (or multiple folders).
 - From the command line on a remote repository on GitHub (`gh:org/repo@branch`)
 - [From WebAssembly][webapp] in [Pyodide][] (example in `docs/index.html`)
 - [From pre-commit][intro-pre-commit] (see caveats there)
 - [From GitHub Actions][intro-github-actions]
 - [From Python][programmatic-usage]
+
+When installing, make sure you also install at least one plugin, as
+`repo-review` has no integrated checks. If you are using the command line
+interface, make sure you include the `cli` extra (`repo-review[cli]`). Some
+plugins, like `sp-repo-review`, support running directly, such as:
+
+```bash
+pipx run sp-repo-review[cli] <args>
+```
 
 If the root of a package is not the repository root, pass `--package-dir a/b/c`.
 
@@ -109,16 +127,6 @@ docstring only if the result is `False`.
 Checks are organized by [Families][]. A plugin can customize the display name,
 change the sort order, and add an optional (dynamic) description. Like the other
 collection functions, the family entry-point also supports fixtures.
-
-## Plugins
-
-Feel free to request your plugin be added to this list.
-
-- [sp-repo-review][]: Checks based on the [Scientific-Python Development Guide][].
-- [validate-pyproject][]: Adds a check to validate pyproject sections, also supports plugins.
-
-`repo-review` itself also acts as a plugin for [validate-pyproject][], allowing
-you to validate the `[tool.repo-review]` section of your `pyproject.toml`.
 
 ## Links
 

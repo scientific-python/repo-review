@@ -12,15 +12,28 @@ want to run a single plugin that depends on repo-review, then the easiest way
 to use it is:
 
 ```bash
-pipx run sp-repo-review .
+pipx run <plugin-name>[cli] .
 ```
 
 This uses [pipx][] (pip for executables) to download the plugin and all of it's
 dependencies (including repo-review itself) into a temporary virtual
-environment (cached for a week), then runs it.
+environment (cached for a week), then runs it. For example:
 
-Any other way you like installing things works too, including `pipx install`
-and `pip install`.
+```bash
+pipx run sp-repo-review[cli] .
+```
+
+You can also use pipx install:
+
+```bash
+pipx install repo-review[cli]
+pipx inject repo-review <plugin(s)>
+repo-review .
+```
+
+Any other way you like installing things works too, including `pip install`.
+Remember the `[cli]` extra if you are using the command line
+interface.
 
 Plugins are also encouraged to support pre-commit and GitHub Actions.
 
