@@ -4,7 +4,7 @@ import itertools
 import json
 import sys
 import typing
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Any, Literal
 
@@ -201,10 +201,32 @@ def display_output(
             assert_never(format_opt)
 
 
+def remote_path_support(
+    _ctx: click.Context, _param: str, value: Sequence[Path]
+) -> list[Path | GHPath]:
+    return [_remote_path_processor(package) for package in value]
+
+
+def _remote_path_processor(package: Path) -> Path | GHPath:
+    if not str(package).startswith("gh:"):
+        return package
+
+    _, org_repo_branch, *p = str(package).split(":", maxsplit=2)
+    if "@" not in org_repo_branch:
+        msg = "online repo must be of the form 'gh:org/repo@branch[:path]' (:branch missing)"
+        raise click.BadParameter(msg)
+    org_repo, branch = org_repo_branch.split("@", maxsplit=1)
+    return GHPath(repo=org_repo, branch=branch, path=p[0] if p else "")
+
+
 @click.command(context_settings={"help_option_names": ["-h", "--help"]})
 @click.version_option(version=__version__)
 @click.argument(
-    "packages", type=click.Path(dir_okay=True, path_type=Path), nargs=-1, required=True
+    "packages",
+    type=click.Path(dir_okay=True, path_type=Path),
+    nargs=-1,
+    required=True,
+    callback=remote_path_support,
 )
 @click.option(
     "--format",
@@ -250,7 +272,7 @@ def display_output(
     help="Show all (default), or just errors, or errors and skips",
 )
 def main(
-    packages: list[Path],
+    packages: list[Path | GHPath],
     format_opt: Formats,
     stderr_fmt: Formats | None,
     select: str,
@@ -298,7 +320,7 @@ def main(
 
 
 def on_each(
-    package: Path,
+    package: Path | GHPath,
     format_opt: Literal["rich", "json", "html", "svg"],
     stderr_fmt: Literal["rich", "json", "html", "svg"] | None,
     select: str,
@@ -318,13 +340,10 @@ def on_each(
         msg = "No checks registered. Please install a repo-review plugin."
         raise click.ClickException(msg)
 
-    if str(package).startswith("gh:"):
-        _, org_repo_branch, *p = str(package).split(":", maxsplit=2)
-        org_repo, branch = org_repo_branch.split("@", maxsplit=1)
-        base_package = GHPath(repo=org_repo, branch=branch, path=p[0] if p else "")
+    if isinstance(package, GHPath):
         if format_opt == "rich":
             rich.print(f"[bold]Processing [blue]{package}[/blue] from GitHub\n")
-        header = org_repo
+        header = package.repo
     elif package.name == "pyproject.toml" and package.is_file():
         # Special case for passing a path to a pyproject.toml
         base_package = package.parent
