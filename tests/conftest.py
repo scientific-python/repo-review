@@ -12,7 +12,9 @@ def nocolor(monkeypatch: pytest.MonkeyPatch) -> None:
 @pytest.fixture()
 def no_entry_points(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(
-        importlib.metadata, "entry_points", lambda group: []  # noqa: ARG005
+        importlib.metadata,
+        "entry_points",
+        lambda group: [],  # noqa: ARG005
     )
 
 

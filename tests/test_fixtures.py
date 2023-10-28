@@ -12,6 +12,7 @@ from repo_review.fixtures import apply_fixtures, compute_fixtures
 
 class D100:
     "Was passed correctly"
+
     family = "pyproject"
 
     @staticmethod
@@ -25,6 +26,7 @@ class D100:
 
 class D200:
     "Always true"
+
     family = "pyproject"
 
     @staticmethod
@@ -87,7 +89,9 @@ def test_process_checks(monkeypatch: pytest.MonkeyPatch, some_bool: bool) -> Non
     sys.modules["test_module"] = ModuleType("test_module")
     sys.modules["test_module"].f = get_checks  # type: ignore[attr-defined]
     monkeypatch.setattr(
-        importlib.metadata, "entry_points", lambda group: [ep]  # noqa: ARG005
+        importlib.metadata,
+        "entry_points",
+        lambda group: [ep],  # noqa: ARG005
     )
     checks = collect_checks({"package": Path(), "some_bool": some_bool})
     assert len(checks) == 1 + some_bool

@@ -129,6 +129,7 @@ class PP301(PyProject):
 
 class PP302(PyProject):
     "Sets a minimum pytest to at least 6"
+
     requires = frozenset(("PP301",))
 
     @staticmethod
