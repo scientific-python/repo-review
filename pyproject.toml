@@ -160,7 +160,7 @@ extend-select = [
   "UP",          # pyupgrade
   "YTT",         # flake8-2020
 ]
-extend-ignore = [
+ignore = [
   "PLR",    # Design related pylint codes
   "PT004",  # Incorrect check, usefixtures is the correct way to do this
   "ISC001", # May collide with formatter
