@@ -44,7 +44,7 @@ cli = [
 ]
 test = [
   "pytest >=7",
-  "sp-repo-review >=2023.08.23",
+  "sp-repo-review >=2023.10.27",
   "validate-pyproject >=0.14",
 ]
 dev = [
@@ -91,7 +91,7 @@ addopts = ["-ra", "--strict-markers", "--strict-config", "--import-mode=importli
 xfail_strict = true
 log_cli_level = "INFO"
 filterwarnings = [
-  'error',
+  "error",
 ]
 testpaths = ["tests"]
 pythonpath = ["tests/test_utilities"]
@@ -136,8 +136,10 @@ messages_control.disable = [
 
 
 [tool.ruff]
-select = [
-  "E", "F", "W", # flake8
+src = ["src"]
+
+[tool.ruff.lint]
+extend-select = [
   "B",           # flake8-bugbear
   "I",           # isort
   "ARG",         # flake8-unused-arguments
@@ -160,18 +162,12 @@ select = [
 ]
 extend-ignore = [
   "PLR",    # Design related pylint codes
-  "E501",   # Line too long
   "PT004",  # Incorrect check, usefixtures is the correct way to do this
-]
-src = ["src"]
-unfixable = [
-  "T20",  # Removes print statements
-  "F841", # Removes unused variables
+  "ISC001", # May collide with formatter
 ]
 typing-modules = ["repo_review._compat.typing"]
-flake8-unused-arguments.ignore-variadic-names = true
 
-[tool.ruff.flake8-tidy-imports.banned-api]
+[tool.ruff.lint.flake8-tidy-imports.banned-api]
 "typing.Callable".msg = "Use collections.abc.Callable instead."
 "typing.Iterator".msg = "Use collections.abc.Iterator instead."
 "typing.Mapping".msg = "Use collections.abc.Mapping instead."
@@ -181,7 +177,7 @@ flake8-unused-arguments.ignore-variadic-names = true
 "importlib.abc".msg = "Use repo_review._compat.importlib.resources.abc instead."
 "importlib.resources.abc".msg = "Use repo_review._compat.importlib.resources.abc instead."
 
-[tool.ruff.per-file-ignores]
+[tool.ruff.lint.per-file-ignores]
 "src/repo_review/_compat/**.py" = ["TID251"]
 "src/**/__main__.py" = ["T20"]
 
