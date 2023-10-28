@@ -14,6 +14,7 @@ from repo_review.checks import collect_checks
 
 class D100:
     "Was passed correctly"
+
     family = "pyproject"
     url = "https://example.com"
 
@@ -28,6 +29,7 @@ class D100:
 
 class D200:
     "Always true"
+
     family = "pyproject"
 
     @staticmethod
@@ -42,6 +44,7 @@ class D200:
 @dataclasses.dataclass(frozen=True, kw_only=True)
 class C100:
     "Can compute custom output strings"
+
     fail: bool
     family: ClassVar[str] = "custom"
 
@@ -52,7 +55,9 @@ class C100:
 
 def test_no_checks(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(
-        importlib.metadata, "entry_points", lambda group: []  # noqa: ARG005
+        importlib.metadata,
+        "entry_points",
+        lambda group: [],  # noqa: ARG005
     )
 
     _, results = repo_review.processor.process(Path())
@@ -64,7 +69,9 @@ def test_load_entry_point(monkeypatch: pytest.MonkeyPatch) -> None:
     sys.modules["test_module"] = ModuleType("test_module")
     sys.modules["test_module"].f = lambda: {"D100": D100, "D200": D200}  # type: ignore[attr-defined]
     monkeypatch.setattr(
-        importlib.metadata, "entry_points", lambda group: [ep]  # noqa: ARG005
+        importlib.metadata,
+        "entry_points",
+        lambda group: [ep],  # noqa: ARG005
     )
     checks = collect_checks({"package": Path()})
 
