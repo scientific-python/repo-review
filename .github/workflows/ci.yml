@@ -41,7 +41,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.10", "3.11", "3.12-dev"]
+        python-version: ["3.10", "3.11", "3.12"]
         runs-on: [ubuntu-latest, macos-latest, windows-latest]
 
     steps:
@@ -106,4 +106,4 @@ jobs:
       - name: Run repo-review action
         uses: ./
         with:
-          plugins: sp-repo-review==2023.07.13
+          plugins: sp-repo-review==2023.10.27
