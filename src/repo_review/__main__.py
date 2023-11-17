@@ -343,6 +343,7 @@ def on_each(
     if isinstance(package, GHPath):
         if format_opt == "rich":
             rich.print(f"[bold]Processing [blue]{package}[/blue] from GitHub\n")
+        base_package = package
         header = package.repo
     elif package.name == "pyproject.toml" and package.is_file():
         # Special case for passing a path to a pyproject.toml
