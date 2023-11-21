@@ -48,8 +48,8 @@ You can explicitly list checks to select or skip in your `pyproject.toml`:
 
 ```toml
 [tool.repo-review]
-select = [...]
-ignore = [...]
+select = ["..."]
+ignore = ["..."]
 ```
 
 ## Pre-commit
