@@ -99,4 +99,4 @@ Though check your favorite plugin, which might directly support running from
 GitHub Actions, and then Dependabot's updating system will pin on your plugin,
 rather than the framework (repo-review).
 
-[pipx]: https://pypa.github.io/pipx
+[pipx]: https://pipx.pypa.io
