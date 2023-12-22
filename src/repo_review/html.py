@@ -49,7 +49,9 @@ def to_html(
             print(md.render(family_description).strip())
         if family_results:
             print("<table>")
-            print("<tr><th>?</th><th>Name</th><th>Description</th></tr>")
+            print(
+                '<tr><th>?</th><th nowrap="nowrap">Name</th><th>Description</th></tr>'
+            )
         for result in family_results:
             color = (
                 "orange"
@@ -79,7 +81,7 @@ def to_html(
             )
             print(f'<tr style="color: {color};">')
             print(f'<td><span role="img" aria-label="{result_txt}">{icon}</span></td>')
-            print(f"<td>{result.name}</td>")
+            print(f'<td nowrap="nowrap">{result.name}</td>')
             if result.result is None or result.result:
                 print(f"<td>{description}</td>")
             else:
