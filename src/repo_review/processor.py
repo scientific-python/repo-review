@@ -192,13 +192,18 @@ def process(
 
     # Collect our own config
     config = pyproject(package).get("tool", {}).get("repo-review", {})
-    select_checks = select if select else set(config.get("select", ()))
-    skip_checks = ignore if ignore else set(config.get("ignore", ()))
+    select_checks = select if select else frozenset(config.get("select", ()))
+    skip_checks = ignore if ignore else frozenset(config.get("ignore", ()))
 
     # Make a graph of the check's interdependencies
-    graph: dict[str, set[str]] = {
-        n: getattr(t, "requires", set()) for n, t in tasks.items()
+    graph: dict[str, Set[str]] = {
+        n: getattr(t, "requires", frozenset()) for n, t in tasks.items()
     }
+    for name, s in graph.items():
+        if not isinstance(s, Set):
+            msg = f"requires must be a set, got {s!r} for {name!r}"  # type: ignore[unreachable]
+            raise TypeError(msg)
+
     # Keep track of which checks have been completed
     completed: dict[str, str | None] = {}
 
