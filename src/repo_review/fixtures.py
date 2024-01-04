@@ -36,7 +36,8 @@ def pyproject(package: Traversable) -> dict[str, Any]:
     pyproject_path = package.joinpath("pyproject.toml")
     if pyproject_path.is_file():
         with pyproject_path.open("rb") as f:
-            return tomllib.load(f)
+            # Type ignore fixed in https://github.com/hukkin/tomli/pull/215
+            return tomllib.load(f)  # type: ignore[arg-type]
     return {}
 
 
