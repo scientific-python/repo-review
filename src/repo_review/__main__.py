@@ -34,6 +34,8 @@ from .processor import Result, as_simple_dict, collect_all, process
 
 __all__ = ["main", "Formats", "Show", "Status"]
 
+CODE_THEME = "default"
+
 
 def __dir__() -> list[str]:
     return __all__
@@ -94,7 +96,9 @@ def rich_printer(
         # Compute the family name and optional description
         rich_family_name = rich.text.Text.from_markup(f"[bold]{family_name}[/bold]:")
         if family_description:
-            rich_description = rich.markdown.Markdown(family_description)
+            rich_description = rich.markdown.Markdown(
+                family_description, code_theme=CODE_THEME
+            )
             rich_family = rich.console.Group(
                 rich_family_name, rich_description, rich.console.NewLine()
             )
@@ -127,7 +131,7 @@ def rich_printer(
                 tree.add(msg)
             else:
                 msg.append(rich.text.Text.from_markup(" :x:"))
-                detail = rich.markdown.Markdown(result.err_msg)
+                detail = rich.markdown.Markdown(result.err_msg, code_theme=CODE_THEME)
                 msg_grp = rich.console.Group(msg, detail)
                 tree.add(msg_grp)
 
