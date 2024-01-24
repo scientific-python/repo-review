@@ -23,7 +23,7 @@ These are some known plugins. Feel free to request your plugin be added to this
 list.
 
 - [sp-repo-review][]: Checks based on the [Scientific-Python Development Guide][] at [scientific-python/cookie][].
-- [validate-pyproject][]: Adds a check to validate pyproject sections, also supports plugins.
+- [validate-pyproject][]: Adds a check to validate pyproject sections, also supports plugins (like [validate-pyproject-schema-store][]).
 
 `repo-review` itself also acts as a plugin for [validate-pyproject][], allowing
 you to validate the `[tool.repo-review]` section of your `pyproject.toml`.
@@ -158,6 +158,7 @@ This was developed for [Scikit-HEP][] before moving to Scientific-Python.
 [scikit-hep]: https://scikit-hep.org
 [sp-repo-review]: https://pypi.org/project/sp-repo-review
 [validate-pyproject]: https://validate-pyproject.readthedocs.io
+[validate-pyproject-schema-store]: https://github.com/henryiii/validate-pyproject-schema-store
 
 [intro-pre-commit]: https://repo-review.readthedocs.io/en/latest/intro.html#pre-commit
 [intro-github-actions]: https://repo-review.readthedocs.io/en/latest/intro.html#github-actions
