@@ -7,8 +7,8 @@
       "extensions": [
         "ms-python.python",
         "donjayamanne.python-environment-manager",
-        "charliermarsh.ruff"
-      ]
-    }
-  }
+        "charliermarsh.ruff",
+      ],
+    },
+  },
 }
