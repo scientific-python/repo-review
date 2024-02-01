@@ -3,7 +3,7 @@
 Like pytest fixtures, fixtures in repo-review are requested by name. There are five built-in fixtures:
 
 - `root`: {class}`~importlib.resources.abc.Traversable` - The repository path. All checks or fixtures that depend on the root of the repository should use this.
-- `package`: `~importlib.resources.abc.Traversable` - The path to the package directory. This is the same as `root` unless `--package-dir` is passed.
+- `package`: {class}`~importlib.resources.abc.Traversable` - The path to the package directory. This is the same as `root` unless `--package-dir` is passed.
 - `name`: `str` - The name of the current check. (Special fixture only provided for checks, not collection functions.)
 - {func}`~repo_review.fixtures.pyproject`: `dict[str, Any]` - The `pyproject.toml` in the package if it exists, an empty dict otherwise.
 - {func}`~repo_review.fixtures.list_all`: `bool` - Returns `True`` if repo-review is just trying to collect all checks to list them.
