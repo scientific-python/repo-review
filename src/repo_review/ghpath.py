@@ -76,12 +76,10 @@ class GHPath(Traversable):
         return (self.path or self.repo).split("/")[-1]
 
     @typing.overload  # type: ignore[override]
-    def open(self, mode: Literal["r"], encoding: str | None = ...) -> io.StringIO:
-        ...
+    def open(self, mode: Literal["r"], encoding: str | None = ...) -> io.StringIO: ...
 
     @typing.overload
-    def open(self, mode: Literal["rb"]) -> io.BytesIO:
-        ...
+    def open(self, mode: Literal["rb"]) -> io.BytesIO: ...
 
     def open(
         self, mode: Literal["r", "rb"] = "r", encoding: str | None = "utf-8"
@@ -164,12 +162,10 @@ class EmptyTraversable(Traversable):
         return self._fake_name
 
     @typing.overload  # type: ignore[override]
-    def open(self, mode: Literal["r"], encoding: str | None = ...) -> io.StringIO:
-        ...
+    def open(self, mode: Literal["r"], encoding: str | None = ...) -> io.StringIO: ...
 
     @typing.overload
-    def open(self, mode: Literal["rb"]) -> io.BytesIO:
-        ...
+    def open(self, mode: Literal["rb"]) -> io.BytesIO: ...
 
     def open(
         self, mode: Literal["r", "rb"] = "r", encoding: str | None = "utf-8"

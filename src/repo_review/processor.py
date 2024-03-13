@@ -108,8 +108,7 @@ class HasFamily(typing.Protocol):
     """
 
     @property
-    def family(self) -> str:
-        ...
+    def family(self) -> str: ...
 
 
 T = TypeVar("T", bound=HasFamily)
