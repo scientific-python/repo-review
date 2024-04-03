@@ -41,7 +41,9 @@ def __dir__() -> list[str]:
     return __all__
 
 
-rich.traceback.install(suppress=[click, rich, orig_click], show_locals=True, width=None)
+rich.traceback.install(
+    suppress=[click, rich, orig_click], show_locals=False, width=None
+)
 
 Status = Literal["empty", "passed", "skips", "errors"]
 Formats = Literal["rich", "json", "html", "svg"]
