@@ -31,9 +31,12 @@ pipx inject repo-review <plugin(s)>
 repo-review .
 ```
 
-Any other way you like installing things works too, including `pip install`.
+Any other way you like installing things works too, including `pip install` and `uv pip install`.
 Remember the `[cli]` extra if you are using the command line
 interface.
+
+A conda-forge package is also available. You can use `conda`, `mamba`, `micromamba`, or `pixi` to
+install from the conda-forge channel.
 
 Plugins are also encouraged to support pre-commit and GitHub Actions.
 
