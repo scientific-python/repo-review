@@ -31,7 +31,7 @@ def test_cmd_pyproject():
 
 
 def test_cmd_dual():
-    subprocess.run(["repo-review", "../repo-review", "../repo-review"], check=True)
+    subprocess.run(["repo-review", "tests/..", "."], check=True)
 
 
 def test_cmd_html():
