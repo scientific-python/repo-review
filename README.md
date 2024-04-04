@@ -4,6 +4,7 @@
 [![Documentation Status][docs-badge]][docs-link]
 
 [![PyPI version][pypi-version]][pypi-link]
+[![Conda-Forge][conda-badge]][conda-link]
 [![PyPI platforms][pypi-platforms]][pypi-link]
 
 <!-- SPHINX-START -->
@@ -159,6 +160,8 @@ This was developed for [Scikit-HEP][] before moving to Scientific-Python.
 [sp-repo-review]: https://pypi.org/project/sp-repo-review
 [validate-pyproject]: https://validate-pyproject.readthedocs.io
 [validate-pyproject-schema-store]: https://github.com/henryiii/validate-pyproject-schema-store
+[conda-badge]: https://img.shields.io/conda/vn/conda-forge/repo-review
+[conda-link]: https://github.com/conda-forge/repo-review-feedstock
 
 [intro-pre-commit]: https://repo-review.readthedocs.io/en/latest/intro.html#pre-commit
 [intro-github-actions]: https://repo-review.readthedocs.io/en/latest/intro.html#github-actions
