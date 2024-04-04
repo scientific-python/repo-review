@@ -7,7 +7,6 @@
 [![Conda-Forge][conda-badge]][conda-link]
 [![PyPI platforms][pypi-platforms]][pypi-link]
 
-
 <!-- SPHINX-START -->
 
 This is a framework for building checks designed to check to see if a
