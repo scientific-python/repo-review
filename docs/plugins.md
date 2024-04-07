@@ -6,7 +6,7 @@ nicer display names. When writing a plugin, you should also do a few things
 when setting up the package. These suggestions assume you are using a
 standardized backend, such as `hatchling`, `flit-core`, `pdm-backend`, or
 `setuptools>=61`. If you are using some other build backend, please adjust
-accordingly.
+accordingly. Notably, Poetry calls `project.entry-points` "`tool.poetry.plugins`".
 
 ## Entry points
 
