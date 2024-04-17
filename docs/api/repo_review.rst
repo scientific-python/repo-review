@@ -72,3 +72,11 @@ repo\_review.schema module
    :members:
    :undoc-members:
    :show-inheritance:
+
+repo\_review.testing module
+---------------------------
+
+.. automodule:: repo_review.testing
+   :members:
+   :undoc-members:
+   :show-inheritance:

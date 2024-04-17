@@ -6,6 +6,7 @@ from pathlib import Path
 import pytest
 
 import repo_review as m
+import repo_review.testing
 from repo_review.processor import process
 
 DIR = Path(__file__).parent.resolve()
@@ -43,3 +44,10 @@ def test_broken_validate_pyproject(tmp_path: Path) -> None:
     (result,) = (r for r in results.results if r.name == "VPP001")
     assert "must match pattern" in result.err_msg
     assert not result.result
+
+
+def test_testing_function():
+    pytest.importorskip("sp_repo_review")
+
+    assert repo_review.testing.compute_check("RF001", ruff={}).result
+    assert not repo_review.testing.compute_check("RF001", ruff=None).result
