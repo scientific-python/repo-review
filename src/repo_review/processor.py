@@ -10,7 +10,13 @@ from typing import Any, TypeVar
 import markdown_it
 
 from ._compat.importlib.resources.abc import Traversable
-from .checks import Check, collect_checks, get_check_url, is_allowed
+from .checks import (
+    Check,
+    collect_checks,
+    get_check_url,
+    is_allowed,
+    process_result_bool,
+)
 from .families import Family, collect_families
 from .fixtures import apply_fixtures, collect_fixtures, compute_fixtures, pyproject
 from .ghpath import EmptyTraversable
@@ -211,16 +217,7 @@ def process(
     for name in ts.static_order():
         if all(completed.get(n, "") == "" for n in graph[name]):
             result = apply_fixtures({"name": name, **fixtures}, tasks[name].check)
-            if isinstance(result, bool):
-                completed[name] = (
-                    ""
-                    if result
-                    else (tasks[name].check.__doc__ or "Check failed").format(
-                        name=name, self=tasks[name]
-                    )
-                )
-            else:
-                completed[name] = result
+            completed[name] = process_result_bool(result, tasks[name], name)
         else:
             completed[name] = None
 

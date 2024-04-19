@@ -53,6 +53,20 @@ You have `processed.results` and `processed.families` from the return of
 {func}`~repo_review.processor.collect_all` to get `.fixtures`, `.checks`, and
 `.families`.
 
+### Unit testing
+
+You can also run unit tests with the {func}`~repo_review.testing.compute_check` helper. It is used like this:
+
+```python
+def test_has_tool_ruff_unit() -> None:
+    assert repo_review.testing.compute_check("RF001", ruff={}).result
+    assert not repo_review.testing.compute_check("RF001", ruff=None).result
+```
+
+It takes the check name and any fixtures as keyword arguments. It returns a
+{class}`~repo_review.checks.Check` instance, so you can see if the `.result` is
+`True`/`False`/`None`, or check any of the other properties.
+
 ## An existing package
 
 Since writing a plugin does not require depending on repo-review, you can also

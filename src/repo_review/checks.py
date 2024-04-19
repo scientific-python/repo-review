@@ -120,3 +120,26 @@ def get_check_description(name: str, check: Check) -> str:
     .. versionadded:: 0.8
     """
     return (check.__doc__ or "").format(self=check, name=name)
+
+
+def process_result_bool(
+    result: str | bool | None, check: Check, name: str
+) -> str | None:
+    """
+    This converts a bool into a string given a check and name. If the result is a string
+    or None, it is returned as is.
+
+    :param result: The result to process.
+    :param check: The check instance.
+    :param name: The name of the check.
+    :return: The final string or None.
+
+    .. versionadded:: 0.11
+    """
+    if isinstance(result, bool):
+        return (
+            ""
+            if result
+            else (check.check.__doc__ or "Check failed").format(name=name, self=check)
+        )
+    return result
