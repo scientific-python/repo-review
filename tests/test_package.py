@@ -51,3 +51,8 @@ def test_testing_function():
 
     assert repo_review.testing.compute_check("RF001", ruff={}).result
     assert not repo_review.testing.compute_check("RF001", ruff=None).result
+
+
+def test_toml_function():
+    pyproject = repo_review.testing.toml_loads("one.two = 3")
+    assert pyproject == {"one": {"two": 3}}

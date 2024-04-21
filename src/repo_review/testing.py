@@ -8,9 +8,28 @@ import importlib.metadata
 import textwrap
 from typing import Any
 
+from ._compat import tomllib
 from .checks import Check, get_check_url, process_result_bool
 from .fixtures import apply_fixtures
 from .processor import Result
+
+__all__ = ["toml_loads", "compute_check"]
+
+
+def __dir__() -> list[str]:
+    return __all__
+
+
+def toml_loads(contents: str, /) -> Any:
+    """
+    A helper function to quickly load a TOML string for Python 3.10+.
+
+    :param contents: The TOML string to load.
+    :return: The loaded TOML.
+
+    .. versionadded:: 0.10.6
+    """
+    return tomllib.loads(contents)
 
 
 def compute_check(name: str, /, **fixtures: Any) -> Result:
