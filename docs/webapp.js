@@ -229,11 +229,8 @@ class App extends React.Component {
       var families_checks;
       try {
         families_checks = pyodide.runPython(`
-          from pyodide.http import open_url
           from repo_review.processor import process, md_as_html
           from repo_review.ghpath import GHPath
-
-          GHPath.open_url = staticmethod(open_url)
 
           package = GHPath(repo="${state.repo}", branch="${state.branch}")
           result = process(package)

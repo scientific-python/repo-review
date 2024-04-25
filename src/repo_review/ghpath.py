@@ -7,6 +7,7 @@ from __future__ import annotations
 import dataclasses
 import io
 import json
+import sys
 import typing
 from collections.abc import Iterator
 from typing import Literal
@@ -47,7 +48,12 @@ class GHPath(Traversable):
 
     @staticmethod
     def open_url(url: str) -> io.StringIO:
-        "This method can be overridden for pyodide with pyodide.open_url"
+        "This method can be overridden manually for WASM. Supports pyodide currently."
+        if sys.platform == "emscripten":
+            import pyodide.http
+
+            return pyodide.http.open_url(url)
+
         import urllib.request  # pylint: disable=import-outside-toplevel
 
         with urllib.request.urlopen(url) as response:
