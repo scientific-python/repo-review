@@ -114,4 +114,4 @@ jobs:
       - name: Run repo-review action
         uses: ./
         with:
-          plugins: sp-repo-review==2024.03.10
+          plugins: sp-repo-review==2024.04.23
