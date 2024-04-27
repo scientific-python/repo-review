@@ -113,8 +113,9 @@ disallow_untyped_defs = true
 
 
 [tool.pylint]
-master.py-version = "3.10"
-master.ignore-paths= ["src/repo_review/_version.py"]
+py-version = "3.10"
+ignore-paths = ["src/repo_review/_version.py"]
+ignored-modules = ["pyodide"]
 reports.output-format = "colorized"
 similarities.ignore-imports = "yes"
 messages_control.disable = [
@@ -131,6 +132,7 @@ messages_control.disable = [
   "no-member",  # better handled by mypy, etc.
   "used-before-assignment",  # False positive on conditional import
   "unnecessary-ellipsis",  # Not correct for typing
+  "import-outside-toplevel",  # better handled elsewhere
 ]
 
 
