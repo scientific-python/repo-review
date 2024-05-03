@@ -191,12 +191,13 @@ function MyThemeProvider(props) {
 class App extends React.Component {
   constructor(props) {
     super(props);
-    const deps_str = props.deps.join(" ");
+    const inner_deps_str = props.deps.join("\n");
+    const deps_str = `<pre><code>${inner_deps_str}</code></pre>`;
     this.state = {
       results: [],
       repo: urlParams.get("repo") || "",
       branch: urlParams.get("branch") || "",
-      msg: `${DEFAULT_MSG} Packages: ${deps_str}`,
+      msg: `<p>${DEFAULT_MSG}</p><h4>Packages:</h4> ${deps_str}`,
       progress: false,
       err_msg: "",
       url: "",
@@ -362,7 +363,7 @@ class App extends React.Component {
           <MaterialUI.Paper elevation={3}>
             <MaterialUI.Box sx={{ p: 2 }}>
               <MaterialUI.Typography variant="body1" component="div">
-                {this.state.msg}
+                <span dangerouslySetInnerHTML={{ __html: this.state.msg }} />
               </MaterialUI.Typography>
               {this.state.progress && <MaterialUI.LinearProgress />}
               {this.state.err_msg && (
