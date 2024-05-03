@@ -33,7 +33,6 @@ function IfUrlLink({ name, url, color }) {
     return (
       <MaterialUI.Typography
         sx={{ display: "inline" }}
-        component="span"
         variant="body2"
         color={color}
         component="a"
