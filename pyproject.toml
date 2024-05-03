@@ -92,6 +92,8 @@ xfail_strict = true
 log_cli_level = "INFO"
 filterwarnings = [
   "error",
+  "ignore:OptionHighlighter:DeprecationWarning",  # rich-click triggers its own warning
+  "ignore:`highlighter`:DeprecationWarning",  # rich-click triggers its own warning
 ]
 testpaths = ["tests"]
 pythonpath = ["tests/test_utilities"]
