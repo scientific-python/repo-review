@@ -5,28 +5,32 @@ detailed description of best practices for developing Scikit-HEP packages.
 
 ## Quick development
 
-The fastest way to start with development is to use nox. If you don't have nox,
-you can use `pipx run nox` to run it without installing, or `pipx install nox`.
-If you don't have pipx (pip for applications), then you can install with with
-`pip install pipx` (the only case were installing an application with regular
-pip is reasonable). If you use macOS, then pipx and nox are both in brew, use
-`brew install pipx nox`.
+The fastest way to start with development is to use hatch. If you don't have
+hatch, you can use `pipx run hatch` to run it without installing, or `pipx
+install hatch`. If you don't have pipx (pip for applications), then you can
+install with with `pip install pipx` (the only case were installing an
+application with regular pip is reasonable). If you use macOS, then pipx and
+hatch are both in brew, use `brew install pipx hatch`. Hatch 1.10+ is required.
 
-To use, run `nox`. This will lint and test using every installed version of
-Python on your system, skipping ones that are not installed. You can also run
-specific jobs:
+Here are some common tasks you might want to run:
 
 ```console
-$ nox -s lint  # Lint only
-$ nox -s tests # Tests
-$ nox -s docs -- --serve  # Build and serve the docs
-$ nox -s build  # Make an SDist and wheel
+$ hatch run lint:lint        # all linters (pre-commit)
+$ hatch run pylint:lint      # pylint
+$ hatch fmt                  # just format & basic lint
+$ hatch tests                # run the tests
+$ hatch build                # build SDist and wheel
+$ hatch run docs:serve       # build and serve the docs
+$ hatch run docs:html        # just build the docs
+$ hatch run docs:man         # build manpage
+$ hatch run docs:linkcheck   # check for broken links
+$ hatch run api-docs:build   # rebuild the API docs
+$ hatch run webapp:serve     # serve the webapp
+$ hatch run example:repo-review <args> # Run an example
 ```
 
-Nox handles everything for you, including setting up an temporary virtual
-environment for each run.
-
-You can also use `nox -s run -- .` to run an example set of checks on a repo.
+Hatch handles everything for you, including setting up an temporary virtual
+environment.
 
 ## Setting up a development environment manually
 
@@ -71,19 +75,25 @@ pytest
 You can build the docs using:
 
 ```bash
-nox -s docs
+hatch run docs:docs
 ```
 
 You can see a preview with:
 
 ```bash
-nox -s docs -- --serve
+hatch run docs:serve
+```
+
+You can rebuild the API docs with:
+
+```bash
+$ hatch run api-docs:build
 ```
 
 ## Pre-commit
 
 This project uses pre-commit for all style checking. While you can run it with
-nox, this is such an important tool that it deserves to be installed on its
+hatch, this is such an important tool that it deserves to be installed on its
 own. Install pre-commit and run:
 
 ```bash
@@ -94,5 +104,5 @@ to check all files.
 
 ## Running DevContainer
 
-You can use DevContainer, such as in GitHub Codespaces or locally. Nox and a
+You can use DevContainer, such as in GitHub Codespaces or locally. Hatch and a
 local install will be available.
