@@ -84,6 +84,46 @@ repo-review = "repo_review.schema:get_schema"
 version.source = "vcs"
 build.hooks.vcs.version-file = "src/repo_review/_version.py"
 
+[tool.hatch.envs.default]
+installer = "uv"
+
+[tool.hatch.envs.hatch-test]
+features = ["test", "cli"]
+
+[tool.hatch.envs.lint]
+dependencies = ["pre-commit"]
+skip-install = true
+scripts.lint = "pre-commit run --all-files --show-diff-on-failure {args}"
+
+[tool.hatch.envs.pylint]
+features = ["cli"]
+dependencies = ["pylint"]
+scripts.lint = "pylint repo_review {args}"
+
+[tool.hatch.envs.docs]
+features = ["docs"]
+dependencies = ["sphinx-autobuild"]
+scripts.linkcheck = "sphinx-build -b=linkcheck docs docs/_build/linkcheck {args}"
+scripts.html = "sphinx-build --keep-going -n -T -b=html docs docs/_build/html {args}"
+scripts.serve = "sphinx-autobuild -n -T -b=html docs docs/_build/html {args}"
+scripts.man = "sphinx-build --keep-going -n -T -b=man docs docs/_build/man {args}"
+
+[tool.hatch.envs.api-docs]
+skip-install = true
+dependencies = ["sphinx"]
+scripts.build = "sphinx-apidoc -o docs/api/ --module-first --no-toc --force src/repo_review"
+
+[tool.hatch.envs.example]
+features = ["cli"]
+post-install-commands = ["$HATCH_UV pip install -e tests/test_utilities"]
+
+[tool.hatch.envs.webapp]
+skip-install = true
+scripts.serve = "cd docs && echo 'Serving on http://localhost:8080' && python -m http.server 8080"
+
+[[tool.hatch.envs.hatch-test.matrix]]
+python = ["3.12", "3.11", "3.10"]
+
 
 [tool.pytest.ini_options]
 minversion = "7.0"
@@ -164,7 +204,7 @@ extend-select = [
   "YTT",         # flake8-2020
 ]
 ignore = [
-  "ISC001", # May collide with formatter
+  "ISC001",  # May collide with formatter
   "PT004",   # Incorrect check, usefixtures is the correct way to do this
   "PLR09",   # Too many X
   "PLR2004", # Magic value in comparison

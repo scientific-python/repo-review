@@ -1,7 +1,7 @@
 {
   "name": "repo-review[dev]",
   "image": "mcr.microsoft.com/devcontainers/python:0-3.11",
-  "postCreateCommand": "pipx install nox && pip install -e.[cli,test] pylint",
+  "postCreateCommand": "pipx install hatch && pip install -e.[cli,test] pylint",
   "customizations": {
     "vscode": {
       "extensions": [
