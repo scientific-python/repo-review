@@ -20,7 +20,7 @@ You can also use the `html` output and write your own webapp. You need to provid
 
 ```html
 <script
-  src="https://cdn.jsdelivr.net/pyodide/v0.23.2/full/pyodide.js"
+  src="https://cdn.jsdelivr.net/pyodide/v0.25.1/full/pyodide.js"
   crossorigin
 ></script>
 ```
@@ -44,12 +44,9 @@ You can get the families and the checks:
 
 ```js
 result_html_py = pyodide.runPython(`
-  from pyodide.http import open_url
   from repo_review.processor import process
   from repo_review.ghpath import GHPath
   from repo_review.html import to_html
-
-  GHPath.open_url = staticmethod(open_url)
 
   package = GHPath(repo="${state.repo}", branch="${state.branch}")
   to_html(*process(package))
