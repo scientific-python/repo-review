@@ -16,7 +16,7 @@ least one plugin to be installed.
 With one or more plugins, it will produce a list of results - green checkmarks
 mean this rule is followed, red x’s mean the rule is not. A yellow warning sign
 means that the check was skipped because a previous required check failed. Four
-output formats are supported; `rich`, `svg`, `html`, and `json`.
+output formats are supported: `rich`, `svg`, `html`, and `json`.
 
 ## Plugins
 
@@ -80,7 +80,7 @@ the files that interest the plugin in question.
 
 So if you want to lint Python code, use Flake8 or Ruff. But if you want to
 check Flake8 or Ruff's configuration, use repo-review! Generally, repo-review
-plugins are more about requiring things to be present, like making use all your
+plugins are more about requiring things to be present, like making sure all your
 repos have some [pre-commit][] check.
 
 ## Development of repo-review and plugins
@@ -109,7 +109,7 @@ accept fixtures, allowing dynamic check listings.
 Check files do not depend on the main library, and can be extended (similar to
 Flake8). You register new check files via entry-points - so extending this is
 with custom checks or custom fixtures is easy and trivial. There's no need to
-subclass or do anything with the base library - no dependency required.
+subclass or do anything with the base library - no dependency on repo-review required.
 
 Checks are as simple as possible so they are easy to write. A check is a class
 with the name (1-2 letters + number) and a docstring (the check message). It
