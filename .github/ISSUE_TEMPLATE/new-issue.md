@@ -1,10 +1,9 @@
 ---
 name: New Issue
 about: Prepare a new bug report or feature request
-title: ''
-labels: ''
-assignees: ''
-
+title: ""
+labels: ""
+assignees: ""
 ---
 
 <!--
