@@ -9,14 +9,10 @@ build:
   os: "ubuntu-22.04"
   tools:
     python: "3.12"
-  jobs:
-    post_create_environment:
-      - curl -LsSf https://astral.sh/uv/install.sh | sh
-      - VIRTUAL_ENV=$READTHEDOCS_VIRTUALENV_PATH $HOME/.cargo/bin/uv pip install --upgrade pip setuptools
-      - VIRTUAL_ENV=$READTHEDOCS_VIRTUALENV_PATH $HOME/.cargo/bin/uv pip install --upgrade sphinx readthedocs-sphinx-ext
-    post_install:
-      - VIRTUAL_ENV=$READTHEDOCS_VIRTUALENV_PATH $HOME/.cargo/bin/uv pip install .[docs]
-
-# Build documentation in the docs/ directory with Sphinx
-sphinx:
-  configuration: docs/conf.py
+  commands:
+    - asdf plugin add uv
+    - asdf install uv latest
+    - asdf global uv latest
+    - uv venv
+    - uv pip install .[docs]
+    - .venv/bin/python -m sphinx -T -b html -d docs/_build/doctrees -D language=en docs $READTHEDOCS_OUTPUT/html
