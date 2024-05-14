@@ -97,7 +97,7 @@ scripts.lint = "pre-commit run --all-files --show-diff-on-failure {args}"
 
 [tool.hatch.envs.pylint]
 features = ["cli"]
-dependencies = ["pylint"]
+dependencies = ["pylint>=3.2"]
 scripts.lint = "pylint repo_review {args}"
 
 [tool.hatch.envs.docs]

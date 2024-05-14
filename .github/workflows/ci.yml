@@ -27,12 +27,8 @@ jobs:
         with:
           python-version: "3.x"
       - uses: pre-commit/action@v3.0.1
-        with:
-          extra_args: --hook-stage manual --all-files
       - name: Run PyLint
-        run: |
-          echo "::add-matcher::$GITHUB_WORKSPACE/.github/matchers/pylint.json"
-          pipx run --python=python hatch run pylint:lint
+        run: pipx run --python=python hatch run pylint:lint --output-format=github
 
   checks:
     name: Check Python on ${{ matrix.runs-on }}
