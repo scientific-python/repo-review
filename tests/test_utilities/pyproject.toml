@@ -5,7 +5,7 @@ build-backend = "flit_core.buildapi"
 [project]
 name = "pyproject"
 version = "0.0.1"
-classfiers = [
+classifiers = [
     "Private :: Do Not Upload",
 ]
 description = "Simple repo-review example for testing"
