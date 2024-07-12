@@ -89,7 +89,7 @@ def is_allowed(select: Set[str], ignore: Set[str], name: str) -> bool:
         and "*" not in select
     ):
         return False
-        
+
     return name not in ignore and name.rstrip("0123456789") not in ignore:
 
 
