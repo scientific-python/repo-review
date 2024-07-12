@@ -90,7 +90,7 @@ def is_allowed(select: Set[str], ignore: Set[str], name: str) -> bool:
     ):
         return False
 
-    return name not in ignore and name.rstrip("0123456789") not in ignore:
+    return name not in ignore and name.rstrip("0123456789") not in ignore
 
 
 def get_check_url(name: str, check: Check) -> str:
