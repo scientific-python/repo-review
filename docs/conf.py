@@ -1,8 +1,11 @@
+from __future__ import annotations
+
 import importlib
 import importlib.metadata
 import inspect
 import os
 from pathlib import Path
+from typing import Any
 
 import repo_review
 
@@ -39,7 +42,7 @@ exclude_patterns = [
 
 html_theme = "furo"
 
-html_theme_options: Dict[str, Any] = {
+html_theme_options: dict[str, Any] = {
     "footer_icons": [
         {
             "name": "GitHub",
