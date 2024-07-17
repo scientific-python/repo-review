@@ -9,7 +9,18 @@
       "$ref": "#/$defs/checks"
     },
     "ignore": {
-      "$ref": "#/$defs/checks"
+      "oneOf": [
+        {
+          "$ref": "#/$defs/checks"
+        },
+        {
+          "type": "object",
+          "patternProperties": {
+            "^[A-Z]+[0-9]*$": { "type": "string" }
+          },
+          "additionalProperties": false
+        }
+      ]
     }
   },
   "$defs": {
