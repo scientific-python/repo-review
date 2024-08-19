@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import itertools
 import json
+import os
 import sys
 import typing
 from collections.abc import Mapping, Sequence
@@ -83,6 +84,17 @@ def rich_printer(
     status: Status,
     header: str = "",
 ) -> None:
+    # Before Python 3.15, this isn't always unicode
+    if (
+        sys.version_info < (3, 15)
+        and "PYTHONIOENCODING" not in os.environ
+        and "PYTHONUTF8" not in os.environ
+    ):
+        if sys.stdout.encoding != "utf-8":
+            sys.stdout.reconfigure(encoding="utf-8")  # type: ignore[union-attr]
+        if sys.stderr.encoding != "utf-8":
+            sys.stderr.reconfigure(encoding="utf-8")  # type: ignore[union-attr]
+
     console = rich.console.Console(
         record=svg, quiet=svg, stderr=stderr, color_system="auto" if color else None
     )
