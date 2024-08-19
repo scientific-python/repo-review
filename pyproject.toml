@@ -225,4 +225,4 @@ typing-modules = ["repo_review._compat.typing"]
 "src/**/__main__.py" = ["T20"]
 
 [tool.repo-review]
-ignore = ["RF003"]  # Will be flipped in next release
+ignore = ["RF003", "PC180"]  # Will be fixed in next sp-repo-review release
