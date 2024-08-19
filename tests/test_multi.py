@@ -6,10 +6,11 @@ from pathlib import Path
 
 import pytest
 from click.testing import CliRunner
+
 from repo_review.__main__ import main
 
 
-@pytest.fixture()
+@pytest.fixture
 def multiple_packages(tmp_path: Path) -> tuple[str, str]:
     packages = (tmp_path / "package_1", tmp_path / "package_2")
 

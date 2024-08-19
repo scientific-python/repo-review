@@ -204,6 +204,7 @@ extend-select = [
 ]
 ignore = [
   "ISC001",  # May collide with formatter
+  "PT004",   # Incorrect check, usefixtures is the correct way to do this
   "PLR09",   # Too many X
   "PLR2004", # Magic value in comparison
 ]

@@ -9,7 +9,7 @@ def nocolor(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.delenv("FORCE_COLOR", raising=False)
 
 
-@pytest.fixture()
+@pytest.fixture
 def no_entry_points(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(
         importlib.metadata,
@@ -18,7 +18,7 @@ def no_entry_points(monkeypatch: pytest.MonkeyPatch) -> None:
     )
 
 
-@pytest.fixture()
+@pytest.fixture
 def local_entry_points(monkeypatch: pytest.MonkeyPatch) -> None:
     orig_ep = importlib.metadata.entry_points
     ep1 = importlib.metadata.EntryPoint(
