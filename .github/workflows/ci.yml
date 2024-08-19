@@ -49,6 +49,8 @@ jobs:
             3.10
             3.11
             3.12
+            3.13
+          allow-prereleases: true
 
       - name: Setup uv
         uses: yezz123/setup-uv@v4
@@ -58,8 +60,6 @@ jobs:
 
       - name: Test package (all Pythons)
         run: hatch test -a
-        env:
-          PYTHONUTF8: "1"
 
   dist:
     name: Distribution build

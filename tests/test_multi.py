@@ -28,7 +28,7 @@ def multiple_packages(tmp_path: Path) -> tuple[str, str]:
             """
         )
 
-        package.joinpath("pyproject.toml").write_text(basic_toml)
+        package.joinpath("pyproject.toml").write_text(basic_toml, encoding="utf-8")
         package.joinpath(".pre-commit-config.yaml").touch()
         package.joinpath("README.md").touch()
 

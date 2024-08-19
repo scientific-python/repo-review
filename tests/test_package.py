@@ -36,7 +36,8 @@ def test_broken_validate_pyproject(tmp_path: Path) -> None:
                 [tool.repo-review]
                 ignore = ["a2"]
             """
-        )
+        ),
+        encoding="utf-8",
     )
 
     results = process(tmp_path)
