@@ -4,7 +4,6 @@ from pathlib import Path
 from types import ModuleType
 
 import pytest
-
 from repo_review._compat.importlib.resources.abc import Traversable
 from repo_review.checks import collect_checks
 from repo_review.fixtures import apply_fixtures, compute_fixtures

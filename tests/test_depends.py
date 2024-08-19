@@ -1,7 +1,6 @@
 from pathlib import Path
 
 import pytest
-
 import repo_review.processor
 from repo_review._compat.importlib.resources.abc import Traversable
 

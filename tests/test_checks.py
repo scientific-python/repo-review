@@ -6,7 +6,6 @@ from types import ModuleType
 from typing import ClassVar
 
 import pytest
-
 import repo_review.processor
 from repo_review._compat.importlib.resources.abc import Traversable
 from repo_review.checks import collect_checks

@@ -4,7 +4,6 @@ import textwrap
 from pathlib import Path
 
 import pytest
-
 import repo_review as m
 import repo_review.testing
 from repo_review.processor import process
