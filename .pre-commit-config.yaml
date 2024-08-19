@@ -17,8 +17,8 @@ repos:
         args: ["--fix", "--show-fixes"]
       - id: ruff-format
 
-  - repo: https://github.com/pre-commit/mirrors-prettier
-    rev: "v4.0.0-alpha.8"
+  - repo: https://github.com/rbubley/mirrors-prettier
+    rev: "v3.3.3"
     hooks:
       - id: prettier
         types_or: [yaml, markdown, html, css, scss, javascript, json]
@@ -78,7 +78,7 @@ repos:
         exclude: .pre-commit-config.yaml
 
   - repo: https://github.com/henryiii/validate-pyproject-schema-store
-    rev: 2024.07.29
+    rev: 2024.08.19
     hooks:
       - id: validate-pyproject
 
