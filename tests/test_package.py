@@ -55,7 +55,8 @@ def test_broken_validate_pyproject_object(tmp_path: Path) -> None:
                 [tool.repo-review.ignore]
                 a2 = "some message"
             """
-        )
+        ),
+        encoding="utf-8",
     )
 
     results = process(tmp_path)
@@ -73,7 +74,8 @@ def test_working_validate_pyproject_object(tmp_path: Path) -> None:
                 [tool.repo-review.ignore]
                 PP102 = "some message"
             """
-        )
+        ),
+        encoding="utf-8",
     )
 
     results = process(tmp_path)

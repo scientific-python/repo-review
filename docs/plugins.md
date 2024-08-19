@@ -43,7 +43,7 @@ def test_has_tool_ruff(tmp_path: Path) -> None:
     # In this example, tool.ruff is required to be present by this plugin
     d = tmp_path / "some_package"
     d.mkdir()
-    d.joinpath("pyproject.toml").write_text("[tool.ruff]")
+    d.joinpath("pyproject.toml").write_text("[tool.ruff]", encoding="utf-8")
     processed = repo_review_processor.process(d)
     assert all(r.result for r in processed.results), f"{processed.results}"
 ```
