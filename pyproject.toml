@@ -223,3 +223,6 @@ typing-modules = ["repo_review._compat.typing"]
 [tool.ruff.lint.per-file-ignores]
 "src/repo_review/_compat/**.py" = ["TID251"]
 "src/**/__main__.py" = ["T20"]
+
+[tool.repo-review]
+ignore = ["RF003"]  # Will be flipped in next release
