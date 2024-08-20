@@ -45,7 +45,7 @@ cli = [
 ]
 test = [
   "pytest >=7",
-  "sp-repo-review >=2024.04.23",
+  "sp-repo-review >=2024.08.19",
   "validate-pyproject >=0.14",
 ]
 dev = [
@@ -223,6 +223,3 @@ typing-modules = ["repo_review._compat.typing"]
 [tool.ruff.lint.per-file-ignores]
 "src/repo_review/_compat/**.py" = ["TID251"]
 "src/**/__main__.py" = ["T20"]
-
-[tool.repo-review]
-ignore = ["RF003", "PC180"]  # Will be fixed in next sp-repo-review release
