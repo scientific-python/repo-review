@@ -1,9 +1,11 @@
 from __future__ import annotations
 
+import copy
 import dataclasses
 import graphlib
 import textwrap
 import typing
+import warnings
 from collections.abc import Mapping, Set
 from typing import Any, TypeVar
 
@@ -211,13 +213,18 @@ def process(
 
     # Keep track of which checks have been completed
     completed: dict[str, str | None] = {}
+    fixtures_copy = copy.deepcopy(fixtures)
 
     # Run all the checks in topological order based on their dependencies
     ts = graphlib.TopologicalSorter(graph)
     for name in ts.static_order():
         if all(completed.get(n, "") == "" for n in graph[name]):
-            result = apply_fixtures({"name": name, **fixtures}, tasks[name].check)
+            result = apply_fixtures({"name": name, **fixtures_copy}, tasks[name].check)
             completed[name] = process_result_bool(result, tasks[name], name)
+            if fixtures != fixtures_copy:
+                fixtures_copy = copy.deepcopy(fixtures)
+                msg = f"{name} modified the input fixtures! Making a deepcopy to fix and continue."
+                warnings.warn(msg, stacklevel=1)
         else:
             completed[name] = None
 
