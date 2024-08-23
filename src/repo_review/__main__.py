@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import importlib.metadata
 import itertools
 import json
 import os
@@ -71,6 +72,29 @@ def list_all(ctx: click.Context, _param: click.Parameter, value: bool) -> None:
             comment = f" [dim]# {doc}" if doc else ""
             rich.print(f'  "{link}",{comment}')
 
+    ctx.exit()
+
+
+def all_versions(ctx: click.Context, _param: click.Parameter, value: bool) -> None:
+    if not value or ctx.resilient_parsing:
+        return
+
+    groups = ["repo_review.checks", "repo_review.families", "repo_review.fixtures"]
+    packages = {
+        dist.name: dist.version
+        for group in groups
+        for ep in importlib.metadata.entry_points(group=group)
+        if (dist := ep.dist) is not None
+    }
+    deps = ["rich", "rich-click", "click", "markdown-it-py", "pyyaml"]
+    rich.print("Repo-review's dependencies:")
+    for name in deps:
+        rich.print(
+            f"  [bold]{name}[/bold]: [magenta]{importlib.metadata.version(name)}[/magenta]"
+        )
+    rich.print("Packages providing repo-review plugins:")
+    for name, version in sorted(packages.items()):
+        rich.print(f"  [bold]{name}[/bold]: [green]{version}[/green]")
     ctx.exit()
 
 
@@ -243,8 +267,24 @@ def _remote_path_processor(package: Path) -> Path | GHPath:
     "packages",
     type=click.Path(dir_okay=True, path_type=Path),
     nargs=-1,
-    required=True,
+    required=False,
     callback=remote_path_support,
+)
+@click.option(
+    "--versions",
+    is_flag=True,
+    callback=all_versions,
+    expose_value=False,
+    is_eager=True,
+    help="List all plugin versions and exit",
+)
+@click.option(
+    "--list-all",
+    is_flag=True,
+    callback=list_all,
+    expose_value=False,
+    is_eager=True,
+    help="List all checks and exit",
 )
 @click.option(
     "--format",
@@ -258,6 +298,12 @@ def _remote_path_processor(package: Path) -> Path | GHPath:
     "stderr_fmt",
     type=click.Choice(["rich", "json", "html", "svg"]),
     help="Select additional output format for stderr. Will disable terminal escape codes for stdout for easy redirection.",
+)
+@click.option(
+    "--show",
+    type=click.Choice(["all", "err", "errskip"]),
+    default="all",
+    help="Show all (default), or just errors, or errors and skips",
 )
 @click.option(
     "--select",
@@ -275,20 +321,6 @@ def _remote_path_processor(package: Path) -> Path | GHPath:
     help="Path to python package.",
     default="",
 )
-@click.option(
-    "--list-all",
-    is_flag=True,
-    callback=list_all,
-    expose_value=False,
-    is_eager=True,
-    help="List all checks and exit",
-)
-@click.option(
-    "--show",
-    type=click.Choice(["all", "err", "errskip"]),
-    default="all",
-    help="Show all (default), or just errors, or errors and skips",
-)
 def main(
     packages: list[Path | GHPath],
     format_opt: Formats,
@@ -299,8 +331,11 @@ def main(
     show: Show,
 ) -> None:
     """
-    Pass in a local Path or gh:org/repo@branch.
+    Pass in a local Path or gh:org/repo@branch. Will run on the current
+    directory if no path passed.
     """
+    if not packages:
+        packages = [Path()]
 
     if len(packages) > 1:
         if format_opt == "json":
