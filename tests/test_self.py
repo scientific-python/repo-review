@@ -6,7 +6,7 @@ import repo_review.processor
 
 
 @pytest.fixture(autouse=True)
-def patch_entry_points(local_entry_points: object) -> None:  # noqa: ARG001
+def patch_entry_points(local_entry_points: object) -> None:
     pass
 
 
