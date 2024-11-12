@@ -53,6 +53,7 @@ repos:
         additional_dependencies:
           - click>=8.1.5
           - markdown-it-py
+          - orjson
           - pytest
           - rich
           - tomli
