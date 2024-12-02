@@ -30,7 +30,7 @@ explanation instead of the `check()` docstring, you can return a non-empty
 string from the check instead of `False`. Returning `None` makes a check
 "skipped". Docstrings/error messages can access their own object with `{self}`
 and check name with `{name}` (these are processed with `.format()`, so escape `{}`
-as `{{}}`). The error message is in markdown format.
+as `{{}}`). The error message is in Markdown format.
 
 ```{versionchanged} 0.9
 The string return value is not processed via `.format`. You can use `self` and

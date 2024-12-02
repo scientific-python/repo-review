@@ -98,7 +98,7 @@ webapp. It also would allow `zipfile.Path` to work just as well, too - no need
 to extract.
 
 [Checks][] can request [fixtures][] (like [pytest][]) as arguments. Check files
-can add new fixtures as needed. Fixtures are are specified with entry points,
+can add new fixtures as needed. Fixtures are specified with entry points,
 and take any other fixture as arguments as well - the `root` and `package`
 fixtures represents the root of the repository and of the package you are
 checking, respectively, and are the basis for the other fixtures, which are
@@ -134,7 +134,7 @@ collection functions, the family entry-point also supports fixtures.
 This project inspired [Try-PyHF](https://kratsg.github.io/try-pyhf/), an
 interface for a High Energy Physics package in Scikit-HEP.
 
-This project inspired [abSENSE](https://princetonuniversity.github.io/abSENSE/), an
+This project inspired [abSENSE](https://princetonuniversity.github.io/abSENSE/), a
 web interface to abSENSE.
 
 This was developed for [Scikit-HEP][] before moving to Scientific-Python.
