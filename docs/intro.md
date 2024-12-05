@@ -15,7 +15,7 @@ to use it is:
 pipx run <plugin-name>[cli] .
 ```
 
-This uses [pipx][] (pip for executables) to download the plugin and all of it's
+This uses [pipx][] (pip for executables) to download the plugin and all of its
 dependencies (including repo-review itself) into a temporary virtual
 environment (cached for a week), then runs it. For example:
 

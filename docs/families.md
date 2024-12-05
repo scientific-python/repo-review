@@ -15,7 +15,7 @@ class Family(typing.TypedDict, total=False):
 
 The `name` will be shown instead if given. The families will be sorted by
 `order` then key. And a `description` will be shown after the name if provided;
-it is expected to be in markdown format.
+it is expected to be in Markdown format.
 
 ```{versionadded} 0.9
 Descriptions are now supported.
@@ -24,7 +24,7 @@ Descriptions are now supported.
 Then you can provide a function that maps family strings to this extra information:
 
 ```python
-def get_familes() -> dict[str, Family]:
+def get_families() -> dict[str, Family]:
     return {
         "general": Family(
             name="General",
