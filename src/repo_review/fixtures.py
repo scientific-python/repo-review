@@ -12,11 +12,11 @@ from ._compat.importlib.resources.abc import Traversable
 from .ghpath import EmptyTraversable
 
 __all__ = [
-    "pyproject",
-    "list_all",
-    "compute_fixtures",
     "apply_fixtures",
     "collect_fixtures",
+    "compute_fixtures",
+    "list_all",
+    "pyproject",
 ]
 
 

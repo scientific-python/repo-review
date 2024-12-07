@@ -6,7 +6,7 @@ from typing import Any, Protocol
 
 from .fixtures import apply_fixtures
 
-__all__ = ["Check", "collect_checks", "is_allowed", "get_check_url"]
+__all__ = ["Check", "collect_checks", "get_check_url", "is_allowed"]
 
 
 def __dir__() -> list[str]:
