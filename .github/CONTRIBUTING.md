@@ -32,23 +32,17 @@ $ hatch run example:repo-review <args> # Run an example
 Hatch handles everything for you, including setting up an temporary virtual
 environment.
 
+Using `uv run` directly is also supported.
+
 ## Setting up a development environment manually
 
-You can set up a development environment by running:
+You can set up a development environment in `.venv` by running:
 
 ```bash
-python3 -m venv .venv
-source ./.venv/bin/activate
-pip install -v -e .[dev]
+uv sync
 ```
 
-If you have the [Python Launcher for Unix](https://github.com/brettcannon/python-launcher),
-you can instead do:
-
-```bash
-py -m venv .venv
-py -m install -v -e .[dev]
-```
+Or just prefix every command by `uv run`.
 
 # Post setup
 
