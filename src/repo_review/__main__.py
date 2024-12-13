@@ -36,7 +36,7 @@ from .processor import Result, as_simple_dict, collect_all, process
 
 __all__ = ["main", "Formats", "Show", "Status"]
 
-CODE_THEME = "default"
+CODE_THEME = "ansi_light"
 
 
 def __dir__() -> list[str]:
