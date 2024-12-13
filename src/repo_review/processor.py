@@ -30,8 +30,8 @@ __all__ = [
     "ResultDict",
     "as_simple_dict",
     "collect_all",
-    "process",
     "md_as_html",
+    "process",
 ]
 
 

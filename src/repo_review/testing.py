@@ -13,7 +13,7 @@ from .checks import Check, get_check_url, process_result_bool
 from .fixtures import apply_fixtures
 from .processor import Result
 
-__all__ = ["toml_loads", "compute_check"]
+__all__ = ["compute_check", "toml_loads"]
 
 
 def __dir__() -> list[str]:

@@ -34,7 +34,7 @@ from .ghpath import GHPath
 from .html import to_html
 from .processor import Result, as_simple_dict, collect_all, process
 
-__all__ = ["main", "Formats", "Show", "Status"]
+__all__ = ["Formats", "Show", "Status", "main"]
 
 CODE_THEME = "ansi_light"
 

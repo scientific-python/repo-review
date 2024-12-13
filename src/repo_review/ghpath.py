@@ -14,7 +14,7 @@ from typing import Literal
 
 from ._compat.importlib.resources.abc import Traversable
 
-__all__ = ["GHPath", "EmptyTraversable"]
+__all__ = ["EmptyTraversable", "GHPath"]
 
 
 def __dir__() -> list[str]:
