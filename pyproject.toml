@@ -64,7 +64,7 @@ cli = [
 [dependency-groups]
 test = [
   "pytest >=7",
-  "sp-repo-review >=2024.08.19",
+  "sp-repo-review >=2025.01.22",
   "validate-pyproject >=0.14",
 ]
 dev = [
@@ -96,7 +96,7 @@ features = ["cli"]
 # duplicated since hatch doesn't support groups yet
 dependencies = [
   "pytest >=7",
-  "sp-repo-review >=2024.08.19",
+  "sp-repo-review >=2025.01.22",
   "validate-pyproject >=0.14",
 ]
 env-vars.PYTHONWARNDEFAULTENCODING = "1"
