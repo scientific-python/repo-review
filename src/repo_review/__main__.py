@@ -316,6 +316,16 @@ def _remote_path_processor(package: Path) -> Path | GHPath:
     default="",
 )
 @click.option(
+    "--extend-select",
+    help="Checks to run in addition to the ones selected.",
+    default="",
+)
+@click.option(
+    "--extend-ignore",
+    help="Checks to ignore in addition to the ones ignored.",
+    default="",
+)
+@click.option(
     "--package-dir",
     "-p",
     help="Path to python package.",
@@ -327,6 +337,8 @@ def main(
     stderr_fmt: Formats | None,
     select: str,
     ignore: str,
+    extend_select: str,
+    extend_ignore: str,
     package_dir: str,
     show: Show,
 ) -> None:
@@ -351,6 +363,8 @@ def main(
             stderr_fmt,
             select,
             ignore,
+            extend_select,
+            extend_ignore,
             package_dir,
             add_header=len(packages) > 1,
             show=show,
@@ -378,6 +392,8 @@ def on_each(
     stderr_fmt: Literal["rich", "json", "html", "svg"] | None,
     select: str,
     ignore: str,
+    extend_select: str,
+    extend_ignore: str,
     package_dir: str,
     *,
     add_header: bool,
@@ -387,6 +403,8 @@ def on_each(
 
     ignore_list = {x.strip() for x in ignore.split(",") if x}
     select_list = {x.strip() for x in select.split(",") if x}
+    extend_ignore_list = {x.strip() for x in extend_ignore.split(",") if x}
+    extend_select_list = {x.strip() for x in extend_select.split(",") if x}
 
     collected = collect_all(package, subdir=package_dir)
     if len(collected.checks) == 0:
@@ -407,7 +425,12 @@ def on_each(
         header = package.name
 
     families, processed = process(
-        base_package, select=select_list, ignore=ignore_list, subdir=package_dir
+        base_package,
+        select=select_list,
+        ignore=ignore_list,
+        extend_select=extend_select_list,
+        extend_ignore=extend_ignore_list,
+        subdir=package_dir,
     )
 
     status: Status = "passed" if processed else "empty"

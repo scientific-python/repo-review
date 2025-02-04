@@ -65,7 +65,9 @@ ignore = ["A100"]
 ```
 
 If `--select` or `--ignore` are given on the command line, they will override
-the `pyproject.toml` config.
+the `pyproject.toml` config. You can use `--extend-select` and `--extend-ignore`
+on the command line to extend the `pyproject.toml` config. These CLI options
+are comma separated.
 
 ## Comparison to other frameworks
 
