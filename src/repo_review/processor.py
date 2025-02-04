@@ -179,6 +179,8 @@ def process(
     *,
     select: Set[str] = frozenset(),
     ignore: Set[str] = frozenset(),
+    extend_select: Set[str] = frozenset(),
+    extend_ignore: Set[str] = frozenset(),
     subdir: str = "",
 ) -> ProcessReturn:
     """
@@ -199,8 +201,12 @@ def process(
 
     # Collect our own config
     config = pyproject(package).get("tool", {}).get("repo-review", {})
-    select_checks = select if select else frozenset(config.get("select", ()))
-    skip_checks = ignore if ignore else frozenset(config.get("ignore", ()))
+    select_checks = (
+        select if select else frozenset(config.get("select", ())) | extend_select
+    )
+    skip_checks = (
+        ignore if ignore else frozenset(config.get("ignore", ())) | extend_ignore
+    )
 
     # Make a graph of the check's interdependencies
     graph: dict[str, Set[str]] = {
