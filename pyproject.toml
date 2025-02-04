@@ -67,8 +67,12 @@ test = [
   "sp-repo-review >=2025.01.22",
   "validate-pyproject >=0.14",
 ]
-dev = [
+cov = [
   { include-group = "test" },
+  "pytest-cov",
+]
+dev = [
+  { include-group = "cov" },
   "sp-repo-review[cli]",
   "validate-pyproject-schema-store[all]",
 ]
@@ -242,3 +246,12 @@ typing-modules = ["repo_review._compat.typing"]
 [tool.ruff.lint.per-file-ignores]
 "src/repo_review/_compat/**.py" = ["TID251"]
 "src/**/__main__.py" = ["T20"]
+
+[tool.coverage]
+report.exclude_also = [
+  "def __dir__()",
+  "if TYPE_CHECKING:",
+  '\.\.\.',
+]
+report.show_missing = true
+report.skip_empty = true
