@@ -93,7 +93,7 @@ function Results(props) {
           variant="body2"
           color="text.disabled"
         >
-          {" [skipped]"}
+          {` [skipped] ${result.skip_reason}` }
         </MaterialUI.Typography>
       );
       const msg = (
@@ -200,6 +200,7 @@ class App extends React.Component {
       msg: `<p>${DEFAULT_MSG}</p><h4>Packages:</h4> ${deps_str}`,
       progress: false,
       err_msg: "",
+      skip_reason: "",
       url: "",
     };
     this.pyodide_promise = prepare_pyodide(props.deps);
@@ -278,6 +279,7 @@ class App extends React.Component {
           state: val.result,
           err_msg: val.err_as_html().toString(),
           url: val.url.toString(),
+          skip_reason: val.skip_reason.toString(),
         });
       }
 
