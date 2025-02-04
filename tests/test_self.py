@@ -11,7 +11,9 @@ def patch_entry_points(local_entry_points: object) -> None:
 
 
 def test_pyproject() -> None:
-    families, results = repo_review.processor.process(Path())
+    families, results = repo_review.processor.process(
+        Path(), extend_ignore={"X", "PP303"}
+    )
 
     assert families == {
         "general": {},
@@ -26,7 +28,9 @@ def test_pyproject() -> None:
 
 
 def test_no_pyproject() -> None:
-    families, results = repo_review.processor.process(Path("tests"))
+    families, results = repo_review.processor.process(
+        Path("tests"), extend_ignore={"X", "PP303"}
+    )
 
     assert families == {
         "general": {},
@@ -58,12 +62,13 @@ def test_empty_pyproject() -> None:
             "description": "Has flit_core.buildapi backend",
             "name": "PyProject",
         },
+        "skipped": {},
     }
-    assert len(results) == 9
+    assert len(results) == 12
 
     assert (
         sum(result.result is None for result in results if result.family == "pyproject")
-        == 1
+        == 2
     )
     assert (
         sum(result.result for result in results if isinstance(result.result, bool)) == 6
@@ -72,3 +77,6 @@ def test_empty_pyproject() -> None:
         sum(result.result is None for result in results if result.family == "general")
         == 0
     )
+    assert sum(1 for result in results if result.skip_reason) == 3
+    assert sum(1 for result in results if result.skip_reason == "One skip") == 1
+    assert sum(1 for result in results if result.skip_reason == "Group skip") == 2
