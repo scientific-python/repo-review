@@ -93,7 +93,7 @@ function Results(props) {
           variant="body2"
           color="text.disabled"
         >
-          {` [skipped] ${result.skip_reason}` }
+          {` [skipped] ${result.skip_reason}`}
         </MaterialUI.Typography>
       );
       const msg = (
