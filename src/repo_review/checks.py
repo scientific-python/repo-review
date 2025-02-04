@@ -6,7 +6,7 @@ from typing import Any, Protocol
 
 from .fixtures import apply_fixtures
 
-__all__ = ["Check", "collect_checks", "get_check_url", "is_allowed"]
+__all__ = ["Check", "collect_checks", "get_check_url", "is_allowed", "name_matches"]
 
 
 def __dir__() -> list[str]:
@@ -70,6 +70,25 @@ def collect_checks(fixtures: Mapping[str, Any]) -> dict[str, Check]:
     }
 
 
+def name_matches(name: str, selectors: Set[str]) -> str:
+    """
+    Checks if the name is contained in the matchers. The selectors can be the
+    exact name or just the non-number prefix. Returns the selector that matched,
+    or an empty string if no match.
+
+    :param name: The name to check.
+    :param expr: The expression to check against.
+
+    :return: The matched selector if the name matches a selector, or an empty string if no match.
+    """
+    if name in selectors:
+        return name
+    short_name = name.rstrip("0123456789")
+    if short_name in selectors:
+        return short_name
+    return ""
+
+
 def is_allowed(select: Set[str], ignore: Set[str], name: str) -> bool:
     """
     Skips the check if the name is in the ignore list or if the name without the
@@ -82,15 +101,10 @@ def is_allowed(select: Set[str], ignore: Set[str], name: str) -> bool:
 
     :return: True if this check is allowed, False otherwise.
     """
-    if (
-        select
-        and name not in select
-        and name.rstrip("0123456789") not in select
-        and "*" not in select
-    ):
+    if select and not name_matches(name, select) and "*" not in select:
         return False
 
-    return name not in ignore and name.rstrip("0123456789") not in ignore
+    return not name_matches(name, ignore)
 
 
 def get_check_url(name: str, check: Check) -> str:

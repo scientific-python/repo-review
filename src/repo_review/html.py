@@ -61,7 +61,7 @@ def to_html(
                 else "red"
             )
             icon = (
-                "&#9888;&#65039;"
+                ("&#128311;" if result.skip_reason else "&#9888;&#65039;")
                 if result.result is None
                 else "&#9989;"
                 if result.result
@@ -79,6 +79,11 @@ def to_html(
                 if result.url
                 else result.description
             )
+            if result.skip_reason:
+                description += (
+                    f'<br/><span style="color:DarkKhaki;"><b>Skipped:</b> '
+                    f"<em>{md.render(result.skip_reason)}</em></span>"
+                )
             print(f'<tr style="color: {color};">')
             print(f'<td><span role="img" aria-label="{result_txt}">{icon}</span></td>')
             print(f'<td nowrap="nowrap">{result.name}</td>')

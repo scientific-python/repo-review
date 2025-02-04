@@ -16,3 +16,11 @@ pyproject = "pyproject:repo_review_checks"
 pyproject = "pyproject:repo_review_families"
 
 [tool.example]
+
+
+[tool.repo-review.ignore]
+"PP999" = "One skip"
+"X" = "Group skip"
+
+[tool.repo-review-local]
+extra = true

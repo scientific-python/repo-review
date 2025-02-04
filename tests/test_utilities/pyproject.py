@@ -142,10 +142,51 @@ class PP302(PyProject):
         return "minversion" in options and float(options["minversion"]) >= 6
 
 
-def repo_review_checks() -> dict[str, PyProject | General]:
-    return {p.__name__: p() for p in PyProject.__subclasses__()} | {
+class PP999(PyProject):
+    "Skipped check (single)"
+
+    @staticmethod
+    def check() -> bool:
+        "Not used"
+        return False
+
+
+class X101:
+    "Skipped check (multi)"
+
+    family = "skipped"
+
+    @staticmethod
+    def check() -> bool:
+        "Not used"
+        return False
+
+
+class X102:
+    "Skipped check (multi)"
+
+    family = "skipped"
+
+    @staticmethod
+    def check() -> bool:
+        "Not used"
+        return False
+
+
+def repo_review_checks(
+    pyproject: dict[str, Any],
+) -> dict[str, PyProject | General | X101 | X102]:
+    ret = {p.__name__: p() for p in PyProject.__subclasses__()} | {
         p.__name__: p() for p in General.__subclasses__()
     }
+    extra_checks = (
+        pyproject.get("tool", {}).get("repo-review-local", {}).get("extra", False)
+    )
+    return (
+        (ret | {"X101": X101()} | {"X102": X102()})
+        if extra_checks
+        else {k: v for k, v in ret.items() if k != "PP999"}
+    )
 
 
 def repo_review_families(pyproject: dict[str, Any]) -> dict[str, dict[str, str]]:

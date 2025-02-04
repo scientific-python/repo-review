@@ -163,6 +163,13 @@ def rich_printer(
             msg.append(rich.text.Text.from_markup(description, style=style))
             if result.result is None:
                 msg.append(" [skipped]", style="yellow bold")
+                if result.skip_reason:
+                    sr_style = "yellow"
+                    msg.append(" (", style=sr_style)
+                    msg.append(
+                        rich.text.Text.from_markup(result.skip_reason, style=sr_style)
+                    )
+                    msg.append(")", style=sr_style)
                 tree.add(msg)
             elif result.result:
                 msg.append(rich.text.Text.from_markup(" :white_check_mark:"))

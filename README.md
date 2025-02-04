@@ -64,6 +64,8 @@ select = ["A", "B", "C100"]
 ignore = ["A100"]
 ```
 
+The ignore list can also be a table, with reasons for values.
+
 If `--select` or `--ignore` are given on the command line, they will override
 the `pyproject.toml` config. You can use `--extend-select` and `--extend-ignore`
 on the command line to extend the `pyproject.toml` config. These CLI options

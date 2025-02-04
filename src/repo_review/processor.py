@@ -17,6 +17,7 @@ from .checks import (
     collect_checks,
     get_check_url,
     is_allowed,
+    name_matches,
     process_result_bool,
 )
 from .families import Family, collect_families
@@ -63,6 +64,7 @@ class ResultDict(typing.TypedDict):
     result: bool | None  #: The result, None means skip
     err_msg: str  #: The error message if the result is false, in markdown format
     url: str  #: An optional URL (empty string if missing)
+    skip_reason: str  #: The reason for the skip, if given (empty string if not)
 
 
 @dataclasses.dataclass(frozen=True, kw_only=True)
@@ -75,6 +77,7 @@ class Result:
     name: str  #: The name of the check
     description: str  #: The short description of what the check looks for
     result: bool | None  #: The result, None means skip
+    skip_reason: str = ""  #: The reason for the skip, if given
     err_msg: str = ""  #: The error message if the result is false, in markdown format
     url: str = ""  #: An optional URL (empty string if missing)
 
@@ -201,12 +204,12 @@ def process(
 
     # Collect our own config
     config = pyproject(package).get("tool", {}).get("repo-review", {})
+    ignore_pyproject: list[str] | dict[str, str] = config.get("ignore", [])
     select_checks = (
-        select if select else frozenset(config.get("select", ())) | extend_select
-    )
-    skip_checks = (
-        ignore if ignore else frozenset(config.get("ignore", ())) | extend_ignore
-    )
+        select if select else frozenset(config.get("select", ()))
+    ) | extend_select
+    skip_checks = (ignore if ignore else frozenset(ignore_pyproject)) | extend_ignore
+    skip_reasons = ignore_pyproject if isinstance(ignore_pyproject, dict) else {}
 
     # Make a graph of the check's interdependencies
     graph: dict[str, Set[str]] = {
@@ -240,9 +243,14 @@ def process(
         result = None if completed[task_name] is None else not completed[task_name]
         doc = check.__doc__ or ""
         err_msg = completed[task_name] or ""
+        skip_reason = ""
 
         if not is_allowed(select_checks, skip_checks, task_name):
-            continue
+            key = name_matches(task_name, skip_reasons.keys())
+            if not key or not skip_reasons.get(key, ""):
+                continue
+            result = None
+            skip_reason = skip_reasons[key]
 
         result_list.append(
             Result(
@@ -252,6 +260,7 @@ def process(
                 result=result,
                 err_msg=textwrap.dedent(err_msg),
                 url=get_check_url(task_name, check),
+                skip_reason=skip_reason,
             )
         )
 

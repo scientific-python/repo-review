@@ -51,9 +51,25 @@ You can explicitly list checks to select or skip in your `pyproject.toml`:
 
 ```toml
 [tool.repo-review]
-select = ["..."]
-ignore = ["..."]
+select = ["A", "B", "C100"]
+ignore = ["A100"]
 ```
+
+You can list the letter prefix or the exact check name. The ignore list can also
+be a table, with reasons for values. These will be shown explicitly in the report if
+a reason is given.
+
+```toml
+[tool.repo-review.ignore]
+A = "Skipping this whole family"
+B101 = "Skipping this specific check"
+C101 = ""  # Hidden from report, like a normal ignore
+```
+
+If `--select` or `--ignore` are given on the command line, they will override
+the `pyproject.toml` config. You can use `--extend-select` and `--extend-ignore`
+on the command line to extend the `pyproject.toml` config. These CLI options
+are comma separated.
 
 ## Pre-commit
 
