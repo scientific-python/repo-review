@@ -6,10 +6,8 @@ import io
 import typing
 from collections.abc import Mapping, Sequence
 
-import markdown_it
-
 from .families import Family, get_family_description, get_family_name
-from .processor import Result
+from .processor import Result, md_as_html
 
 if typing.TYPE_CHECKING:
     from .__main__ import Status
@@ -37,16 +35,15 @@ def to_html(
     """
     out = io.StringIO()
     print = functools.partial(builtins.print, file=out)
-    md = markdown_it.MarkdownIt()
 
     for family in families:
         family_name = get_family_name(families, family)
         family_description = get_family_description(families, family)
-        family_results = [r for r in processed if r.family == family]
+        family_results = [r.md_as_html() for r in processed if r.family == family]
         if family_results or family_description:
             print(f"<h3>{family_name}</h3>")
         if family_description:
-            print(md.render(family_description).strip())
+            print("<p>", md_as_html(family_description), "</p>")
         if family_results:
             print("<table>")
             print(
@@ -82,7 +79,7 @@ def to_html(
             if result.skip_reason:
                 description += (
                     f'<br/><span style="color:DarkKhaki;"><b>Skipped:</b> '
-                    f"<em>{md.render(result.skip_reason)}</em></span>"
+                    f"<em>{result.skip_reason}</em></span>"
                 )
             print(f'<tr style="color: {color};">')
             print(f'<td><span role="img" aria-label="{result_txt}">{icon}</span></td>')
@@ -93,7 +90,7 @@ def to_html(
                 print("<td>")
                 print(description)
                 print("<br/>")
-                print(md.render(result.err_msg))
+                print(result.err_msg)
                 print("</td>")
             print("</tr>")
         if family_results:
