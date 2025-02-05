@@ -3,11 +3,12 @@ from __future__ import annotations
 import copy
 import dataclasses
 import graphlib
+import sys
 import textwrap
 import typing
 import warnings
 from collections.abc import Mapping, Set
-from typing import Any, TypeVar
+from typing import TYPE_CHECKING, Any, TypeVar
 
 import markdown_it
 
@@ -23,6 +24,12 @@ from .checks import (
 from .families import Family, collect_families
 from .fixtures import apply_fixtures, collect_fixtures, compute_fixtures, pyproject
 from .ghpath import EmptyTraversable
+
+if TYPE_CHECKING:
+    if sys.version_info >= (3, 11):
+        from typing import Self
+    else:
+        from typing_extensions import Self
 
 __all__ = [
     "CollectionReturn",
@@ -84,8 +91,21 @@ class Result:
     def err_as_html(self) -> str:
         """
         Produces HTML from the error message, assuming it is in markdown.
+        Deprecated, use :meth:`md_as_html` directly instead.
         """
         return md_as_html(self.err_msg)
+
+    def md_as_html(self) -> Self:
+        """
+        Process fields that are assumed to be markdown.
+
+        .. versionadded:: 0.12.1
+        """
+        return dataclasses.replace(
+            self,
+            err_msg=md_as_html(self.err_msg),
+            skip_reason=md_as_html(self.skip_reason),
+        )
 
 
 class ProcessReturn(typing.NamedTuple):

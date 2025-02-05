@@ -93,7 +93,7 @@ function Results(props) {
           variant="body2"
           color="text.disabled"
         >
-          {" [skipped]"}
+          {` [skipped] ${result.skip_reason}`}
         </MaterialUI.Typography>
       );
       const msg = (
@@ -200,6 +200,7 @@ class App extends React.Component {
       msg: `<p>${DEFAULT_MSG}</p><h4>Packages:</h4> ${deps_str}`,
       progress: false,
       err_msg: "",
+      skip_reason: "",
       url: "",
     };
     this.pyodide_promise = prepare_pyodide(props.deps);
@@ -231,15 +232,17 @@ class App extends React.Component {
         families_checks = pyodide.runPython(`
           from repo_review.processor import process, md_as_html
           from repo_review.ghpath import GHPath
+          from dataclasses import replace
 
           package = GHPath(repo="${state.repo}", branch="${state.branch}")
-          result = process(package)
+          families, checks = process(package)
 
-          for v in result[0].values():
+          for v in families.values():
               if v.get("description"):
                   v["description"] = md_as_html(v["description"])
+          checks = [replace(v, err_msg=md_as_html(v.err_msg), skip_reason=md_as_html(v.skip_reason)) for v in checks]
 
-          result
+          (families, checks)
           `);
       } catch (e) {
         if (e.message.includes("KeyError: 'tree'")) {
@@ -276,8 +279,9 @@ class App extends React.Component {
           name: val.name.toString(),
           description: val.description.toString(),
           state: val.result,
-          err_msg: val.err_as_html().toString(),
+          err_msg: val.err_msg.toString(),
           url: val.url.toString(),
+          skip_reason: val.skip_reason.toString(),
         });
       }
 
