@@ -240,7 +240,7 @@ class App extends React.Component {
           for v in families.values():
               if v.get("description"):
                   v["description"] = md_as_html(v["description"])
-          checks = [replace(v, err_msg=md_as_html(v.err_msg), skip_reason=md_as_html(v.skip_reason)) for v in checks]
+          checks = [res.md_as_html() for res in checks]
 
           (families, checks)
           `);
