@@ -373,19 +373,48 @@ class App extends React.Component {
   }
 
   render() {
-    const refOptions = [
-      ...this.state.refs.branches.map((branch) => ({
+    const priorityBranches = ["main", "master", "develop", "stable"];
+    const branchMap = new Map(
+      this.state.refs.branches.map((branch) => [branch.name, branch])
+    );
+
+    const prioritizedBranches = [];
+    const otherBranches = [];
+
+    priorityBranches.forEach((branchName) => {
+      if (branchMap.has(branchName)) {
+        prioritizedBranches.push({
+          label: `${branchName} (branch)`,
+          value: branchName,
+          type: "branch",
+        });
+        // Remove from map so it doesn't get added twice.
+        branchMap.delete(branchName);
+      }
+    });
+
+    branchMap.forEach((branch) => {
+      otherBranches.push({
         label: `${branch.name} (branch)`,
         value: branch.name,
         type: "branch",
-      })),
-      ...this.state.refs.tags.map((tag) => ({
-        label: `${tag.name} (tag)`,
-        value: tag.name,
-        type: "tag",
-      })),
-    ];
+      });
+    });
 
+    otherBranches.sort((a, b) => a.value.localeCompare(b.value));
+
+    const tagOptions = this.state.refs.tags.map((tag) => ({
+      label: `${tag.name} (tag)`,
+      value: tag.name,
+      type: "tag",
+    }));
+    tagOptions.sort((a, b) => a.value.localeCompare(b.value));
+    // Combine them all together.
+    const refOptions = [
+      ...prioritizedBranches,
+      ...otherBranches,
+      ...tagOptions,
+    ];
     // some common references for quick access if the API fails.
     // this is only a fallback for backwards behaviour.
     const commonRefs = [
