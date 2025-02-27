@@ -1,5 +1,5 @@
 const DEFAULT_MSG =
-  "Enter a GitHub repo and branch to review. Runs Python entirely in your browser using WebAssembly. Built with React, MaterialUI, and Pyodide.";
+  "Enter a GitHub repo and branch/tag to review. Runs Python entirely in your browser using WebAssembly. Built with React, MaterialUI, and Pyodide.";
 
 const urlParams = new URLSearchParams(window.location.search);
 const baseurl = window.location.pathname;
@@ -249,7 +249,7 @@ class App extends React.Component {
           this.setState({
             msg: DEFAULT_MSG,
             progress: false,
-            err_msg: "Invalid repository or branch. Please try again.",
+            err_msg: "Invalid repository or branch/tag. Please try again.",
           });
           return;
         }
@@ -345,7 +345,7 @@ class App extends React.Component {
               renderInput={(params) => (
                 <MaterialUI.TextField
                   {...params}
-                  label="Branch"
+                  label="Branch/Tag"
                   variant="outlined"
                   helperText="e.g. main"
                   sx={{ flexGrow: 2, minWidth: 130 }}
