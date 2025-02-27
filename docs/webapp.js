@@ -375,7 +375,7 @@ class App extends React.Component {
   render() {
     const priorityBranches = ["main", "master", "develop", "stable"];
     const branchMap = new Map(
-      this.state.refs.branches.map((branch) => [branch.name, branch])
+      this.state.refs.branches.map((branch) => [branch.name, branch]),
     );
 
     const prioritizedBranches = [];
