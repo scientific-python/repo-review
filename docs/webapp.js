@@ -373,58 +373,67 @@ class App extends React.Component {
   }
 
   render() {
-    const priorityBranches = ["main", "master", "develop", "stable"];
+    const priorityBranches = ["HEAD", "main", "master", "develop", "stable"];
     const branchMap = new Map(
       this.state.refs.branches.map((branch) => [branch.name, branch]),
     );
 
-    const prioritizedBranches = [];
-    const otherBranches = [];
+    let availableOptions = [];
 
-    priorityBranches.forEach((branchName) => {
-      if (branchMap.has(branchName)) {
-        prioritizedBranches.push({
-          label: `${branchName} (branch)`,
-          value: branchName,
+    // If no repo is entered or API hasn't returned any branches/tags yet,
+    // show all five priority branches.
+    if (
+      this.state.repo === "" ||
+      (this.state.refs.branches.length === 0 &&
+        this.state.refs.tags.length === 0)
+    ) {
+      availableOptions = [
+        { label: "HEAD (default branch)", value: "HEAD", type: "branch" },
+        { label: "main (branch)", value: "main", type: "branch" },
+        { label: "master (branch)", value: "master", type: "branch" },
+        { label: "develop (branch)", value: "develop", type: "branch" },
+        { label: "stable (branch)", value: "stable", type: "branch" },
+      ];
+    } else {
+      const prioritizedBranches = [
+        { label: "HEAD (default branch)", value: "HEAD", type: "branch" },
+      ];
+
+      priorityBranches.slice(1).forEach((branchName) => {
+        if (branchMap.has(branchName)) {
+          prioritizedBranches.push({
+            label: `${branchName} (branch)`,
+            value: branchName,
+            type: "branch",
+          });
+          // Remove from map so it doesn't get added twice.
+          branchMap.delete(branchName);
+        }
+      });
+
+      const otherBranches = [];
+      branchMap.forEach((branch) => {
+        otherBranches.push({
+          label: `${branch.name} (branch)`,
+          value: branch.name,
           type: "branch",
         });
-        // Remove from map so it doesn't get added twice.
-        branchMap.delete(branchName);
-      }
-    });
-
-    branchMap.forEach((branch) => {
-      otherBranches.push({
-        label: `${branch.name} (branch)`,
-        value: branch.name,
-        type: "branch",
       });
-    });
+      otherBranches.sort((a, b) => a.value.localeCompare(b.value));
 
-    otherBranches.sort((a, b) => a.value.localeCompare(b.value));
+      const tagOptions = this.state.refs.tags.map((tag) => ({
+        label: `${tag.name} (tag)`,
+        value: tag.name,
+        type: "tag",
+      }));
+      tagOptions.sort((a, b) => a.value.localeCompare(b.value));
 
-    const tagOptions = this.state.refs.tags.map((tag) => ({
-      label: `${tag.name} (tag)`,
-      value: tag.name,
-      type: "tag",
-    }));
-    tagOptions.sort((a, b) => a.value.localeCompare(b.value));
-    // Combine them all together.
-    const refOptions = [
-      ...prioritizedBranches,
-      ...otherBranches,
-      ...tagOptions,
-    ];
-    // some common references for quick access if the API fails.
-    // this is only a fallback for backwards behaviour.
-    const commonRefs = [
-      { label: "main (branch)", value: "main", type: "branch" },
-      { label: "master (branch)", value: "master", type: "branch" },
-      { label: "develop (branch)", value: "develop", type: "branch" },
-      { label: "stable (branch)", value: "stable", type: "branch" },
-    ];
-
-    const availableOptions = refOptions.length > 0 ? refOptions : commonRefs;
+      availableOptions = [
+        ...prioritizedBranches,
+        ...otherBranches,
+        ...tagOptions,
+      ];
+    }
 
     return (
       <MyThemeProvider>
@@ -487,7 +496,7 @@ class App extends React.Component {
                   {...params}
                   label="Branch/Tag"
                   variant="outlined"
-                  helperText="e.g. main or v1.0.0"
+                  helperText="e.g. HEAD, main, or v1.0.0"
                   sx={{ flexGrow: 2, minWidth: 200 }}
                   InputProps={{
                     ...params.InputProps,
