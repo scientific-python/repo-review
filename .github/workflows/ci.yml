@@ -58,7 +58,7 @@ jobs:
           allow-prereleases: true
 
       - name: Setup uv
-        uses: yezz123/setup-uv@v4
+        uses: astral-sh/setup-uv@v4
 
       - name: Install hatch
         run: uv pip install --system hatch
@@ -88,7 +88,7 @@ jobs:
           persist-credentials: false
 
       - name: Setup uv
-        uses: yezz123/setup-uv@v4
+        uses: astral-sh/setup-uv@v4
 
       - uses: actions/setup-python@v5
         with:
@@ -120,4 +120,4 @@ jobs:
       - name: Run repo-review action
         uses: ./
         with:
-          plugins: sp-repo-review==2025.01.22
+          plugins: sp-repo-review==2025.05.02
