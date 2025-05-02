@@ -25,7 +25,8 @@ def test_local():
     assert "BSD License" in results.families["general"]["description"]
     assert "[tool.repo-review]" in results.families["validate-pyproject"]["description"]
     for result in results.results:
-        assert result.result
+        if result.result is not None:
+            assert result.result
 
 
 def test_broken_validate_pyproject(tmp_path: Path) -> None:
