@@ -20,7 +20,7 @@ You can also use the `html` output and write your own webapp. You need to provid
 
 ```html
 <script
-  src="https://cdn.jsdelivr.net/pyodide/v0.25.1/full/pyodide.js"
+  src="https://cdn.jsdelivr.net/pyodide/v0.27.6/full/pyodide.js"
   crossorigin
 ></script>
 ```
