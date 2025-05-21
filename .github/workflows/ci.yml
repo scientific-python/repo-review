@@ -48,6 +48,8 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
+      # Last one is activated
+      # yaml circular import issue on 3.14t on ubuntu 
       - uses: actions/setup-python@v5
         with:
           python-version: |
@@ -56,7 +58,6 @@ jobs:
             3.12
             3.13t
             3.14
-            3.14t
             3.13
           allow-prereleases: true
 
