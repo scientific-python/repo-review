@@ -6,6 +6,7 @@ import json
 import os
 import sys
 import typing
+import urllib.error
 from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Any, Literal
@@ -17,6 +18,7 @@ if typing.TYPE_CHECKING:
 else:
     import rich_click as click
 
+import rich
 import rich.console
 import rich.markdown
 import rich.syntax
@@ -265,7 +267,12 @@ def _remote_path_processor(package: Path) -> Path | GHPath:
         msg = "online repo must be of the form 'gh:org/repo@branch[:path]' (:branch missing)"
         raise click.BadParameter(msg)
     org_repo, branch = org_repo_branch.split("@", maxsplit=1)
-    return GHPath(repo=org_repo, branch=branch, path=p[0] if p else "")
+    try:
+        return GHPath(repo=org_repo, branch=branch, path=p[0] if p else "")
+    except urllib.error.HTTPError as e:
+        rich.print(f"[red][bold]Error[/bold] accessing {e.url}", file=sys.stderr)
+        rich.print(f"[red]{e}", file=sys.stderr)
+        raise SystemExit(1) from None
 
 
 @click.command(context_settings={"help_option_names": ["-h", "--help"]})
