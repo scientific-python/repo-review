@@ -149,7 +149,7 @@ skip-install = true
 scripts.serve = "cd docs && echo 'Serving on http://localhost:8080' && python -m http.server 8080"
 
 [[tool.hatch.envs.hatch-test.matrix]]
-python = ["3.14t", "3.13", "3.12", "3.11", "3.10"]
+python = ["3.14t", "3.14", "3.13t", "3.13", "3.12", "3.11", "3.10"]
 
 
 [tool.pytest.ini_options]
