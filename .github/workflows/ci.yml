@@ -49,7 +49,7 @@ jobs:
           persist-credentials: false
 
       # Last one is activated
-      # yaml circular import issue on 3.14t on ubuntu 
+      # yaml circular import issue on 3.14t on ubuntu
       - uses: actions/setup-python@v5
         with:
           python-version: |
