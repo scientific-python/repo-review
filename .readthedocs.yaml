@@ -9,8 +9,8 @@ build:
   os: "ubuntu-24.04"
   commands:
     - asdf plugin add python
-    - asdf install python 3.14
-    - asdf global python 3.14
+    - asdf install python 3.14.0b1
+    - asdf global python 3.14.0b1
     - asdf plugin add uv
     - asdf install uv latest
     - asdf global uv latest
