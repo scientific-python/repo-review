@@ -50,11 +50,11 @@ class GHPath(Traversable):
     def open_url(url: str) -> io.StringIO:
         "This method can be overridden manually for WASM. Supports pyodide currently."
         if sys.platform == "emscripten":
-            import pyodide.http
+            import pyodide.http  # noqa: PLC0415
 
             return pyodide.http.open_url(url)
 
-        import urllib.request  # pylint: disable=import-outside-toplevel
+        import urllib.request  # noqa: PLC0415
 
         with urllib.request.urlopen(url) as response:
             return io.StringIO(response.read().decode("utf-8"))

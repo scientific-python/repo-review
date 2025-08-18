@@ -227,6 +227,7 @@ extend-select = [
   "T20",         # flake8-print
   "UP",          # pyupgrade
   "YTT",         # flake8-2020
+
 ]
 ignore = [
   "ISC001",  # May collide with formatter

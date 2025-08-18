@@ -11,14 +11,14 @@ repos:
         additional_dependencies: [black==24.*]
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: "v0.11.12"
+    rev: "v0.12.7"
     hooks:
-      - id: ruff
+      - id: ruff-check
         args: ["--fix", "--show-fixes"]
       - id: ruff-format
 
   - repo: https://github.com/rbubley/mirrors-prettier
-    rev: "v3.5.3"
+    rev: "v3.6.2"
     hooks:
       - id: prettier
         types_or: [yaml, markdown, html, css, scss, javascript, json]
@@ -45,7 +45,7 @@ repos:
       - id: rst-inline-touching-normal
 
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.16.0
+    rev: v1.17.1
     hooks:
       - id: mypy
         files: (src|web|tests)
@@ -79,12 +79,12 @@ repos:
         exclude: .pre-commit-config.yaml
 
   - repo: https://github.com/henryiii/validate-pyproject-schema-store
-    rev: 2025.05.12
+    rev: 2025.07.28
     hooks:
       - id: validate-pyproject
 
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.33.0
+    rev: 0.33.2
     hooks:
       - id: check-dependabot
       - id: check-github-workflows
