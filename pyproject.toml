@@ -57,9 +57,9 @@ repo-review = "repo_review.schema:get_schema"
 
 [project.optional-dependencies]
 cli = [
-  "click >=8",
+  "click >=8, <8.3",
   "rich >=12.2",
-  "rich-click",
+  "rich-click <1.9",
 ]
 
 [dependency-groups]
