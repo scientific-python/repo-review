@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import functools
 import importlib.metadata
 import itertools
 import json
@@ -100,16 +101,8 @@ def all_versions(ctx: click.Context, _param: click.Parameter, value: bool) -> No
     ctx.exit()
 
 
-def rich_printer(
-    families: Mapping[str, Family],
-    processed: list[Result],
-    *,
-    svg: bool = False,
-    stderr: bool = False,
-    color: bool = True,
-    status: Status,
-    header: str = "",
-) -> None:
+@functools.cache
+def _ensure_unicode_streams() -> None:
     # Before Python 3.15, this isn't always unicode
     if (
         sys.version_info < (3, 15)
@@ -120,6 +113,19 @@ def rich_printer(
             sys.stdout.reconfigure(encoding="utf-8")  # type: ignore[union-attr]
         if sys.stderr.encoding != "utf-8":
             sys.stderr.reconfigure(encoding="utf-8")  # type: ignore[union-attr]
+
+
+def rich_printer(
+    families: Mapping[str, Family],
+    processed: list[Result],
+    *,
+    svg: bool = False,
+    stderr: bool = False,
+    color: bool = True,
+    status: Status,
+    header: str = "",
+) -> None:
+    _ensure_unicode_streams()
 
     console = rich.console.Console(
         record=svg, quiet=svg, stderr=stderr, color_system="auto" if color else None
@@ -275,7 +281,15 @@ def _remote_path_processor(package: Path) -> Path | GHPath:
         raise SystemExit(1) from None
 
 
-@click.command(context_settings={"help_option_names": ["-h", "--help"]})
+class UnicodeHelpCommand(click.Command):
+    def get_help(self, ctx: click.Context) -> str:
+        _ensure_unicode_streams()
+        return super().get_help(ctx)
+
+
+@click.command(
+    cls=UnicodeHelpCommand, context_settings={"help_option_names": ["-h", "--help"]}
+)
 @click.version_option(version=__version__)
 @click.argument(
     "packages",
