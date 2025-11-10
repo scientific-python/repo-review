@@ -32,7 +32,7 @@ runs:
     - name: Install repo-review and plugins
       shell: bash
       run: |
-        pipx install --python '${{ steps.python.outputs.python-path }}' '${{ github.action_path }}[cli]'
+        pipx install --python '${{ steps.python.outputs.python-path }}' '${{ github.action_path }}[cli]' sp-repo-review>=2025.11.10
         pipx inject repo-review ${{ inputs.plugins }}
 
     - name: Run repo-review
