@@ -156,7 +156,7 @@ python = ["3.14", "3.13", "3.12", "3.11", "3.10"]
 minversion = "7.0"
 addopts = ["-ra", "--strict-markers", "--strict-config", "--import-mode=importlib"]
 xfail_strict = true
-log_cli_level = "INFO"
+log_level = "INFO"
 filterwarnings = [
   "error",
   "ignore:OptionHighlighter:DeprecationWarning",  # rich-click triggers its own warning
