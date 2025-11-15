@@ -50,7 +50,7 @@ class GHPath(Traversable):
 
     @staticmethod
     def open_url(url: str) -> io.StringIO:
-        "This method can be overridden manually for WASM. Supports pyodide currently."
+        """This method can be overridden manually for WASM. Supports pyodide currently."""
         if sys.platform == "emscripten":
             import pyodide.http  # noqa: PLC0415
 

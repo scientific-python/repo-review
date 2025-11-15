@@ -42,7 +42,6 @@ def collect_families(fixtures: Mapping[str, Any]) -> dict[str, Family]:
 
     :param fixtures: Fully evaluated dict of fixtures.
     """
-
     family_functions = (
         ep.load()
         for ep in importlib.metadata.entry_points(group="repo_review.families")
