@@ -57,7 +57,7 @@ Formats = Literal["rich", "json", "html", "svg"]
 Show = Literal["all", "err", "errskip"]
 
 
-def list_all(ctx: click.Context, _param: click.Parameter, *, value: bool) -> None:
+def list_all(ctx: click.Context, _param: click.Parameter, value: bool) -> None:
     if not value or ctx.resilient_parsing:
         return
 
@@ -80,7 +80,7 @@ def list_all(ctx: click.Context, _param: click.Parameter, *, value: bool) -> Non
     ctx.exit()
 
 
-def all_versions(ctx: click.Context, _param: click.Parameter, *, value: bool) -> None:
+def all_versions(ctx: click.Context, _param: click.Parameter, value: bool) -> None:
     if not value or ctx.resilient_parsing:
         return
 

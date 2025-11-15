@@ -238,7 +238,7 @@ flake8-builtins.ignorelist = ["copyright", "print"]
 
 [tool.ruff.lint.per-file-ignores]
 "src/repo_review/_compat/**.py" = ["TID251"]
-"src/**/__main__.py" = ["T20"]
+"src/**/__main__.py" = ["T20", "FBT001"]
 "tests/**.py" = ["D", "INP001", "FBT001", "ANN"]
 "docs/**.py" = ["INP001"]
 
