@@ -139,7 +139,7 @@ def get_check_description(name: str, check: Check) -> str:
 
 
 def process_result_bool(
-    result: str | bool | None,
+    result: str | bool | None,  # noqa: FBT001
     check: Check,
     name: str,
 ) -> str | None:
