@@ -5,9 +5,6 @@ from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from repo_review._compat.importlib.resources.abc import Traversable
 
-# PP: PyProject.toml
-## PP0xx: Build system
-
 
 class General:
     family = "general"

@@ -54,7 +54,6 @@ def list_all(root: Traversable) -> bool:
 
     .. versionadded:: 0.8
     """
-
     return isinstance(root, EmptyTraversable)
 
 

@@ -44,7 +44,6 @@ def compute_check(name: str, /, **fixtures: Any) -> Result:
 
     .. versionadded:: 0.10.5
     """
-
     check_functions = (
         ep.load() for ep in importlib.metadata.entry_points(group="repo_review.checks")
     )

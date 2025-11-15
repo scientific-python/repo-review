@@ -139,7 +139,9 @@ def get_check_description(name: str, check: Check) -> str:
 
 
 def process_result_bool(
-    result: str | bool | None, check: Check, name: str
+    result: str | bool | None,  # noqa: FBT001
+    check: Check,
+    name: str,
 ) -> str | None:
     """
     This converts a bool into a string given a check and name. If the result is a string

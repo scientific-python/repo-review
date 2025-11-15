@@ -206,14 +206,14 @@ def rich_printer(
             console.print("[bold green]All checks passed [yellow](with some skips)")
 
     if svg:
-        str = console.export_svg(theme=rich.terminal_theme.DEFAULT_TERMINAL_THEME)
+        string = console.export_svg(theme=rich.terminal_theme.DEFAULT_TERMINAL_THEME)
         if color:
             rich.print(
-                rich.syntax.Syntax(str, lexer="xml"),
+                rich.syntax.Syntax(string, lexer="xml"),
                 file=sys.stderr if stderr else sys.stdout,
             )
         else:
-            print(str, file=sys.stderr if stderr else sys.stdout)
+            print(string, file=sys.stderr if stderr else sys.stdout)
 
 
 def display_output(
