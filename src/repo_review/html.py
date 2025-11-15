@@ -4,12 +4,13 @@ import builtins
 import functools
 import io
 import typing
-from collections.abc import Mapping, Sequence
 
 from .families import Family, get_family_description, get_family_name
 from .processor import Result, md_as_html
 
 if typing.TYPE_CHECKING:
+    from collections.abc import Mapping, Sequence
+
     from .__main__ import Status
 
 __all__ = ["to_html"]

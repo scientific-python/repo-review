@@ -8,14 +8,17 @@ import os
 import sys
 import typing
 import urllib.error
-from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Any, Literal
 
 import click as orig_click
 
 if typing.TYPE_CHECKING:
+    from collections.abc import Mapping, Sequence
+
     import click  # pylint: disable=reimported
+
+    from ._compat.importlib.resources.abc import Traversable
 else:
     import rich_click as click
 
@@ -29,7 +32,6 @@ import rich.traceback
 import rich.tree
 
 from . import __version__
-from ._compat.importlib.resources.abc import Traversable
 from ._compat.typing import assert_never
 from .checks import get_check_description, get_check_url
 from .families import Family, get_family_description, get_family_name

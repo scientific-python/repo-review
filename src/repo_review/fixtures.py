@@ -4,12 +4,16 @@ import graphlib
 import importlib.metadata
 import inspect
 import typing
-from collections.abc import Callable, Mapping, Set
 from typing import Any
 
 from ._compat import tomllib
-from ._compat.importlib.resources.abc import Traversable
 from .ghpath import EmptyTraversable
+
+if typing.TYPE_CHECKING:
+    from collections.abc import Callable, Mapping
+    from collections.abc import Set as AbstractSet
+
+    from ._compat.importlib.resources.abc import Traversable
 
 __all__ = [
     "apply_fixtures",
@@ -71,7 +75,7 @@ def compute_fixtures(
     :return: The fully evaluated dict of fixtures.
     """
     fixtures: dict[str, Any] = {"root": root, "package": package}
-    graph: dict[str, Set[str]] = {"root": set(), "package": set()}
+    graph: dict[str, AbstractSet[str]] = {"root": set(), "package": set()}
     graph |= {
         name: inspect.signature(fix).parameters.keys()
         for name, fix in unevaluated_fixtures.items()

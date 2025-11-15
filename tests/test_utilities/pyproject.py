@@ -1,8 +1,9 @@
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from repo_review._compat.importlib.resources.abc import Traversable
+if TYPE_CHECKING:
+    from repo_review._compat.importlib.resources.abc import Traversable
 
 # PP: PyProject.toml
 ## PP0xx: Build system
