@@ -3,16 +3,15 @@ from __future__ import annotations
 import copy
 import dataclasses
 import graphlib
-import sys
 import textwrap
 import typing
 import warnings
-from collections.abc import Mapping, Set
+from collections.abc import Mapping
+from collections.abc import Set as AbstractSet
 from typing import TYPE_CHECKING, Any, TypeVar
 
 import markdown_it
 
-from ._compat.importlib.resources.abc import Traversable
 from .checks import (
     Check,
     collect_checks,
@@ -26,6 +25,10 @@ from .fixtures import apply_fixtures, collect_fixtures, compute_fixtures, pyproj
 from .ghpath import EmptyTraversable
 
 if TYPE_CHECKING:
+    import sys
+
+    from ._compat.importlib.resources.abc import Traversable
+
     if sys.version_info >= (3, 11):
         from typing import Self
     else:
@@ -200,10 +203,10 @@ def collect_all(
 def process(
     root: Traversable,
     *,
-    select: Set[str] = frozenset(),
-    ignore: Set[str] = frozenset(),
-    extend_select: Set[str] = frozenset(),
-    extend_ignore: Set[str] = frozenset(),
+    select: AbstractSet[str] = frozenset(),
+    ignore: AbstractSet[str] = frozenset(),
+    extend_select: AbstractSet[str] = frozenset(),
+    extend_ignore: AbstractSet[str] = frozenset(),
     subdir: str = "",
 ) -> ProcessReturn:
     """
@@ -232,11 +235,11 @@ def process(
     skip_reasons = ignore_pyproject if isinstance(ignore_pyproject, dict) else {}
 
     # Make a graph of the check's interdependencies
-    graph: dict[str, Set[str]] = {
+    graph: dict[str, AbstractSet[str]] = {
         n: getattr(t, "requires", frozenset()) for n, t in tasks.items()
     }
     for name, s in graph.items():
-        if not isinstance(s, Set):
+        if not isinstance(s, AbstractSet):
             msg = f"requires must be a set, got {s!r} for {name!r}"  # type: ignore[unreachable]
             raise TypeError(msg)
 
@@ -296,7 +299,7 @@ def as_simple_dict(results: list[Result]) -> dict[str, ResultDict]:
     """
     return {
         result.name: typing.cast(
-            ResultDict,
+            "ResultDict",
             {k: v for k, v in dataclasses.asdict(result).items() if k != "name"},
         )
         for result in results

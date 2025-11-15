@@ -9,10 +9,12 @@ import io
 import json
 import sys
 import typing
-from collections.abc import Iterator
 from typing import Literal
 
 from ._compat.importlib.resources.abc import Traversable
+
+if typing.TYPE_CHECKING:
+    from collections.abc import Iterator
 
 __all__ = ["EmptyTraversable", "GHPath"]
 

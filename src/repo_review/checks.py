@@ -1,10 +1,13 @@
 from __future__ import annotations
 
 import importlib.metadata
-from collections.abc import Mapping, Set
-from typing import Any, Protocol
+from typing import TYPE_CHECKING, Any, Protocol
 
 from .fixtures import apply_fixtures
+
+if TYPE_CHECKING:
+    from collections.abc import Mapping
+    from collections.abc import Set as AbstractSet
 
 __all__ = ["Check", "collect_checks", "get_check_url", "is_allowed", "name_matches"]
 
@@ -28,7 +31,7 @@ class Check(Protocol):
         """
 
     @property
-    def requires(self) -> Set[str]:  # Optional
+    def requires(self) -> AbstractSet[str]:  # Optional
         """
         Requires is an (optional) set of checks that must pass for this check
         to run. Omitting this is like returning `set()`.
@@ -70,7 +73,7 @@ def collect_checks(fixtures: Mapping[str, Any]) -> dict[str, Check]:
     }
 
 
-def name_matches(name: str, selectors: Set[str]) -> str:
+def name_matches(name: str, selectors: AbstractSet[str]) -> str:
     """
     Checks if the name is contained in the matchers. The selectors can be the
     exact name or just the non-number prefix. Returns the selector that matched,
@@ -89,7 +92,7 @@ def name_matches(name: str, selectors: Set[str]) -> str:
     return ""
 
 
-def is_allowed(select: Set[str], ignore: Set[str], name: str) -> bool:
+def is_allowed(select: AbstractSet[str], ignore: AbstractSet[str], name: str) -> bool:
     """
     Skips the check if the name is in the ignore list or if the name without the
     number is in the ignore list. If the select list is not empty, only runs the
