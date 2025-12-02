@@ -81,6 +81,7 @@ docs = [
   "furo",
   "myst_parser >=0.13",
   "repo-review[cli]",
+  "rich-click",
   "sphinx >=4.0",
   "sphinx-autodoc-typehints",
   "sphinx-copybutton",
@@ -98,18 +99,13 @@ installer = "uv"
 
 [tool.hatch.envs.hatch-test]
 features = ["cli"]
-# duplicated since hatch doesn't support groups yet
-dependencies = [
-  "pytest >=7",
-  "sp-repo-review >=2025.11.10",
-  "validate-pyproject >=0.14",
-]
+dependency-groups = ["test"]
 env-vars.PYTHONWARNDEFAULTENCODING = "1"
 
 [tool.hatch.envs.lint]
-dependencies = ["pre-commit"]
+dependencies = ["prek"]
 skip-install = true
-scripts.lint = "pre-commit run --all-files --show-diff-on-failure {args}"
+scripts.lint = "prek run --all-files --show-diff-on-failure {args}"
 
 [tool.hatch.envs.pylint]
 features = ["cli"]
@@ -117,19 +113,7 @@ dependencies = ["pylint>=3.2"]
 scripts.lint = "pylint repo_review {args}"
 
 [tool.hatch.envs.docs]
-# duplicated since hatch doesn't support groups yet
-dependencies = [
-  "furo",
-  "myst_parser >=0.13",
-  "repo-review[cli]",
-  "sphinx >=4.0",
-  "sphinx-autodoc-typehints",
-  "sphinx-copybutton",
-  "sphinxcontrib-programoutput",
-  "sphinxext-opengraph",
-  "sphinx-github-changelog",
-  "sphinx-autobuild",
-]
+dependency-groups = ["docs"]
 scripts.linkcheck = "sphinx-build -b=linkcheck docs docs/_build/linkcheck {args}"
 scripts.html = "sphinx-build --keep-going -n -T -b=html docs docs/_build/html {args}"
 scripts.serve = "sphinx-autobuild -n -T -b=html docs docs/_build/html {args}"
