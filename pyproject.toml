@@ -81,7 +81,6 @@ docs = [
   "furo",
   "myst_parser >=0.13",
   "repo-review[cli]",
-  "rich-click",
   "sphinx >=4.0",
   "sphinx-autodoc-typehints",
   "sphinx-copybutton",
