@@ -59,7 +59,7 @@ uv run repo-review --help
 uv run repo-review .                # Check current directory
 uv run repo-review --list-all       # List all available checks
 ```
-   
+
 **WebApp**:
 
 ```bash
@@ -156,7 +156,6 @@ Hooks run via `hatch run lint:lint` or `pre-commit run --all-files`:
 ## Important Build Notes & Gotchas
 
 ### Known Issues & Workarounds
-
 
 1. **Documentation Warnings**:
    - Building docs shows ~55 warnings about missing reference targets
