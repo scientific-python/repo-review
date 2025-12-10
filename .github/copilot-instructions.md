@@ -16,11 +16,13 @@
 **Primary Tool**: Use `hatch` for all development tasks. Hatch manages virtual environments automatically.
 
 **Installation**:
+
 ```bash
 pip install hatch  # or pipx install hatch, or brew install hatch
 ```
 
 **Alternative**: `uv` is also supported:
+
 ```bash
 pip install uv
 uv sync  # Sets up .venv with all dependencies
@@ -29,6 +31,7 @@ uv sync  # Sets up .venv with all dependencies
 ### Key Commands (Verified Working)
 
 **Testing** (takes ~5-10 seconds):
+
 ```bash
 hatch test                    # Run tests on current Python
 hatch test -a                 # Run tests on all Python versions (3.10-3.14)
@@ -36,6 +39,7 @@ hatch test -py 3.12          # Run tests on specific Python version
 ```
 
 **Linting/Formatting** (takes ~60-90 seconds first time due to hook installation):
+
 ```bash
 hatch run lint:lint          # Run all pre-commit hooks (comprehensive)
 hatch fmt                    # Quick format and basic lint (ruff only)
@@ -44,11 +48,13 @@ hatch run pylint:lint        # Run pylint only (~7 seconds)
 ```
 
 **Building** (takes ~10-15 seconds):
+
 ```bash
 hatch build                  # Build sdist and wheel to dist/
 ```
 
 **Documentation** (takes ~30-45 seconds):
+
 ```bash
 hatch run docs:html          # Build HTML docs to docs/_build/html
 hatch run docs:serve         # Build and serve docs locally with auto-reload
@@ -58,6 +64,7 @@ hatch run api-docs:build     # Rebuild API documentation
 ```
 
 **Running the Tool**:
+
 ```bash
 # After installing with: pip install -e .[cli]
 repo-review --help
@@ -66,11 +73,13 @@ repo-review --list-all       # List all available checks
 ```
 
 **Example Environment** (for testing with plugins):
+
 ```bash
 hatch run example:repo-review <args>  # Pre-configured with test utilities
 ```
 
 **WebApp**:
+
 ```bash
 hatch run webapp:serve       # Serve webapp on http://localhost:8080
 ```
@@ -116,6 +125,7 @@ docs/                     # Sphinx documentation
 ### Key Source Files
 
 **Entry Points**:
+
 - `src/repo_review/__main__.py`: CLI with rich output, handles formats (rich/json/html/svg)
 - `src/repo_review/processor.py`: Core logic for collecting and running checks
 - `src/repo_review/checks.py`: Check discovery via entry points
@@ -123,6 +133,7 @@ docs/                     # Sphinx documentation
 
 **Plugin System**:
 Entry points in `pyproject.toml`:
+
 - `repo_review.fixtures`: Add new fixtures
 - `repo_review.checks`: Plugin entry point returning check dicts
 - `repo_review.families`: Customize check grouping/display
@@ -132,21 +143,24 @@ Entry points in `pyproject.toml`:
 ### GitHub Actions (.github/workflows/)
 
 **ci.yml** (main CI pipeline):
+
 1. **pre-commit job**: Runs `pre-commit` hooks + pylint on ubuntu-latest, Python 3.x
 2. **checks job**: Runs `hatch test -a` on ubuntu/macos/windows with Python 3.10-3.14
 3. **dist job**: Builds distribution with `hynek/build-and-inspect-python-package@v2`
-4. **docs job**: 
+4. **docs job**:
    - Runs `hatch run docs:linkcheck` to check for broken links
    - Runs `hatch run docs:html -W` (warnings as errors)
    - Verifies API docs are up-to-date: `hatch run api-docs:build && git diff --exit-code`
 5. **action job**: Tests the GitHub Action itself with a plugin
 
 **cd.yml** (release pipeline):
+
 - Builds distribution and publishes to PyPI on releases
 
 ### Pre-commit Hooks
 
 Hooks run via `hatch run lint:lint` or `pre-commit run --all-files`:
+
 - **blacken-docs**: Format Python code in docs
 - **ruff-check**, **ruff-format**: Linting and formatting
 - **prettier**: Format YAML, markdown, HTML, CSS, JSON
@@ -160,7 +174,7 @@ Hooks run via `hatch run lint:lint` or `pre-commit run --all-files`:
 
 ### Known Issues & Workarounds
 
-1. **Relative Import Warnings**: 
+1. **Relative Import Warnings**:
    - Running `hatch fmt --check` shows TID252 warnings about relative imports
    - These are existing and expected (48+ instances)
    - Not errors, just linter suggestions - don't try to fix unless task-related
@@ -202,6 +216,7 @@ Hooks run via `hatch run lint:lint` or `pre-commit run --all-files`:
 ## Validation Checklist
 
 Before completing a PR:
+
 - [ ] `hatch test` passes (all 41 tests)
 - [ ] `hatch run lint:lint` passes (or only shows pre-existing warnings)
 - [ ] `hatch run pylint:lint` passes (10.00/10 rating)
@@ -237,6 +252,7 @@ Before completing a PR:
 ### Plugin Development
 
 Plugins extend repo-review via entry points:
+
 - Checks are classes with `requires` set, `check()` classmethod, docstring as message
 - Fixtures use dependency injection (pytest-style)
 - Entry points: `repo_review.checks`, `repo_review.fixtures`, `repo_review.families`
@@ -252,6 +268,7 @@ Plugins extend repo-review via entry points:
 ## Trust These Instructions
 
 These instructions have been validated by running all commands successfully. Only search for additional information if:
+
 - You encounter an error not documented here
 - You need to understand implementation details not covered
 - The task requires knowledge beyond build/test/lint workflows
