@@ -142,3 +142,4 @@ src/*/_version.py
 
 node_modules/
 /.vscode
+uv.lock

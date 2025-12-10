@@ -209,11 +209,11 @@ The code is written in modern Python (3.10+) with an emphasis on clean, readable
 - **Build**: hatchling, hatch-vcs (for version from git)
 - **Runtime**: markdown-it-py, pyyaml, tomli (Python <3.11)
 - **CLI optional**: click>=8, rich>=12.2, rich-click
-- **Dev**: pytest>=7, sp-repo-review (for self-checking), validate-pyproject
+- **Dev**: pytest>=9, sp-repo-review (for self-checking), validate-pyproject
 
 ### Testing Notes
 
-- **pytest configuration**: See `[tool.pytest.ini_options]` in pyproject.toml
+- **pytest configuration**: See `[tool.pytest]` in pyproject.toml
 - **Test fixtures**: See tests/conftest.py for entry point mocking
 - **Integration tests**: Use tests/test_utilities/ as example plugin
 - **Coverage**: Use `hatch run cov:test` for coverage reports
