@@ -13,19 +13,12 @@
 
 ### Environment Setup
 
-**Primary Tool**: Use `hatch` for all development tasks. Hatch manages virtual environments automatically.
+**Primary Tools**: Use `uv` to manage virtual environments and dependencies, and `prek` for pre-commit hooks.
 
 **Installation**:
 
 ```bash
-pip install hatch  # or pipx install hatch, or brew install hatch
-```
-
-**Alternative**: `uv` is also supported:
-
-```bash
-pip install uv
-uv sync  # Sets up .venv with all dependencies
+pip install uv prek  # or pipx install uv prek, or brew install uv prek
 ```
 
 ### Key Commands (Verified Working)
@@ -33,55 +26,44 @@ uv sync  # Sets up .venv with all dependencies
 **Testing** (takes ~5-10 seconds):
 
 ```bash
-hatch test                    # Run tests on current Python
-hatch test -a                 # Run tests on all Python versions (3.10-3.14)
-hatch test -py 3.12           # Run tests on specific Python version
+uv run pytest                # Run tests on current Python
 ```
 
 **Linting/Formatting** (takes ~60-90 seconds first time due to hook installation):
 
 ```bash
-hatch run lint:lint          # Run all pre-commit hooks (comprehensive)
-hatch fmt                    # Quick format and basic lint (ruff only)
-hatch fmt --check            # Check formatting without modifying
-hatch run pylint:lint        # Run pylint only (~7 seconds)
+prek -a                      # Run all pre-commit hooks (comprehensive)
+uvx hatch run pylint:lint    # Run pylint only (~7 seconds)
 ```
 
 **Building** (takes ~10-15 seconds):
 
 ```bash
-hatch build                  # Build sdist and wheel to dist/
+uv build                     # Build sdist and wheel to dist/
 ```
 
 **Documentation** (takes ~30-45 seconds):
 
 ```bash
-hatch run docs:html          # Build HTML docs to docs/_build/html
-hatch run docs:serve         # Build and serve docs locally with auto-reload
-hatch run docs:linkcheck     # Check for broken links in docs
-hatch run docs:man           # Build manpage
-hatch run api-docs:build     # Rebuild API documentation
+uvx hatch run docs:html          # Build HTML docs to docs/_build/html
+uvx hatch run docs:serve         # Build and serve docs locally with auto-reload
+uvx hatch run docs:linkcheck     # Check for broken links in docs
+uvx hatch run docs:man           # Build manpage
+uvx hatch run api-docs:build     # Rebuild API documentation
 ```
 
 **Running the Tool**:
 
 ```bash
-# After installing with: pip install -e .[cli]
-repo-review --help
-repo-review .                # Check current directory
-repo-review --list-all       # List all available checks
+uv run repo-review --help
+uv run repo-review .                # Check current directory
+uv run repo-review --list-all       # List all available checks
 ```
-
-**Example Environment** (for testing with plugins):
-
-```bash
-hatch run example:repo-review <args>  # Pre-configured with test utilities
-```
-
+   
 **WebApp**:
 
 ```bash
-hatch run webapp:serve       # Serve webapp on http://localhost:8080
+uvx hatch run webapp:serve       # Serve webapp on http://localhost:8080
 ```
 
 ## Project Structure
@@ -118,7 +100,7 @@ docs/                     # Sphinx documentation
 ### Configuration Files
 
 - **pyproject.toml**: Main project config (build, dependencies, tools, hatch envs)
-- **.pre-commit-config.yaml**: Pre-commit hooks (ruff, mypy, prettier, etc.)
+- **.pre-commit-config.yaml**: Pre-commit / prek hooks (ruff, mypy, prettier, etc.)
 - **.readthedocs.yaml**: ReadTheDocs build configuration
 - **action.yml**: GitHub Action composite action definition
 
@@ -175,56 +157,47 @@ Hooks run via `hatch run lint:lint` or `pre-commit run --all-files`:
 
 ### Known Issues & Workarounds
 
-1. **Relative Import Warnings**:
-   - Running `hatch fmt --check` shows TID252 warnings about relative imports
-   - These are existing and expected (48+ instances)
-   - Not errors, just linter suggestions - don't try to fix unless task-related
 
-2. **Shallow Clone Warning**:
-   - `hatch build` may warn about shallow clones affecting version detection
-   - This is informational - build still succeeds
-   - Version uses setuptools_scm with git history
-
-3. **Documentation Warnings**:
+1. **Documentation Warnings**:
    - Building docs shows ~55 warnings about missing reference targets
    - These are existing and expected (mostly importlib.resources type references)
    - Build succeeds despite warnings
 
-4. **Python Version Requirements**:
+2. **Python Version Requirements**:
    - Minimum: Python 3.10
    - Tested: Python 3.10, 3.11, 3.12, 3.13, 3.14
    - Uses modern Python features (match statements, typing, etc.)
 
 ### Command Order Best Practices
 
-1. **Before making changes**: Always run `hatch test` and `hatch run lint:lint` to understand baseline
-2. **After code changes**: Run `hatch test` first (fast), then `hatch run lint:lint` (slower)
-3. **Before committing**: Run `hatch run lint:lint` to ensure pre-commit hooks pass
-4. **Documentation changes**: Run `hatch run docs:html -W` and `hatch run api-docs:build`
-5. **If API changes**: Always regenerate API docs with `hatch run api-docs:build`
+1. **Before making changes**: Always run `uv run pytest` and `prek -a` to understand baseline
+2. **After code changes**: Run `prek -a` first (fast), then `uv run pytest` (slower)
+3. **Before committing**: Run `prek -a` to ensure pre-commit hooks pass
+4. **Documentation changes**: Run `uvx hatch run docs:html -W` and `uvx hatch run api-docs:build`
+5. **If API changes**: Always regenerate API docs with `uvx hatch run api-docs:build`
 
 ### Development Workflow
 
-1. **Install hatch**: `pip install hatch` (or use pipx/brew)
-2. **Run tests**: `hatch test` - ensures environment is working
+1. **Install hatch**: `pip install uv prek` (or use pipx/brew)
+2. **Run tests**: `uv run pytest` - ensures environment is working
 3. **Make changes**: Edit files in src/repo_review/ or tests/
-4. **Test changes**: `hatch test` (quick validation)
-5. **Lint**: `hatch run lint:lint` (comprehensive checks)
-6. **Fix lint issues**: `hatch fmt` (auto-fix formatting)
-7. **Build docs** (if needed): `hatch run docs:html`
-8. **Build package** (if needed): `hatch build`
+4. **Test changes**: `uv run pytest` (quick validation)
+5. **Lint**: `prek -a` (comprehensive checks)
+6. **Fix lint issues**: `prek -a` (auto-fix formatting)
+7. **Build docs** (if needed): `uvx hatch run docs:html`
+8. **Build package** (if needed): `uv build`
 
 ## Validation Checklist
 
 Before completing a PR:
 
-- [ ] `hatch test` passes (all 41 tests)
-- [ ] `hatch run lint:lint` passes (or only shows pre-existing warnings)
-- [ ] `hatch run pylint:lint` passes (10.00/10 rating)
-- [ ] If docs changed: `hatch run docs:html -W` succeeds
-- [ ] If code changed: `hatch run docs:linkcheck` succeeds
-- [ ] If API changed: Run `hatch run api-docs:build` and commit changes
-- [ ] Build succeeds: `hatch build`
+- [ ] `uv run pytest` passes (all 41 tests)
+- [ ] `prek -a` passes (or only shows pre-existing warnings)
+- [ ] `prek -a` passes (10.00/10 rating)
+- [ ] If docs changed: `uvx hatch run docs:html -W` succeeds
+- [ ] If code changed: `uvx hatch run docs:linkcheck` succeeds
+- [ ] If API changed: Run `uvx hatch run api-docs:build` and commit changes
+- [ ] Build succeeds: `uv build`
 
 ## Coding guidelines
 
