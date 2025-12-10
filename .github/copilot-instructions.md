@@ -35,7 +35,7 @@ uv sync  # Sets up .venv with all dependencies
 ```bash
 hatch test                    # Run tests on current Python
 hatch test -a                 # Run tests on all Python versions (3.10-3.14)
-hatch test -py 3.12          # Run tests on specific Python version
+hatch test -py 3.12           # Run tests on specific Python version
 ```
 
 **Linting/Formatting** (takes ~60-90 seconds first time due to hook installation):
@@ -89,7 +89,7 @@ hatch run webapp:serve       # Serve webapp on http://localhost:8080
 ### Source Code Layout
 
 ```
-src/repo_review/           # Main package (1,635 lines total)
+src/repo_review/          # Main package (1,635 lines total)
 ├── __init__.py           # Package initialization
 ├── __main__.py           # CLI entry point (rich-click based)
 ├── checks.py             # Check collection and processing
@@ -97,22 +97,22 @@ src/repo_review/           # Main package (1,635 lines total)
 ├── fixtures.py           # Fixture system (pytest-like)
 ├── processor.py          # Main processing logic
 ├── ghpath.py             # GitHub/remote path handling (Traversable)
-├── html.py              # HTML output generation
-├── schema.py            # JSON schema for validate-pyproject
-├── testing.py           # Testing utilities for plugins
-├── _compat/             # Compatibility shims for Python versions
-└── resources/           # Bundled resource files
+├── html.py               # HTML output generation
+├── schema.py             # JSON schema for validate-pyproject
+├── testing.py            # Testing utilities for plugins
+├── _compat/              # Compatibility shims for Python versions
+└── resources/            # Bundled resource files
 
 tests/                    # Test suite (pytest)
-├── conftest.py          # Pytest configuration/fixtures
-├── test_*.py            # Test files (41 tests total)
-└── test_utilities/      # Example plugin for testing
-    └── pyproject.py     # Test plugin implementation
+├── conftest.py           # Pytest configuration/fixtures
+├── test_*.py             # Test files (41 tests total)
+└── test_utilities/       # Example plugin for testing
+    └── pyproject.py      # Test plugin implementation
 
 docs/                     # Sphinx documentation
-├── index.md, intro.md   # User-facing docs
+├── index.md, intro.md    # User-facing docs
 ├── plugins.md, checks.md # Plugin development docs
-└── api/                 # Auto-generated API docs
+└── api/                  # Auto-generated API docs
 ```
 
 ### Configuration Files
@@ -132,6 +132,7 @@ docs/                     # Sphinx documentation
 - `src/repo_review/fixtures.py`: Fixture system (root, package, pyproject)
 
 **Plugin System**:
+
 Entry points in `pyproject.toml`:
 
 - `repo_review.fixtures`: Add new fixtures
@@ -224,6 +225,10 @@ Before completing a PR:
 - [ ] If code changed: `hatch run docs:linkcheck` succeeds
 - [ ] If API changed: Run `hatch run api-docs:build` and commit changes
 - [ ] Build succeeds: `hatch build`
+
+## Coding guidelines
+
+The code is written in modern Python (3.10+) with an emphasis on clean, readable code using high level constructs.
 
 ## Additional Context
 
