@@ -114,30 +114,30 @@ class PP301(PyProject):
     def check(pyproject: dict[str, Any]) -> bool:
         """
         Must have a pytest configuration section in pyproject.toml. If you must
-        have it somewhere else (such as to support `pytest<6`), ignore this
+        have it somewhere else (such as to support `pytest<9`), ignore this
         check.
         """
 
         match pyproject:
-            case {"tool": {"pytest": {"ini_options": {}}}}:
+            case {"tool": {"pytest": {}}}:
                 return True
             case _:
                 return False
 
 
 class PP302(PyProject):
-    "Sets a minimum pytest to at least 6"
+    "Sets a minimum pytest to at least 9"
 
     requires = frozenset(("PP301",))
 
     @staticmethod
     def check(pyproject: dict[str, Any]) -> bool:
         """
-        Must have a `minversion=`, and must be at least 6 (first version to
-        support `pyproject.toml` configuration).
+        Must have a `minversion=`, and must be at least 9 (first version to
+        support native `pyproject.toml` configuration).
         """
-        options = pyproject["tool"]["pytest"]["ini_options"]
-        return "minversion" in options and float(options["minversion"]) >= 6
+        options = pyproject["tool"]["pytest"]
+        return "minversion" in options and float(options["minversion"]) >= 9
 
 
 class PP999(PyProject):

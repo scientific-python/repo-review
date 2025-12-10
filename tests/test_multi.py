@@ -23,8 +23,8 @@ def multiple_packages(tmp_path: Path) -> tuple[str, str]:
             requires = ["somepackage"]
             build-backend="somebackend"
 
-            [tool.pytest.ini_options]
-            minversion = "6.0"
+            [tool.pytest]
+            minversion = "9.0"
             """
         )
 

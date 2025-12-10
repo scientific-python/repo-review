@@ -64,7 +64,7 @@ cli = [
 
 [dependency-groups]
 test = [
-  "pytest >=7",
+  "pytest >=9",
   "sp-repo-review >=2025.11.04",
   "validate-pyproject >=0.14",
 ]
@@ -135,10 +135,11 @@ scripts.serve = "cd docs && echo 'Serving on http://localhost:8080' && python -m
 python = ["3.14", "3.13", "3.12", "3.11", "3.10"]
 
 
-[tool.pytest.ini_options]
-minversion = "7.0"
-addopts = ["-ra", "--strict-markers", "--strict-config", "--import-mode=importlib"]
-xfail_strict = true
+
+[tool.pytest]
+minversion = "9.0"
+addopts = ["-ra", "--import-mode=importlib"]
+strict = true
 log_level = "INFO"
 filterwarnings = [
   "error",
