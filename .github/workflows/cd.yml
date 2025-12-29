@@ -11,7 +11,7 @@ permissions: {}
 jobs:
   dist:
     name: Distribution build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
 
     steps:
       - uses: actions/checkout@v6
@@ -27,7 +27,7 @@ jobs:
     environment: pypi
     permissions:
       id-token: write
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     if: github.event_name == 'release' && github.event.action == 'published'
     steps:
       - uses: actions/download-artifact@v6

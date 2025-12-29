@@ -22,14 +22,11 @@ permissions: {}
 jobs:
   pre-commit:
     name: Format
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     steps:
       - uses: actions/checkout@v6
         with:
           persist-credentials: false
-      - uses: actions/setup-python@v6
-        with:
-          python-version: "3.x"
       - uses: pre-commit/action@v3.0.1
       - name: Run PyLint
         run: pipx run --python=python hatch run pylint:lint --output-format=github
@@ -71,7 +68,7 @@ jobs:
 
   dist:
     name: Distribution build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
 
     steps:
       - uses: actions/checkout@v6
@@ -83,7 +80,7 @@ jobs:
 
   docs:
     name: Docs
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     steps:
       - uses: actions/checkout@v6
         with:
@@ -93,12 +90,8 @@ jobs:
       - name: Setup uv
         uses: astral-sh/setup-uv@v7
 
-      - uses: actions/setup-python@v6
-        with:
-          python-version: "3.12"
-
       - name: Install hatch
-        run: uv pip install --system hatch
+        run: uv tool install hatch
 
       - name: Linkcheck
         run: hatch run docs:linkcheck
@@ -113,7 +106,7 @@ jobs:
 
   action:
     name: Action
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     steps:
       - uses: actions/checkout@v6
         with:
