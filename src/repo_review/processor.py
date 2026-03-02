@@ -228,10 +228,8 @@ def process(
     # Collect our own config
     config = pyproject(package).get("tool", {}).get("repo-review", {})
     ignore_pyproject: list[str] | dict[str, str] = config.get("ignore", [])
-    select_checks = (
-        select if select else frozenset(config.get("select", ()))
-    ) | extend_select
-    skip_checks = (ignore if ignore else frozenset(ignore_pyproject)) | extend_ignore
+    select_checks = (select or frozenset(config.get("select", ()))) | extend_select
+    skip_checks = (ignore or frozenset(ignore_pyproject)) | extend_ignore
     skip_reasons = ignore_pyproject if isinstance(ignore_pyproject, dict) else {}
 
     # Make a graph of the check's interdependencies
