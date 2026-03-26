@@ -59,7 +59,6 @@ repo-review = "repo_review.schema:get_schema"
 cli = [
   "click >=8",
   "rich >=12.2",
-  "rich-click",
 ]
 
 [dependency-groups]
@@ -143,8 +142,6 @@ strict = true
 log_level = "INFO"
 filterwarnings = [
   "error",
-  "ignore:OptionHighlighter:DeprecationWarning",  # rich-click triggers its own warning
-  "ignore:`highlighter`:DeprecationWarning",  # rich-click triggers its own warning
 ]
 testpaths = ["tests"]
 pythonpath = ["tests/test_utilities"]

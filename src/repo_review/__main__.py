@@ -11,16 +11,12 @@ import urllib.error
 from pathlib import Path
 from typing import Any, Literal
 
-import click as orig_click
+import click
 
 if typing.TYPE_CHECKING:
     from collections.abc import Mapping, Sequence
 
-    import click  # pylint: disable=reimported
-
     from ._compat.importlib.resources.abc import Traversable
-else:
-    import rich_click as click
 
 import rich
 import rich.console
@@ -49,7 +45,7 @@ def __dir__() -> list[str]:
 
 
 rich.traceback.install(
-    suppress=[click, rich, orig_click], show_locals=False, width=None
+    suppress=[click, rich], show_locals=False, width=None
 )
 
 Status = Literal["empty", "passed", "skips", "errors"]
