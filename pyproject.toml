@@ -76,6 +76,7 @@ dev = [
   "validate-pyproject-schema-store[all]",
 ]
 docs = [
+  "erbsland-sphinx-ansi",
   "furo",
   "myst_parser >=0.13",
   "repo-review[cli]",
