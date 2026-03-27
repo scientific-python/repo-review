@@ -18,6 +18,7 @@ version = importlib.metadata.version("repo-review").split("+")[0]
 release = version
 
 extensions = [
+    "erbsland.sphinx.ansi",
     "myst_parser",
     "sphinx.ext.autodoc",
     "sphinx.ext.intersphinx",
@@ -29,7 +30,10 @@ extensions = [
     "sphinx.ext.linkcode",
 ]
 
-source_suffix = [".rst", ".md"]
+source_suffix = {
+    ".rst": "restructuredtext",
+    ".md": "markdown",
+}
 
 exclude_patterns = [
     "_build",
@@ -81,6 +85,16 @@ sphinx_github_changelog_token = os.environ.get("GITHUB_API_TOKEN")
 
 commit = os.environ.get("READTHEDOCS_GIT_COMMIT_HASH", "main")
 code_url = "https://github.com/scientific-python/repo-review/blob"
+
+
+# https://sphinxcontrib-programoutput.readthedocs.io
+programoutput_use_ansi = True
+
+# Needed to ensure color output
+# See https://github.com/OpenNTI/sphinxcontrib-programoutput/issues/77
+os.environ["FORCE_COLOR"] = "1"
+os.environ.pop("NO_COLOR", None)
+
 
 linkcheck_ignore = [r"https://pypi.org/project/repo-review/v0\.[23456]"]
 
