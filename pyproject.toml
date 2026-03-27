@@ -113,6 +113,7 @@ scripts.lint = "pylint repo_review {args}"
 
 [tool.hatch.envs.docs]
 dependency-groups = ["docs"]
+dependencies = ["sphinx-autobuild"]
 scripts.linkcheck = "sphinx-build -b=linkcheck docs docs/_build/linkcheck {args}"
 scripts.html = "sphinx-build --keep-going -n -T -b=html docs docs/_build/html {args}"
 scripts.serve = "sphinx-autobuild -n -T -b=html docs docs/_build/html {args}"
