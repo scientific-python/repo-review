@@ -4,6 +4,8 @@ This accesses the schema for repo-review's tool section.
 
 from __future__ import annotations
 
+__lazy_modules__ = [f"{__spec__.parent}.resources", "json", "typing"]
+
 import json
 from typing import Any
 

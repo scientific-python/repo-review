@@ -1,5 +1,17 @@
 from __future__ import annotations
 
+__lazy_modules__ = [
+    "collections",
+    "collections.abc",
+    "copy",
+    f"{__spec__.parent}.checks",
+    f"{__spec__.parent}.families",
+    f"{__spec__.parent}.fixtures",
+    "graphlib",
+    "textwrap",
+    "warnings",
+]
+
 import copy
 import dataclasses
 import graphlib
