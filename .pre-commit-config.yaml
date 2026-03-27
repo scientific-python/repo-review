@@ -51,7 +51,6 @@ repos:
         files: (src|web|tests)
         args: []
         additional_dependencies:
-          - click>=8.1.5
           - markdown-it-py
           - orjson
           - pytest

@@ -73,7 +73,7 @@ uvx hatch run webapp:serve       # Serve webapp on http://localhost:8080
 ```
 src/repo_review/          # Main package (1,635 lines total)
 ├── __init__.py           # Package initialization
-├── __main__.py           # CLI entry point (rich-click based)
+├── __main__.py           # CLI entry point (argparse based)
 ├── checks.py             # Check collection and processing
 ├── families.py           # Check families/grouping system
 ├── fixtures.py           # Fixture system (pytest-like)
@@ -208,7 +208,7 @@ The code is written in modern Python (3.10+) with an emphasis on clean, readable
 
 - **Build**: hatchling, hatch-vcs (for version from git)
 - **Runtime**: markdown-it-py, pyyaml, tomli (Python <3.11)
-- **CLI optional**: click>=8, rich>=12.2
+- **CLI optional**: rich>=12.2
 - **Dev**: pytest>=9, sp-repo-review (for self-checking), validate-pyproject
 
 ### Testing Notes

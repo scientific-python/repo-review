@@ -57,7 +57,6 @@ repo-review = "repo_review.schema:get_schema"
 
 [project.optional-dependencies]
 cli = [
-  "click >=8",
   "rich >=12.2",
 ]
 
