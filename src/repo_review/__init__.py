@@ -6,8 +6,6 @@ Review repos with a set of checks defined by plugins.
 
 from __future__ import annotations
 
-__lazy_modules__ = [f"{__spec__.parent}._version"]
-
-from ._version import version as __version__
+__version__ = "1.0.0.dev0"
 
 __all__ = ["__version__"]

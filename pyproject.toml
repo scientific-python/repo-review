@@ -1,10 +1,11 @@
 [build-system]
-requires = ["hatchling", "hatch-vcs"]
+requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 
 [project]
 name = "repo_review"
+version = "1.0.0.dev0"
 authors = [
   { name = "Henry Schreiner", email = "henryfs@princeton.edu" },
 ]
@@ -30,7 +31,6 @@ classifiers = [
   "Topic :: Software Development :: Libraries :: Python Modules",
   "Typing :: Typed",
 ]
-dynamic = ["version"]
 dependencies = [
   "markdown-it-py",
   "pyyaml",
@@ -88,10 +88,6 @@ docs = [
   "sphinx-github-changelog",
 ]
 
-[tool.hatch]
-version.source = "vcs"
-build.hooks.vcs.version-file = "src/repo_review/_version.py"
-
 [tool.hatch.envs.default]
 installer = "uv"
 
@@ -132,6 +128,11 @@ post-install-commands = ["$HATCH_UV pip install -e tests/test_utilities"]
 skip-install = true
 scripts.serve = "cd docs/_static/scripts && echo 'Serving on http://localhost:8080' && python -m http.server 8080"
 
+[tool.hatch.envs.version]
+skip-install = true
+dependencies = ["bump-my-version"]
+scripts.bump = "bump-my-version {args}"
+
 [[tool.hatch.envs.hatch-test.matrix]]
 python = ["3.15", "3.14", "3.13", "3.12", "3.11", "3.10"]
 
@@ -166,7 +167,6 @@ disallow_untyped_defs = true
 
 [tool.pylint]
 py-version = "3.10"
-ignore-paths = ["src/repo_review/_version.py"]
 ignored-modules = ["pyodide"]
 reports.output-format = "colorized"
 similarities.ignore-imports = "yes"
@@ -234,3 +234,29 @@ report.exclude_also = [
 ]
 report.show_missing = true
 report.skip_empty = true
+
+
+[tool.bumpversion]
+allow_dirty = true
+parse = """(?x)
+    (?P<major>0|[1-9]\\d*)\\.
+    (?P<minor>0|[1-9]\\d*)\\.
+    (?P<patch>0|[1-9]\\d*)
+    (?:
+        \\.                           # dash separator for pre-release section
+        (?P<pre_l>[a-zA-Z-]+)         # pre-release label
+        (?P<pre_n>0|[1-9]\\d*)        # pre-release version number
+    )?                                # pre-release section is optional
+"""
+serialize = [
+    "{major}.{minor}.{patch}.{pre_l}{pre_n}",
+    "{major}.{minor}.{patch}",
+]
+values = ["dev", "a", "b", "rc", "final", "post"]
+optional_value = "final"
+
+[[tool.bumpversion.files]]
+filename = "package.json"
+
+[[tool.bumpversion.files]]
+filename = "src/repo_review/__init__.py"

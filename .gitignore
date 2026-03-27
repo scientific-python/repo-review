@@ -137,9 +137,6 @@ dmypy.json
 # Cython debug symbols
 cython_debug/
 
-# setuptools_scm
-src/*/_version.py
-
 node_modules/
 /.vscode
 uv.lock
