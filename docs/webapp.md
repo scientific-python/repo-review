@@ -7,7 +7,7 @@ written in JSX using React and MaterialUI is provided at `docs/webapp.js` and
 `docs/index.html`; the `index.html` uses `sp-repo-review` and can be seen at
 <https://scientific-python.github.io/repo-review>. The webapp supports
 selecting org/repo and branch via URL, too, such as
-<https://scientific-python.github.io/repo-review/?repo=scikit-hep/hist&branch=main>.
+<https://scientific-python.github.io/repo-review/?repo=scikit-hep/hist&ref=main>.
 On the results screen, you can click on the check numbers to jump to the URLs
 provided by the checks.
 
