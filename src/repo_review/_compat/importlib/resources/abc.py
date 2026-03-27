@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-__lazy_modules__ = ["importlib", "importlib.abc", "importlib.resources.abc"]
+__lazy_modules__ = ["importlib", "importlib.resources", "importlib.resources.abc"]
 
 import sys
 

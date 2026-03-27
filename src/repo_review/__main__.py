@@ -8,6 +8,7 @@ __lazy_modules__ = [
     "json",
     "os",
     "pathlib",
+    "repo_review._compat",
     "repo_review._compat.typing",
     "repo_review.checks",
     "repo_review.families",
