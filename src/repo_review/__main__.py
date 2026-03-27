@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import argparse
 import functools
 import importlib.metadata
 import itertools
@@ -11,16 +12,10 @@ import urllib.error
 from pathlib import Path
 from typing import Any, Literal
 
-import click as orig_click
-
 if typing.TYPE_CHECKING:
-    from collections.abc import Mapping, Sequence
-
-    import click  # pylint: disable=reimported
+    from collections.abc import Mapping
 
     from ._compat.importlib.resources.abc import Traversable
-else:
-    import rich_click as click
 
 import rich
 import rich.console
@@ -48,23 +43,19 @@ def __dir__() -> list[str]:
     return __all__
 
 
-rich.traceback.install(
-    suppress=[click, rich, orig_click], show_locals=False, width=None
-)
+rich.traceback.install(suppress=[rich], show_locals=False, width=None)
 
 Status = Literal["empty", "passed", "skips", "errors"]
 Formats = Literal["rich", "json", "html", "svg"]
 Show = Literal["all", "err", "errskip"]
 
 
-def list_all(ctx: click.Context, _param: click.Parameter, value: bool) -> None:
-    if not value or ctx.resilient_parsing:
-        return
-
+def _list_all() -> None:
     collected = collect_all()
     if len(collected.checks) == 0:
         msg = "No checks registered. Please install a repo-review plugin."
-        raise click.ClickException(msg)
+        print(f"Error: {msg}", file=sys.stderr)
+        raise SystemExit(1)
 
     for family, grp in itertools.groupby(
         collected.checks.items(), key=lambda x: x[1].family
@@ -77,13 +68,8 @@ def list_all(ctx: click.Context, _param: click.Parameter, value: bool) -> None:
             comment = f" [dim]# {doc}" if doc else ""
             rich.print(f'  "{link}",{comment}')
 
-    ctx.exit()
 
-
-def all_versions(ctx: click.Context, _param: click.Parameter, value: bool) -> None:
-    if not value or ctx.resilient_parsing:
-        return
-
+def _all_versions() -> None:
     groups = ["repo_review.checks", "repo_review.families", "repo_review.fixtures"]
     packages = {
         dist.name: dist.version
@@ -91,7 +77,7 @@ def all_versions(ctx: click.Context, _param: click.Parameter, value: bool) -> No
         for ep in importlib.metadata.entry_points(group=group)
         if (dist := ep.dist) is not None
     }
-    deps = ["rich", "rich-click", "click", "markdown-it-py", "pyyaml"]
+    deps = ["rich", "markdown-it-py", "pyyaml"]
     rich.print("Repo-review's dependencies:")
     for name in deps:
         rich.print(
@@ -100,7 +86,6 @@ def all_versions(ctx: click.Context, _param: click.Parameter, value: bool) -> No
     rich.print("Packages providing repo-review plugins:")
     for name, version in sorted(packages.items()):
         rich.print(f"  [bold]{name}[/bold]: [green]{version}[/green]")
-    ctx.exit()
 
 
 @functools.cache
@@ -111,10 +96,10 @@ def _ensure_unicode_streams() -> None:
         and "PYTHONIOENCODING" not in os.environ
         and "PYTHONUTF8" not in os.environ
     ):
-        if sys.stdout.encoding != "utf-8":
-            sys.stdout.reconfigure(encoding="utf-8")  # type: ignore[union-attr]
-        if sys.stderr.encoding != "utf-8":
-            sys.stderr.reconfigure(encoding="utf-8")  # type: ignore[union-attr]
+        if hasattr(sys.stdout, "reconfigure") and sys.stdout.encoding != "utf-8":
+            sys.stdout.reconfigure(encoding="utf-8")
+        if hasattr(sys.stderr, "reconfigure") and sys.stderr.encoding != "utf-8":
+            sys.stderr.reconfigure(encoding="utf-8")
 
 
 def rich_printer(
@@ -248,7 +233,6 @@ def display_output(
                 print(json.dumps({header: d}, indent=2)[2:-2], end="", file=output)
             else:
                 print(json.dumps(d, indent=2), file=output)
-
         case "html":
             html = to_html(families, processed, status)
             if header:
@@ -260,12 +244,6 @@ def display_output(
             assert_never(format_opt)
 
 
-def remote_path_support(
-    _ctx: click.Context, _param: str, value: Sequence[Path]
-) -> list[Path | GHPath]:
-    return [_remote_path_processor(package) for package in value]
-
-
 def _remote_path_processor(package: Path) -> Path | GHPath:
     if not str(package).startswith("gh:"):
         return package
@@ -273,7 +251,8 @@ def _remote_path_processor(package: Path) -> Path | GHPath:
     _, org_repo_branch, *p = str(package).split(":", maxsplit=2)
     if "@" not in org_repo_branch:
         msg = "online repo must be of the form 'gh:org/repo@branch[:path]' (:branch missing)"
-        raise click.BadParameter(msg)
+        print(f"Error: {msg}", file=sys.stderr)
+        raise SystemExit(2)
     org_repo, branch = org_repo_branch.split("@", maxsplit=1)
     try:
         return GHPath(repo=org_repo, branch=branch, path=p[0] if p else "")
@@ -283,101 +262,97 @@ def _remote_path_processor(package: Path) -> Path | GHPath:
         raise SystemExit(1) from None
 
 
-class UnicodeHelpCommand(click.Command):
-    def get_help(self, ctx: click.Context) -> str:
-        _ensure_unicode_streams()
-        return super().get_help(ctx)
-
-
-@click.command(
-    cls=UnicodeHelpCommand, context_settings={"help_option_names": ["-h", "--help"]}
-)
-@click.version_option(version=__version__)
-@click.argument(
-    "packages",
-    type=click.Path(dir_okay=True, path_type=Path),
-    nargs=-1,
-    required=False,
-    callback=remote_path_support,
-)
-@click.option(
-    "--versions",
-    is_flag=True,
-    callback=all_versions,
-    expose_value=False,
-    is_eager=True,
-    help="List all plugin versions and exit",
-)
-@click.option(
-    "--list-all",
-    is_flag=True,
-    callback=list_all,
-    expose_value=False,
-    is_eager=True,
-    help="List all checks and exit",
-)
-@click.option(
-    "--format",
-    "format_opt",
-    type=click.Choice(["rich", "json", "html", "svg"]),
-    default="rich",
-    help="Select output format.",
-)
-@click.option(
-    "--stderr",
-    "stderr_fmt",
-    type=click.Choice(["rich", "json", "html", "svg"]),
-    help="Select additional output format for stderr. Will disable terminal escape codes for stdout for easy redirection.",
-)
-@click.option(
-    "--show",
-    type=click.Choice(["all", "err", "errskip"]),
-    default="all",
-    help="Show all (default), or just errors, or errors and skips",
-)
-@click.option(
-    "--select",
-    help="Only run certain checks, comma separated. All checks run if empty.",
-    default="",
-)
-@click.option(
-    "--ignore",
-    help="Ignore a check or checks, comma separated.",
-    default="",
-)
-@click.option(
-    "--extend-select",
-    help="Checks to run in addition to the ones selected.",
-    default="",
-)
-@click.option(
-    "--extend-ignore",
-    help="Checks to ignore in addition to the ones ignored.",
-    default="",
-)
-@click.option(
-    "--package-dir",
-    "-p",
-    help="Path to python package.",
-    default="",
-)
-def main(
-    packages: list[Path | GHPath],
-    format_opt: Formats,
-    stderr_fmt: Formats | None,
-    select: str,
-    ignore: str,
-    extend_select: str,
-    extend_ignore: str,
-    package_dir: str,
-    show: Show,
-) -> None:
+def main(args: list[str] | None = None) -> None:
     """
     Pass in a local Path or gh:org/repo@branch. Will run on the current
     directory if no path passed.
     """
+    _ensure_unicode_streams()
+
+    parser = argparse.ArgumentParser(
+        prog="repo-review",
+        description="Pass in a local Path or gh:org/repo@branch. Will run on the current directory if no path passed.",
+    )
+    parser.add_argument("--version", action="version", version=__version__)
+    parser.add_argument(
+        "--versions",
+        action="store_true",
+        help="List all plugin versions and exit",
+    )
+    parser.add_argument(
+        "--list-all",
+        action="store_true",
+        help="List all checks and exit",
+    )
+    parser.add_argument(
+        "packages",
+        type=Path,
+        nargs="*",
+        help="Local path or gh:org/repo@branch",
+    )
+    parser.add_argument(
+        "--format",
+        dest="format_opt",
+        choices=["rich", "json", "html", "svg"],
+        default="rich",
+        help="Select output format.",
+    )
+    parser.add_argument(
+        "--stderr",
+        dest="stderr_fmt",
+        choices=["rich", "json", "html", "svg"],
+        help="Select additional output format for stderr. Will disable terminal escape codes for stdout for easy redirection.",
+    )
+    parser.add_argument(
+        "--show",
+        choices=["all", "err", "errskip"],
+        default="all",
+        help="Show all (default), or just errors, or errors and skips",
+    )
+    parser.add_argument(
+        "--select",
+        default="",
+        help="Only run certain checks, comma separated. All checks run if empty.",
+    )
+    parser.add_argument(
+        "--ignore",
+        default="",
+        help="Ignore a check or checks, comma separated.",
+    )
+    parser.add_argument(
+        "--extend-select",
+        default="",
+        help="Checks to run in addition to the ones selected.",
+    )
+    parser.add_argument(
+        "--extend-ignore",
+        default="",
+        help="Checks to ignore in addition to the ones ignored.",
+    )
+    parser.add_argument(
+        "--package-dir",
+        "-p",
+        default="",
+        help="Path to python package.",
+    )
+
+    parsed = parser.parse_args(args)
+
+    if parsed.versions:
+        _all_versions()
+        return
+
+    if parsed.list_all:
+        _list_all()
+        return
+
+    packages: list[Path | GHPath] = [_remote_path_processor(p) for p in parsed.packages]
+
     if not packages:
         packages = [Path()]
+
+    format_opt: Formats = parsed.format_opt
+    stderr_fmt: Formats | None = parsed.stderr_fmt
 
     if len(packages) > 1:
         if format_opt == "json":
@@ -391,13 +366,13 @@ def main(
             package,
             format_opt,
             stderr_fmt,
-            select,
-            ignore,
-            extend_select,
-            extend_ignore,
-            package_dir,
+            parsed.select,
+            parsed.ignore,
+            parsed.extend_select,
+            parsed.extend_ignore,
+            parsed.package_dir,
             add_header=len(packages) > 1,
-            show=show,
+            show=parsed.show,
         )
         if len(packages) > 1:
             is_before_end = n < len(packages) - 1
@@ -439,7 +414,8 @@ def on_each(
     collected = collect_all(package, subdir=package_dir)
     if len(collected.checks) == 0:
         msg = "No checks registered. Please install a repo-review plugin."
-        raise click.ClickException(msg)
+        print(f"Error: {msg}", file=sys.stderr)
+        raise SystemExit(1)
 
     if isinstance(package, GHPath):
         if format_opt == "rich":
