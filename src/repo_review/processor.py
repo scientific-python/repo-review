@@ -20,7 +20,7 @@ import typing
 import warnings
 from collections.abc import Mapping
 from collections.abc import Set as AbstractSet
-from typing import TYPE_CHECKING, Any, TypeVar
+from typing import Any, TypeVar
 
 import markdown_it
 
@@ -36,6 +36,7 @@ from .families import Family, collect_families
 from .fixtures import apply_fixtures, collect_fixtures, compute_fixtures, pyproject
 from .ghpath import EmptyTraversable
 
+TYPE_CHECKING = False
 if TYPE_CHECKING:
     import sys
 

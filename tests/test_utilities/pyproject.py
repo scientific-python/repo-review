@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
+TYPE_CHECKING = False
 if TYPE_CHECKING:
     from repo_review._compat.importlib.resources.abc import Traversable
 

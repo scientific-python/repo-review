@@ -11,12 +11,12 @@ __lazy_modules__ = [
 import builtins
 import functools
 import io
-import typing
 
 from .families import Family, get_family_description, get_family_name
 from .processor import Result, md_as_html
 
-if typing.TYPE_CHECKING:
+TYPE_CHECKING = False
+if TYPE_CHECKING:
     from collections.abc import Mapping, Sequence
 
     from .__main__ import Status

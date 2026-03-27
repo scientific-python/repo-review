@@ -217,6 +217,7 @@ flake8-builtins.ignorelist = ["copyright", "print"]
 "typing.assert_never".msg = "Use repo_review._compat.typing.assert_never instead."
 "importlib.abc".msg = "Use repo_review._compat.importlib.resources.abc instead."
 "importlib.resources.abc".msg = "Use repo_review._compat.importlib.resources.abc instead."
+"typing.TYPE_CHECKING".msg = "Use TYPE_CHECKING=False instead"
 
 [tool.ruff.lint.per-file-ignores]
 "src/repo_review/_compat/**.py" = ["TID251"]
