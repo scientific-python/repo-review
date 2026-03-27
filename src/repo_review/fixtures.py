@@ -18,7 +18,8 @@ from typing import Any
 from ._compat import tomllib
 from .ghpath import EmptyTraversable
 
-if typing.TYPE_CHECKING:
+TYPE_CHECKING = False
+if TYPE_CHECKING:
     from collections.abc import Callable, Mapping
     from collections.abc import Set as AbstractSet
 

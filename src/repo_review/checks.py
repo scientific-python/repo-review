@@ -3,10 +3,11 @@ from __future__ import annotations
 __lazy_modules__ = [f"{__spec__.parent}.fixtures", "importlib", "importlib.metadata"]
 
 import importlib.metadata
-from typing import TYPE_CHECKING, Any, Protocol
+from typing import Any, Protocol
 
 from .fixtures import apply_fixtures
 
+TYPE_CHECKING = False
 if TYPE_CHECKING:
     from collections.abc import Mapping
     from collections.abc import Set as AbstractSet

@@ -15,6 +15,7 @@ __lazy_modules__ = [
     "repo_review.ghpath",
     "repo_review.html",
     "repo_review.processor",
+    "rich",
     "rich.console",
     "rich.markdown",
     "rich.syntax",
@@ -33,15 +34,9 @@ import itertools
 import json
 import os
 import sys
-import typing
 import urllib.error
 from pathlib import Path
 from typing import Any, Literal
-
-if typing.TYPE_CHECKING:
-    from collections.abc import Mapping
-
-    from ._compat.importlib.resources.abc import Traversable
 
 import rich
 import rich.console
@@ -49,7 +44,6 @@ import rich.markdown
 import rich.syntax
 import rich.terminal_theme
 import rich.text
-import rich.traceback
 import rich.tree
 
 from repo_review import __version__
@@ -60,6 +54,12 @@ from repo_review.ghpath import GHPath
 from repo_review.html import to_html
 from repo_review.processor import Result, as_simple_dict, collect_all, process
 
+TYPE_CHECKING = False
+if TYPE_CHECKING:
+    from collections.abc import Mapping
+
+    from ._compat.importlib.resources.abc import Traversable
+
 __all__ = ["Formats", "Show", "Status", "main"]
 
 CODE_THEME = "ansi_light"
@@ -68,8 +68,6 @@ CODE_THEME = "ansi_light"
 def __dir__() -> list[str]:
     return __all__
 
-
-rich.traceback.install(suppress=[rich], show_locals=False, width=None)
 
 Status = Literal["empty", "passed", "skips", "errors"]
 Formats = Literal["rich", "json", "html", "svg"]

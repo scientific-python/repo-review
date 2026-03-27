@@ -8,7 +8,8 @@ from typing import Any
 
 from .fixtures import apply_fixtures
 
-if typing.TYPE_CHECKING:
+TYPE_CHECKING = False
+if TYPE_CHECKING:
     from collections.abc import Mapping
 
 __all__ = ["Family", "collect_families", "get_family_name"]

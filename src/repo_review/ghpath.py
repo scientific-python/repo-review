@@ -4,7 +4,7 @@
 
 from __future__ import annotations
 
-__lazy_modules__ = ["io", "json", "sys"]
+__lazy_modules__ = ["io", "json", "sys", "typing"]
 
 import dataclasses
 import io
@@ -15,7 +15,8 @@ from typing import Literal
 
 from ._compat.importlib.resources.abc import Traversable
 
-if typing.TYPE_CHECKING:
+TYPE_CHECKING = False
+if TYPE_CHECKING:
     from collections.abc import Iterator
 
 __all__ = ["EmptyTraversable", "GHPath"]
