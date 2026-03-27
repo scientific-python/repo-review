@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import argparse
+import functools
 import importlib.metadata
 import itertools
 import json
+import os
 import sys
 import typing
 import urllib.error
@@ -86,6 +88,20 @@ def _all_versions() -> None:
         rich.print(f"  [bold]{name}[/bold]: [green]{version}[/green]")
 
 
+@functools.cache
+def _ensure_unicode_streams() -> None:
+    # Before Python 3.15, this isn't always unicode
+    if (
+        sys.version_info < (3, 15)
+        and "PYTHONIOENCODING" not in os.environ
+        and "PYTHONUTF8" not in os.environ
+    ):
+        if hasattr(sys.stdout, "reconfigure") and sys.stdout.encoding != "utf-8":
+            sys.stdout.reconfigure(encoding="utf-8")
+        if hasattr(sys.stderr, "reconfigure") and sys.stderr.encoding != "utf-8":
+            sys.stderr.reconfigure(encoding="utf-8")
+
+
 def rich_printer(
     families: Mapping[str, Family],
     processed: list[Result],
@@ -96,6 +112,8 @@ def rich_printer(
     status: Status,
     header: str = "",
 ) -> None:
+    _ensure_unicode_streams()
+
     console = rich.console.Console(
         record=svg, quiet=svg, stderr=stderr, color_system="auto" if color else None
     )
@@ -249,6 +267,8 @@ def main(args: list[str] | None = None) -> None:
     Pass in a local Path or gh:org/repo@branch. Will run on the current
     directory if no path passed.
     """
+    _ensure_unicode_streams()
+
     parser = argparse.ArgumentParser(
         prog="repo-review",
         description="Pass in a local Path or gh:org/repo@branch. Will run on the current directory if no path passed.",
