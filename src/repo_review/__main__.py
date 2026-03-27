@@ -81,10 +81,9 @@ def _all_versions() -> None:
     deps = ["rich", "markdown-it-py", "pyyaml"]
     rich.print("Repo-review's dependencies:")
     for name in deps:
-        with contextlib.suppress(importlib.metadata.PackageNotFoundError):
-            rich.print(
-                f"  [bold]{name}[/bold]: [magenta]{importlib.metadata.version(name)}[/magenta]"
-            )
+        rich.print(
+            f"  [bold]{name}[/bold]: [magenta]{importlib.metadata.version(name)}[/magenta]"
+        )
     rich.print("Packages providing repo-review plugins:")
     for name, version in sorted(packages.items()):
         rich.print(f"  [bold]{name}[/bold]: [green]{version}[/green]")
@@ -275,26 +274,16 @@ def main(args: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(
         prog="repo-review",
         description="Pass in a local Path or gh:org/repo@branch. Will run on the current directory if no path passed.",
-        add_help=False,
-    )
-    parser.add_argument(
-        "-h",
-        "--help",
-        action="help",
-        default=argparse.SUPPRESS,
-        help="Show this message and exit.",
     )
     parser.add_argument("--version", action="version", version=__version__)
     parser.add_argument(
         "--versions",
         action="store_true",
-        default=False,
         help="List all plugin versions and exit",
     )
     parser.add_argument(
         "--list-all",
         action="store_true",
-        default=False,
         help="List all checks and exit",
     )
     parser.add_argument(
@@ -325,28 +314,23 @@ def main(args: list[str] | None = None) -> None:
     )
     parser.add_argument(
         "--select",
-        default="",
         help="Only run certain checks, comma separated. All checks run if empty.",
     )
     parser.add_argument(
         "--ignore",
-        default="",
         help="Ignore a check or checks, comma separated.",
     )
     parser.add_argument(
         "--extend-select",
-        default="",
         help="Checks to run in addition to the ones selected.",
     )
     parser.add_argument(
         "--extend-ignore",
-        default="",
         help="Checks to ignore in addition to the ones ignored.",
     )
     parser.add_argument(
         "--package-dir",
         "-p",
-        default="",
         help="Path to python package.",
     )
 
