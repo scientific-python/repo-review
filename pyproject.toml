@@ -12,7 +12,7 @@ description = "Framework that can run checks on repos"
 readme = "README.md"
 requires-python = ">=3.10"
 classifiers = [
-  "Development Status :: 4 - Beta",
+  "Development Status :: 5 - Production/Stable",
   "Intended Audience :: Developers",
   "Intended Audience :: Science/Research",
   "License :: OSI Approved :: BSD License",
@@ -132,7 +132,7 @@ skip-install = true
 scripts.serve = "cd docs && echo 'Serving on http://localhost:8080' && python -m http.server 8080"
 
 [[tool.hatch.envs.hatch-test.matrix]]
-python = ["3.14", "3.13", "3.12", "3.11", "3.10"]
+python = ["3.15", "3.14", "3.13", "3.12", "3.11", "3.10"]
 
 
 
