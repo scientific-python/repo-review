@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import argparse
-import contextlib
 import functools
 import importlib.metadata
 import itertools
@@ -303,7 +302,6 @@ def main(args: list[str] | None = None) -> None:
         "--stderr",
         dest="stderr_fmt",
         choices=["rich", "json", "html", "svg"],
-        default=None,
         help="Select additional output format for stderr. Will disable terminal escape codes for stdout for easy redirection.",
     )
     parser.add_argument(
@@ -314,23 +312,28 @@ def main(args: list[str] | None = None) -> None:
     )
     parser.add_argument(
         "--select",
+        default="",
         help="Only run certain checks, comma separated. All checks run if empty.",
     )
     parser.add_argument(
         "--ignore",
+        default="",
         help="Ignore a check or checks, comma separated.",
     )
     parser.add_argument(
         "--extend-select",
+        default="",
         help="Checks to run in addition to the ones selected.",
     )
     parser.add_argument(
         "--extend-ignore",
+        default="",
         help="Checks to ignore in addition to the ones ignored.",
     )
     parser.add_argument(
         "--package-dir",
         "-p",
+        default="",
         help="Path to python package.",
     )
 
