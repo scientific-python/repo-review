@@ -4,6 +4,17 @@ Helpers for testing repo-review plugins.
 
 from __future__ import annotations
 
+__lazy_modules__ = [
+    f"{__spec__.parent}._compat",
+    f"{__spec__.parent}.checks",
+    f"{__spec__.parent}.fixtures",
+    f"{__spec__.parent}.processor",
+    "importlib",
+    "importlib.metadata",
+    "textwrap",
+    "typing",
+]
+
 import importlib.metadata
 import textwrap
 from typing import Any

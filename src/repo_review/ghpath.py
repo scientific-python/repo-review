@@ -4,6 +4,8 @@
 
 from __future__ import annotations
 
+__lazy_modules__ = ["io", "json", "sys"]
+
 import dataclasses
 import io
 import json

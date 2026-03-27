@@ -1,5 +1,31 @@
 from __future__ import annotations
 
+__lazy_modules__ = [
+    "argparse",
+    "importlib",
+    "importlib.metadata",
+    "itertools",
+    "json",
+    "os",
+    "pathlib",
+    "repo_review._compat",
+    "repo_review._compat.typing",
+    "repo_review.checks",
+    "repo_review.families",
+    "repo_review.ghpath",
+    "repo_review.html",
+    "repo_review.processor",
+    "rich.console",
+    "rich.markdown",
+    "rich.syntax",
+    "rich.terminal_theme",
+    "rich.text",
+    "rich.tree",
+    "sys",
+    "urllib",
+    "urllib.error",
+]
+
 import argparse
 import functools
 import importlib.metadata
@@ -26,13 +52,13 @@ import rich.text
 import rich.traceback
 import rich.tree
 
-from . import __version__
-from ._compat.typing import assert_never
-from .checks import get_check_description, get_check_url
-from .families import Family, get_family_description, get_family_name
-from .ghpath import GHPath
-from .html import to_html
-from .processor import Result, as_simple_dict, collect_all, process
+from repo_review import __version__
+from repo_review._compat.typing import assert_never
+from repo_review.checks import get_check_description, get_check_url
+from repo_review.families import Family, get_family_description, get_family_name
+from repo_review.ghpath import GHPath
+from repo_review.html import to_html
+from repo_review.processor import Result, as_simple_dict, collect_all, process
 
 __all__ = ["Formats", "Show", "Status", "main"]
 

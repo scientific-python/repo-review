@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+__lazy_modules__ = ["typing"]
+
 import sys
 
 if sys.version_info < (3, 11):

@@ -1,5 +1,13 @@
 from __future__ import annotations
 
+__lazy_modules__ = [
+    "builtins",
+    f"{__spec__.parent}.families",
+    f"{__spec__.parent}.processor",
+    "functools",
+    "io",
+]
+
 import builtins
 import functools
 import io
