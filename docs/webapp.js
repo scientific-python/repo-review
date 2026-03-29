@@ -422,7 +422,6 @@ json.dumps({"families": families_out, "results": results_out})
     this.setState({
       knownChecks: knownResults,
       knownFamilies: knownFamilies,
-      infoOpen: false,
     });
   }
 
@@ -612,11 +611,15 @@ json.dumps({"families": families_out, "results": results_out})
               elevation={0}
               disableGutters
               square
+              sx={{ borderBottom: 1, borderColor: "divider" }}
             >
               <MaterialUI.AccordionSummary
                 expandIcon={<MaterialUI.Icon>expand_more</MaterialUI.Icon>}
+                sx={{ bgcolor: "primary.main", color: "primary.contrastText" }}
               >
-                <MaterialUI.Typography>About</MaterialUI.Typography>
+                <MaterialUI.Typography fontWeight="medium">
+                  About
+                </MaterialUI.Typography>
               </MaterialUI.AccordionSummary>
               <MaterialUI.AccordionDetails>
                 <MaterialUI.Typography variant="body1" component="div">
