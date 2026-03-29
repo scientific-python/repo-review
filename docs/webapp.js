@@ -240,6 +240,7 @@ class App extends React.Component {
       url: "",
       knownChecks: null,
       knownFamilies: {},
+      infoOpen: true,
     };
     this.pyodide_promise = prepare_pyodide(props.deps);
     this.refInputDebounce = null;
@@ -287,8 +288,8 @@ class App extends React.Component {
     window.history.replaceState(null, "", `${baseurl}?${local_params}`);
     this.setState({
       results: [],
-      msg: "Running Python via Pyodide",
       progress: true,
+      infoOpen: false,
     });
     const state = this.state;
     this.pyodide_promise.then((pyodide) => {
@@ -312,7 +313,6 @@ class App extends React.Component {
       } catch (e) {
         if (e.message.includes("KeyError: 'tree'")) {
           this.setState({
-            msg: DEFAULT_MSG,
             progress: false,
             err_msg: "Invalid repository or branch/tag. Please try again.",
           });
@@ -353,10 +353,10 @@ class App extends React.Component {
       this.setState({
         results: results,
         families: families,
-        msg: `Results for ${state.repo}@${state.ref} (${state.refType})`,
         progress: false,
         err_msg: "",
         url: "",
+        infoOpen: false,
       });
 
       results_list.destroy();
@@ -422,6 +422,7 @@ json.dumps({"families": families_out, "results": results_out})
     this.setState({
       knownChecks: knownResults,
       knownFamilies: knownFamilies,
+      infoOpen: false,
     });
   }
 
@@ -500,8 +501,17 @@ json.dumps({"families": families_out, "results": results_out})
     }
 
     const hasResults = !Array.isArray(this.state.results);
-    const displayResults = hasResults ? this.state.results : {};
-    const displayFamilies = hasResults ? this.state.families : {};
+    const displayResults = hasResults
+      ? this.state.results
+      : !this.state.progress && this.state.knownChecks
+        ? this.state.knownChecks
+        : null;
+    const displayFamilies = hasResults
+      ? this.state.families
+      : this.state.knownFamilies;
+    const resultsHeading = hasResults
+      ? `Results for ${this.state.repo}@${this.state.ref} (${this.state.refType})`
+      : "Available checks";
 
     return (
       <MyThemeProvider>
@@ -596,31 +606,44 @@ json.dumps({"families": families_out, "results": results_out})
             </MaterialUI.Button>
           </MaterialUI.Stack>
           <MaterialUI.Paper elevation={3}>
-            {!hasResults && !this.state.progress && this.state.knownChecks && (
-              <Results
-                results={this.state.knownChecks}
-                families={this.state.knownFamilies}
-              />
-            )}
-            <MaterialUI.Box sx={{ p: 2 }}>
-              <MaterialUI.Typography variant="body1" component="div">
-                <span dangerouslySetInnerHTML={{ __html: this.state.msg }} />
-              </MaterialUI.Typography>
-              {this.state.progress && <MaterialUI.LinearProgress />}
-              {this.state.err_msg && (
-                <MaterialUI.Typography
-                  variant="body1"
-                  component="div"
-                  color="error"
-                >
-                  <span
-                    dangerouslySetInnerHTML={{ __html: this.state.err_msg }}
-                  />
+            <MaterialUI.Accordion
+              expanded={this.state.infoOpen}
+              onChange={(e, open) => this.setState({ infoOpen: open })}
+              elevation={0}
+              disableGutters
+              square
+            >
+              <MaterialUI.AccordionSummary
+                expandIcon={<MaterialUI.Icon>expand_more</MaterialUI.Icon>}
+              >
+                <MaterialUI.Typography>About</MaterialUI.Typography>
+              </MaterialUI.AccordionSummary>
+              <MaterialUI.AccordionDetails>
+                <MaterialUI.Typography variant="body1" component="div">
+                  <span dangerouslySetInnerHTML={{ __html: this.state.msg }} />
                 </MaterialUI.Typography>
-              )}
-            </MaterialUI.Box>
-            {hasResults && (
-              <Results results={displayResults} families={displayFamilies} />
+              </MaterialUI.AccordionDetails>
+            </MaterialUI.Accordion>
+            {this.state.progress && <MaterialUI.LinearProgress />}
+            {this.state.err_msg && (
+              <MaterialUI.Typography
+                variant="body1"
+                component="div"
+                color="error"
+                sx={{ p: 2 }}
+              >
+                <span
+                  dangerouslySetInnerHTML={{ __html: this.state.err_msg }}
+                />
+              </MaterialUI.Typography>
+            )}
+            {displayResults && (
+              <React.Fragment>
+                <MaterialUI.Typography variant="h6" sx={{ px: 2, pt: 1 }}>
+                  {resultsHeading}
+                </MaterialUI.Typography>
+                <Results results={displayResults} families={displayFamilies} />
+              </React.Fragment>
             )}
           </MaterialUI.Paper>
         </MaterialUI.Box>
