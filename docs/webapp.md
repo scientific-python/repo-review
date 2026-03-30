@@ -2,56 +2,43 @@
 
 ## Example app
 
-You can run repo-review in Pyodide as a webapp if you wish. An example webapp
-written in JSX using React and MaterialUI is provided at `docs/webapp.js` and
-`docs/index.html`; the `index.html` uses `sp-repo-review` and can be seen at
-<https://scientific-python.github.io/repo-review>. The webapp supports
-selecting org/repo and branch via URL, too, such as
-<a href="https://scientific-python.github.io/repo-review/?repo=scikit-hep/hist&ref=main">https://scientific-python.github.io/repo-review/?repo=scikit-hep/hist&ref=main</a>.
-On the results screen, you can click on the check numbers to jump to the URLs
-provided by the checks.
+You can run repo-review in Pyodide as a webapp. An example webapp written in
+JSX using React and MaterialUI is provided in the repository; the live demo is
+available in the docs at the **Live Demo** page or at <https://scientific-python.github.io/repo-review>.
 
-This webapp can be embedded into an existing webpage if you set
-`header={false}`. You can set your own deps with `deps = {["...", "..."]}`.
+The webapp supports selecting org/repo and branch via URL, for example,
+<a href="https://scientific-python.github.io/repo-review/?repo=scikit-hep/hist&ref=main">https://scientific-python.github.io/repo-review/?repo=scikit-hep/hist&ref=main</a>.
+
+This webapp can be embedded into an existing webpage by setting
+`header={false}` and you can set your own `deps` when calling `mountApp()`.
+
+You can see the source at `/src/repo-review-app`, and you can see the file to
+set up the `bun` bundle at `/package.json`.
+
+### Bundler notes
+
+When bundling the app for the web, Pyodide is NOT bundled via an npm package.
+The webapp expects `loadPyodide()` to be available at runtime (for example by
+including Pyodide from the official CDN or otherwise providing it on the host
+page). Running `bun run build` writes a bundled ESM file to
+`docs/_static/scripts/webapp.min.js`, which the Live Demo imports as a module.
 
 ## Custom app
 
-You can also use the `html` output and write your own webapp. You need to provide Pyodide:
+If you prefer to write a custom integration, ensure Pyodide is loaded on the
+page and then call `loadPyodide()` as the demo does. For example, load Pyodide
+from the CDN and then mount the app (or import the ESM bundle):
+
+Global (script) example:
 
 ```html
-<script
-  src="https://cdn.jsdelivr.net/pyodide/v0.29.3/full/pyodide.js"
-  crossorigin
-></script>
+<script src="https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js"></script>
+<script type="module">
+  import { mountApp } from "./_static/scripts/webapp.min.js";
+  await loadPyodide();
+  mountApp({ header: false, deps: ["repo-review"] });
+</script>
 ```
 
-Then, you need to load your plugin & repo-review.
-
-```js
-async function prepare_pyodide() {
-  const pyodide = await loadPyodide();
-
-  await pyodide.loadPackage("micropip");
-  await pyodide.runPythonAsync(`
-        import micropip
-        await micropip.install(["my_plugin", "repo-review"])
-    `);
-  return pyodide;
-}
-```
-
-You can get the families and the checks:
-
-```js
-result_html_py = pyodide.runPython(`
-  from repo_review.processor import process
-  from repo_review.ghpath import GHPath
-  from repo_review.html import to_html
-
-  package = GHPath(repo="${state.repo}", branch="${state.branch}")
-  to_html(*process(package))
-`);
-result_html = result_html_py.toString();
-```
-
-This can throw an error with `KeyError: 'tree'` if the repo or branch is invalid.
+The webapp code expects a callable `loadPyodide()` and will use `micropip` to
+install any requested Python packages.

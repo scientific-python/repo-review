@@ -44,6 +44,8 @@ exclude_patterns = [
     ".venv",
 ]
 
+html_static_path = ["_static"]
+
 html_theme = "furo"
 
 html_theme_options: dict[str, Any] = {

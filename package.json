@@ -1,0 +1,19 @@
+{
+  "name": "repo-review-webapp",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "build": "bunx esbuild src/repo-review-app/webapp.jsx --bundle --minify --sourcemap --outfile=docs/_static/scripts/webapp.min.js --platform=browser --format=esm"
+  },
+  "devDependencies": {
+    "esbuild": "^0.18.0"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "@mui/material": "^5.14.0",
+    "@emotion/react": "^11.11.0",
+    "@emotion/styled": "^11.11.0"
+  }
+}

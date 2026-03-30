@@ -1,0 +1,45 @@
+name: Deploy Webapp to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: stable
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Build webapp
+        run: bun run build
+
+      - name: Prepare Pages artifact
+        run: |
+          mkdir -p out
+          cp docs/_static/scripts/webapp.min.js* out/
+          cp docs/_static/scripts/index.html out/index.html
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v6
+
+      - name: Upload artifact for Pages
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: out
+
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v5
