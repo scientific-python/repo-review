@@ -144,7 +144,7 @@ function Results(props) {
 
   return (
     <MaterialUI.Box sx={{ bgcolor: "background.paper" }}>
-      <MaterialUI.List subheader={<li />} overflow="auto">
+      <MaterialUI.List subheader={<li />} sx={{ overflow: "auto" }}>
         {output}
       </MaterialUI.List>
     </MaterialUI.Box>
@@ -519,7 +519,7 @@ json.dumps({"families": families_out, "results": results_out})
           <MaterialUI.Stack
             direction="row"
             spacing={2}
-            alignItems="top"
+            alignItems="flex-start"
             sx={{ m: 1, mb: 3 }}
           >
             <MaterialUI.TextField
