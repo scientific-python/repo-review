@@ -621,7 +621,11 @@ json.dumps({"families": families_out, "results": results_out})
                   About
                 </MaterialUI.Typography>
               </MaterialUI.AccordionSummary>
-              <MaterialUI.AccordionDetails sx={{ bgcolor: "primary.50" }}>
+              <MaterialUI.AccordionDetails
+                sx={(theme) => ({
+                  bgcolor: MaterialUI.alpha(theme.palette.primary.main, 0.08),
+                })}
+              >
                 <MaterialUI.Typography variant="body1" component="div">
                   <span dangerouslySetInnerHTML={{ __html: this.state.msg }} />
                 </MaterialUI.Typography>
