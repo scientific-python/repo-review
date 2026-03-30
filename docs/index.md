@@ -12,6 +12,7 @@ fixtures
 checks
 families
 webapp
+live-demo
 changelog
 ```
 

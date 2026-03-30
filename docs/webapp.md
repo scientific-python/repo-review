@@ -2,32 +2,31 @@
 
 ## Example app
 
-You can run repo-review in Pyodide as a webapp if you wish. An example webapp
-written in JSX using React and MaterialUI is provided at `docs/webapp.js` and
-`docs/index.html`; the `index.html` uses `sp-repo-review` and can be seen at
-<https://scientific-python.github.io/repo-review>. The webapp supports
-selecting org/repo and branch via URL, too, such as
-<a href="https://scientific-python.github.io/repo-review/?repo=scikit-hep/hist&ref=main">https://scientific-python.github.io/repo-review/?repo=scikit-hep/hist&ref=main</a>.
-On the results screen, you can click on the check numbers to jump to the URLs
-provided by the checks.
+You can run repo-review in Pyodide as a webapp. An example webapp written in
+JSX using React and MaterialUI is provided in the repository; the live demo is
+available in the docs at the **Live Demo** page.
 
-This webapp can be embedded into an existing webpage if you set
-`header={false}`. You can set your own deps with `deps = {["...", "..."]}`.
+The webapp supports selecting org/repo and branch via URL, for example, try
+appending `?repo=scikit-hep/hist&ref=main`.
+
+This webapp can be embedded into an existing webpage by setting
+`header={false}` and you can set your own `deps` when calling `mountApp()`.
+
+### Bundler notes
+
+When bundling the app for the web, Pyodide is included via the `pyodide` npm
+package and imported as a module (no global `<script>` tag required). The
+project build writes a bundled ESM file to `docs/_static/webapp.min.js` which
+the Live Demo page imports as a module.
 
 ## Custom app
 
-You can also use the `html` output and write your own webapp. You need to provide Pyodide:
-
-```html
-<script
-  src="https://cdn.jsdelivr.net/pyodide/v0.29.3/full/pyodide.js"
-  crossorigin
-></script>
-```
-
-Then, you need to load your plugin & repo-review.
+If you prefer to write a custom integration, you can still use Pyodide directly
+by importing `loadPyodide()` from the `pyodide` package in an ESM environment:
 
 ```js
+import { loadPyodide } from "pyodide";
+
 async function prepare_pyodide() {
   const pyodide = await loadPyodide();
 
@@ -40,18 +39,5 @@ async function prepare_pyodide() {
 }
 ```
 
-You can get the families and the checks:
-
-```js
-result_html_py = pyodide.runPython(`
-  from repo_review.processor import process
-  from repo_review.ghpath import GHPath
-  from repo_review.html import to_html
-
-  package = GHPath(repo="${state.repo}", branch="${state.branch}")
-  to_html(*process(package))
-`);
-result_html = result_html_py.toString();
-```
-
-This can throw an error with `KeyError: 'tree'` if the repo or branch is invalid.
+You can then call into `repo_review` as shown in the demo app. Note that an
+invalid repository or branch can surface a `KeyError: 'tree'` exception.

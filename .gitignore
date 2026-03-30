@@ -143,3 +143,4 @@ src/*/_version.py
 node_modules/
 /.vscode
 uv.lock
+/docs/_static/scripts/webapp.*

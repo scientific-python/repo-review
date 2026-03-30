@@ -101,6 +101,16 @@ jobs:
       - name: Install hatch
         run: uv pip install --system hatch
 
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install with cache
+        run: bun install --frozen-lockfile
+
+      - name: Test
+        run: bun run build
+
       - name: Linkcheck
         run: hatch run docs:linkcheck
 

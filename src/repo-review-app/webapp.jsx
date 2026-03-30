@@ -1,37 +1,55 @@
+import React from "react";
+import ReactDOM from "react-dom/client";
+import {
+  Box,
+  AppBar,
+  Toolbar,
+  Typography,
+  Button,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  ListSubheader,
+  Icon,
+  CssBaseline,
+  CircularProgress,
+  Stack,
+  TextField,
+  Autocomplete,
+  Paper,
+  LinearProgress,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+} from "@mui/material";
+import { ThemeProvider, createTheme, alpha } from "@mui/material/styles";
+import useMediaQuery from "@mui/material/useMediaQuery";
+
 const DEFAULT_MSG =
   "Enter a GitHub repo and branch/tag to review. Runs Python entirely in your browser using WebAssembly. Built with React, MaterialUI, and Pyodide.";
 
-const urlParams = new URLSearchParams(window.location.search);
-const baseurl = window.location.pathname;
-
 function Heading(props) {
   return (
-    <MaterialUI.Box sx={{ flexGrow: 1, mb: 2 }}>
-      <MaterialUI.AppBar position="static">
-        <MaterialUI.Toolbar>
-          <MaterialUI.Typography
-            variant="h6"
-            component="div"
-            sx={{ flexGrow: 1 }}
-          >
+    <Box sx={{ flexGrow: 1, mb: 2 }}>
+      <AppBar position="static">
+        <Toolbar>
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             Repo-Review
-          </MaterialUI.Typography>
-          <MaterialUI.Button
-            href="https://github.com/scientific-python/repo-review"
-            color="inherit"
-          >
+          </Typography>
+          <Button href="https://github.com/scientific-python/repo-review" color="inherit">
             Source
-          </MaterialUI.Button>
-        </MaterialUI.Toolbar>
-      </MaterialUI.AppBar>
-    </MaterialUI.Box>
+          </Button>
+        </Toolbar>
+      </AppBar>
+    </Box>
   );
 }
 
 function IfUrlLink({ name, url, color }) {
   if (url) {
     return (
-      <MaterialUI.Typography
+      <Typography
         sx={{ display: "inline" }}
         variant="body2"
         color={color}
@@ -41,18 +59,13 @@ function IfUrlLink({ name, url, color }) {
         rel="noopener noreferrer"
       >
         {name}
-      </MaterialUI.Typography>
+      </Typography>
     );
   }
   return (
-    <MaterialUI.Typography
-      sx={{ display: "inline" }}
-      component="span"
-      variant="body2"
-      color={color}
-    >
+    <Typography sx={{ display: "inline" }} component="span" variant="body2" color={color}>
       {name}
-    </MaterialUI.Typography>
+    </Typography>
   );
 }
 
@@ -62,99 +75,65 @@ function Results(props) {
     const inner_results = props.results[key];
     const results_components = inner_results.map((result) => {
       const text_color =
-        result.state === false
-          ? "error.main"
-          : result.state === true
-            ? "text.primary"
-            : "info.main";
-      const details =
-        result.state === false ? (
-          <span dangerouslySetInnerHTML={{ __html: result.err_msg }} />
-        ) : null;
-      const color =
-        result.state === false
-          ? "error"
-          : result.state === true
-            ? "success"
-            : "info";
+        result.state === false ? "error.main" : result.state === true ? "text.primary" : "info.main";
+      const details = result.state === false ? <span dangerouslySetInnerHTML={{ __html: result.err_msg }} /> : null;
+      const color = result.state === false ? "error" : result.state === true ? "success" : "info";
       const icon = (
-        <MaterialUI.Icon color={color}>
-          {result.state === false
-            ? "report"
-            : result.state === true
-              ? "check_box"
-              : "info"}
-        </MaterialUI.Icon>
+        <Icon color={color}>{result.state === false ? "report" : result.state === true ? "check_box" : "info"}</Icon>
       );
 
       const skipped = (
-        <MaterialUI.Typography
-          sx={{ display: "inline" }}
-          component="span"
-          variant="body2"
-          color="text.disabled"
-        >
+        <Typography sx={{ display: "inline" }} component="span" variant="body2" color="text.disabled">
           {` [skipped] ${result.skip_reason}`}
-        </MaterialUI.Typography>
+        </Typography>
       );
       const msg = (
-        <React.Fragment>
+        <>
           <IfUrlLink name={result.name} url={result.url} color={text_color} />
           <IfUrlLink name={": "} url={""} color={text_color} />
-          <React.Fragment>
-            <MaterialUI.Typography
-              sx={{ display: "inline" }}
-              component="span"
-              color={text_color}
-            >
+          <>
+            <Typography sx={{ display: "inline" }} component="span" color={text_color}>
               {result.description}
-            </MaterialUI.Typography>
-          </React.Fragment>
+            </Typography>
+          </>
           {result.state === undefined && skipped}
-        </React.Fragment>
+        </>
       );
       return (
-        <MaterialUI.ListItem disablePadding key={result.name}>
-          <MaterialUI.ListItemIcon>{icon}</MaterialUI.ListItemIcon>
-          <MaterialUI.ListItemText primary={msg} secondary={details} />
-        </MaterialUI.ListItem>
+        <ListItem disablePadding key={result.name}>
+          <ListItemIcon>{icon}</ListItemIcon>
+          <ListItemText primary={msg} secondary={details} />
+        </ListItem>
       );
     });
 
     output.push(
       <li key={`section-${key}`}>
         <ul>
-          <MaterialUI.ListSubheader>
-            {props.families[key].name}
-          </MaterialUI.ListSubheader>
+          <ListSubheader>{props.families[key].name}</ListSubheader>
           {props.families[key].description && (
-            <MaterialUI.ListItem>
-              <span
-                dangerouslySetInnerHTML={{
-                  __html: props.families[key].description,
-                }}
-              />
-            </MaterialUI.ListItem>
+            <ListItem>
+              <span dangerouslySetInnerHTML={{ __html: props.families[key].description }} />
+            </ListItem>
           )}
           {results_components}
         </ul>
-      </li>,
+      </li>
     );
   }
 
   return (
-    <MaterialUI.Box sx={{ bgcolor: "background.paper" }}>
-      <MaterialUI.List subheader={<li />} sx={{ overflow: "auto" }}>
+    <Box sx={{ bgcolor: "background.paper" }}>
+      <List subheader={<li />} sx={{ overflow: "auto" }}>
         {output}
-      </MaterialUI.List>
-    </MaterialUI.Box>
+      </List>
+    </Box>
   );
 }
 
 async function fetchRepoRefs(repo) {
   if (!repo) return { branches: [], tags: [] };
   try {
-    // Fetch both branches and tags from GitHub API
     const [branchesResponse, tagsResponse] = await Promise.all([
       fetch(`https://api.github.com/repos/${repo}/branches`),
       fetch(`https://api.github.com/repos/${repo}/tags`),
@@ -169,14 +148,8 @@ async function fetchRepoRefs(repo) {
     const tags = await tagsResponse.json();
 
     return {
-      branches: branches.map((branch) => ({
-        name: branch.name,
-        type: "branch",
-      })),
-      tags: tags.map((tag) => ({
-        name: tag.name,
-        type: "tag",
-      })),
+      branches: branches.map((branch) => ({ name: branch.name, type: "branch" })),
+      tags: tags.map((tag) => ({ name: tag.name, type: "tag" })),
     };
   } catch (error) {
     console.error("Error fetching repo references:", error);
@@ -209,25 +182,11 @@ async function prepare_pyodide(deps, onProgress) {
 }
 
 function MyThemeProvider(props) {
-  const prefersDarkMode = MaterialUI.useMediaQuery(
-    "(prefers-color-scheme: dark)",
-  );
+  const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
 
-  const theme = React.useMemo(
-    () =>
-      MaterialUI.createTheme({
-        palette: {
-          mode: prefersDarkMode ? "dark" : "light",
-        },
-      }),
-    [prefersDarkMode],
-  );
+  const theme = React.useMemo(() => createTheme({ palette: { mode: prefersDarkMode ? "dark" : "light" } }), [prefersDarkMode]);
 
-  return (
-    <MaterialUI.ThemeProvider theme={theme}>
-      {props.children}
-    </MaterialUI.ThemeProvider>
-  );
+  return <ThemeProvider theme={theme}>{props.children}</ThemeProvider>;
 }
 
 class App extends React.Component {
@@ -237,9 +196,9 @@ class App extends React.Component {
     const deps_str = `<pre><code>${inner_deps_str}</code></pre>`;
     this.state = {
       results: [],
-      repo: urlParams.get("repo") || "",
-      ref: urlParams.get("ref") || "",
-      refType: urlParams.get("refType") || "branch",
+      repo: new URLSearchParams(window.location.search).get("repo") || "",
+      ref: new URLSearchParams(window.location.search).get("ref") || "",
+      refType: new URLSearchParams(window.location.search).get("refType") || "branch",
       refs: { branches: [], tags: [] },
       msg: `<p>${DEFAULT_MSG}</p><h4>Packages:</h4> ${deps_str}`,
       progress: false,
@@ -269,16 +228,12 @@ class App extends React.Component {
 
     this.setState({ loadingRefs: true });
     const refs = await fetchRepoRefs(repo);
-    this.setState({
-      refs: refs,
-      loadingRefs: false,
-    });
+    this.setState({ refs: refs, loadingRefs: false });
   }
 
   handleRepoChange(repo) {
     this.setState({ repo });
 
-    // debounce the API call to avoid too many requests
     clearTimeout(this.refInputDebounce);
     this.refInputDebounce = setTimeout(() => {
       this.fetchRepoReferences(repo);
@@ -292,23 +247,13 @@ class App extends React.Component {
   handleCompute() {
     if (!this.state.repo || !this.state.ref) {
       this.setState({ results: [], msg: DEFAULT_MSG });
-      window.history.replaceState(null, "", baseurl);
-      alert(
-        `Please enter a repo (${this.state.repo}) and branch/tag (${this.state.ref})`,
-      );
+      window.history.replaceState(null, "", window.location.pathname);
+      alert(`Please enter a repo (${this.state.repo}) and branch/tag (${this.state.ref})`);
       return;
     }
-    const local_params = new URLSearchParams({
-      repo: this.state.repo,
-      ref: this.state.ref,
-      refType: this.state.refType,
-    });
-    window.history.replaceState(null, "", `${baseurl}?${local_params}`);
-    this.setState({
-      results: [],
-      progress: true,
-      infoOpen: false,
-    });
+    const local_params = new URLSearchParams({ repo: this.state.repo, ref: this.state.ref, refType: this.state.refType });
+    window.history.replaceState(null, "", `${window.location.pathname}?${local_params}`);
+    this.setState({ results: [], progress: true, infoOpen: false });
     const state = this.state;
     this.pyodide_promise.then((pyodide) => {
       var families_checks;
@@ -331,17 +276,11 @@ class App extends React.Component {
           (families, checks)
           `);
       } catch (e) {
-        if (e.message.includes("KeyError: 'tree'")) {
-          this.setState({
-            progress: false,
-            err_msg: "Invalid repository or branch/tag. Please try again.",
-          });
+        if (e.message && e.message.includes("KeyError: 'tree'")) {
+          this.setState({ progress: false, err_msg: "Invalid repository or branch/tag. Please try again." });
           return;
         }
-        this.setState({
-          progress: false,
-          err_msg: `<pre><code>${e.message}</code></pre>`,
-        });
+        this.setState({ progress: false, err_msg: `<pre><code>${e.message}</code><pre>` });
         return;
       }
 
@@ -353,30 +292,13 @@ class App extends React.Component {
       for (const val of families_dict) {
         const descr = families_dict.get(val).get("description");
         results[val] = [];
-        families[val] = {
-          name: families_dict.get(val).get("name").toString(),
-          description: descr && descr.toString(),
-        };
+        families[val] = { name: families_dict.get(val).get("name").toString(), description: descr && descr.toString() };
       }
       for (const val of results_list) {
-        results[val.family].push({
-          name: val.name.toString(),
-          description: val.description.toString(),
-          state: val.result,
-          err_msg: val.err_msg.toString(),
-          url: val.url.toString(),
-          skip_reason: val.skip_reason.toString(),
-        });
+        results[val.family].push({ name: val.name.toString(), description: val.description.toString(), state: val.result, err_msg: val.err_msg.toString(), url: val.url.toString(), skip_reason: val.skip_reason.toString() });
       }
 
-      this.setState({
-        results: results,
-        families: families,
-        progress: false,
-        err_msg: "",
-        url: "",
-        infoOpen: false,
-      });
+      this.setState({ results: results, families: families, progress: false, err_msg: "", url: "", infoOpen: false });
 
       results_list.destroy();
       families_dict.destroy();
@@ -385,47 +307,50 @@ class App extends React.Component {
 
   async loadKnownChecks() {
     const pyodide = await this.pyodide_promise;
-    let data;
+    let dataStr;
     try {
-      data = JSON.parse(
-        pyodide.runPython(`
+      dataStr = pyodide.runPython(`
 import json
 from repo_review.processor import collect_all
 from repo_review.checks import get_check_url
 
 collected = collect_all()
-families_out = {
-    k: {"name": v.get("name", k)}
-    for k, v in collected.families.items()
-}
-results_out = [
-    {
+families_out = {k: {"name": v.get("name", k)} for k, v in collected.families.items()}
+results_out = []
+for name, check in collected.checks.items():
+    desc = (check.__doc__ or "").strip()
+    results_out.append({
         "name": name,
         "family": check.family,
-        "description": (check.__doc__ or "").format(self=check, name=name).strip(),
+        "description": desc,
         "url": get_check_url(name, check),
-    }
-    for name, check in collected.checks.items()
-]
+    })
 json.dumps({"families": families_out, "results": results_out})
-        `),
-      );
+      `);
     } catch (e) {
       console.error("Error loading known checks:", e);
+      return;
+    }
+
+    let data;
+    try {
+      data = JSON.parse(dataStr.toString ? dataStr.toString() : dataStr);
+    } catch (e) {
+      console.error("Error parsing known checks JSON:", e, dataStr);
       return;
     }
 
     const knownResults = {};
     const knownFamilies = {};
 
-    for (const [key, fam] of Object.entries(data.families)) {
+    for (const key of Object.keys(data.families || {})) {
       knownResults[key] = [];
       knownFamilies[key] = {
-        name: fam.name,
+        name: data.families[key].name,
       };
     }
 
-    for (const check of data.results) {
+    for (const check of data.results || []) {
       if (knownResults[check.family] !== undefined) {
         knownResults[check.family].push({
           name: check.name,
@@ -438,17 +363,15 @@ json.dumps({"families": families_out, "results": results_out})
       }
     }
 
-    this.setState({
-      knownChecks: knownResults,
-      knownFamilies: knownFamilies,
-    });
+    this.setState({ knownChecks: knownResults, knownFamilies: knownFamilies });
   }
 
   componentDidMount() {
-    if (urlParams.get("repo")) {
-      this.fetchRepoReferences(urlParams.get("repo"));
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("repo")) {
+      this.fetchRepoReferences(params.get("repo"));
     }
-    if (urlParams.get("repo") && urlParams.get("ref")) {
+    if (params.get("repo") && params.get("ref")) {
       this.handleCompute();
     } else {
       this.pyodide_promise.then(() => this.loadKnownChecks());
@@ -457,19 +380,11 @@ json.dumps({"families": families_out, "results": results_out})
 
   render() {
     const priorityBranches = ["HEAD", "main", "master", "develop", "stable"];
-    const branchMap = new Map(
-      this.state.refs.branches.map((branch) => [branch.name, branch]),
-    );
+    const branchMap = new Map(this.state.refs.branches.map((branch) => [branch.name, branch]));
 
     let availableOptions = [];
 
-    // If no repo is entered or API hasn't returned any branches/tags yet,
-    // show all five priority branches.
-    if (
-      this.state.repo === "" ||
-      (this.state.refs.branches.length === 0 &&
-        this.state.refs.tags.length === 0)
-    ) {
+    if (this.state.repo === "" || (this.state.refs.branches.length === 0 && this.state.refs.tags.length === 0)) {
       availableOptions = [
         { label: "HEAD (default branch)", value: "HEAD", type: "branch" },
         { label: "main (branch)", value: "main", type: "branch" },
@@ -478,85 +393,63 @@ json.dumps({"families": families_out, "results": results_out})
         { label: "stable (branch)", value: "stable", type: "branch" },
       ];
     } else {
-      const prioritizedBranches = [
-        { label: "HEAD (default branch)", value: "HEAD", type: "branch" },
-      ];
+      const prioritizedBranches = [{ label: "HEAD (default branch)", value: "HEAD", type: "branch" }];
 
       priorityBranches.slice(1).forEach((branchName) => {
         if (branchMap.has(branchName)) {
-          prioritizedBranches.push({
-            label: `${branchName} (branch)`,
-            value: branchName,
-            type: "branch",
-          });
-          // Remove from map so it doesn't get added twice.
+          prioritizedBranches.push({ label: `${branchName} (branch)`, value: branchName, type: "branch" });
           branchMap.delete(branchName);
         }
       });
 
       const otherBranches = [];
       branchMap.forEach((branch) => {
-        otherBranches.push({
-          label: `${branch.name} (branch)`,
-          value: branch.name,
-          type: "branch",
-        });
+        otherBranches.push({ label: `${branch.name} (branch)`, value: branch.name, type: "branch" });
       });
       otherBranches.sort((a, b) => a.value.localeCompare(b.value));
 
-      const tagOptions = this.state.refs.tags.map((tag) => ({
-        label: `${tag.name} (tag)`,
-        value: tag.name,
-        type: "tag",
-      }));
+      const tagOptions = this.state.refs.tags.map((tag) => ({ label: `${tag.name} (tag)`, value: tag.name, type: "tag" }));
       tagOptions.sort((a, b) => a.value.localeCompare(b.value));
 
-      availableOptions = [
-        ...prioritizedBranches,
-        ...otherBranches,
-        ...tagOptions,
-      ];
+      availableOptions = [...prioritizedBranches, ...otherBranches, ...tagOptions];
     }
 
     const hasResults = !Array.isArray(this.state.results);
     const displayResults = hasResults
       ? this.state.results
       : !this.state.progress && this.state.knownChecks
-        ? this.state.knownChecks
-        : null;
-    const displayFamilies = hasResults
-      ? this.state.families
-      : this.state.knownFamilies;
+      ? this.state.knownChecks
+      : null;
+    const displayFamilies = hasResults ? this.state.families : this.state.knownFamilies;
     const resultsHeading = hasResults
       ? `Results for ${this.state.repo}@${this.state.ref} (${this.state.refType})`
       : "Available checks";
 
     return (
       <MyThemeProvider>
-        <MaterialUI.CssBaseline />
-        <MaterialUI.Box>
+        <CssBaseline />
+        <Box>
           {this.props.header && <Heading />}
-          <MaterialUI.Stack
+          <Stack
             direction="row"
             spacing={2}
             alignItems="flex-start"
             sx={{ m: 1, mb: 3 }}
           >
-            <MaterialUI.TextField
+            <TextField
               id="repo-select"
               label="Org/Repo"
               helperText="e.g. scikit-hep/hist"
               variant="outlined"
               autoFocus={true}
               onKeyDown={(e) => {
-                if (e.keyCode === 13)
-                  document.getElementById("ref-select").focus();
+                if (e.keyCode === 13) document.getElementById("ref-select").focus();
               }}
               onInput={(e) => this.handleRepoChange(e.target.value)}
-              defaultValue={urlParams.get("repo")}
+              defaultValue={new URLSearchParams(window.location.search).get("repo")}
               sx={{ flexGrow: 3 }}
             />
-            <MaterialUI.Autocomplete
+            <Autocomplete
               disablePortal
               id="ref-select"
               options={availableOptions}
@@ -565,14 +458,9 @@ json.dumps({"families": families_out, "results": results_out})
               onKeyDown={(e) => {
                 if (e.keyCode === 13) this.handleCompute();
               }}
-              getOptionLabel={(option) =>
-                typeof option === "string" ? option : option.label
-              }
-              renderOption={(props, option) => (
-                <li {...props}>{option.label}</li>
-              )}
+              getOptionLabel={(option) => (typeof option === "string" ? option : option.label)}
+              renderOption={(props, option) => <li {...props}>{option.label}</li>}
               onInputChange={(e, value) => {
-                // If the user enters free text, treat it as a branch
                 if (typeof value === "string") {
                   this.handleRefChange(value, "branch");
                 }
@@ -586,9 +474,9 @@ json.dumps({"families": families_out, "results": results_out})
                   }
                 }
               }}
-              defaultValue={urlParams.get("ref")}
+              defaultValue={new URLSearchParams(window.location.search).get("ref")}
               renderInput={(params) => (
-                <MaterialUI.TextField
+                <TextField
                   {...params}
                   label="Branch/Tag"
                   variant="outlined"
@@ -597,34 +485,22 @@ json.dumps({"families": families_out, "results": results_out})
                   InputProps={{
                     ...params.InputProps,
                     endAdornment: (
-                      <React.Fragment>
-                        {this.state.loadingRefs ? (
-                          <MaterialUI.CircularProgress
-                            color="inherit"
-                            size={20}
-                          />
-                        ) : null}
+                      <>
+                        {this.state.loadingRefs ? <CircularProgress color="inherit" size={20} /> : null}
                         {params.InputProps.endAdornment}
-                      </React.Fragment>
+                      </>
                     ),
                   }}
                 />
               )}
             />
 
-            <MaterialUI.Button
-              onClick={() => this.handleCompute()}
-              variant="contained"
-              size="large"
-              disabled={
-                this.state.progress || !this.state.repo || !this.state.ref
-              }
-            >
-              <MaterialUI.Icon>start</MaterialUI.Icon>
-            </MaterialUI.Button>
-          </MaterialUI.Stack>
-          <MaterialUI.Paper elevation={3}>
-            <MaterialUI.Accordion
+            <Button onClick={() => this.handleCompute()} variant="contained" size="large" disabled={this.state.progress || !this.state.repo || !this.state.ref}>
+              <Icon>start</Icon>
+            </Button>
+          </Stack>
+          <Paper elevation={3}>
+            <Accordion
               expanded={this.state.infoOpen}
               onChange={(e, open) => this.setState({ infoOpen: open })}
               elevation={0}
@@ -632,27 +508,18 @@ json.dumps({"families": families_out, "results": results_out})
               square
               sx={{ borderBottom: 1, borderColor: "divider" }}
             >
-              <MaterialUI.AccordionSummary
-                expandIcon={<MaterialUI.Icon>expand_more</MaterialUI.Icon>}
-                sx={{ bgcolor: "primary.main", color: "primary.contrastText" }}
-              >
-                <MaterialUI.Typography fontWeight="medium">
-                  About
-                </MaterialUI.Typography>
-              </MaterialUI.AccordionSummary>
-              <MaterialUI.AccordionDetails
-                sx={(theme) => ({
-                  bgcolor: MaterialUI.alpha(theme.palette.primary.main, 0.08),
-                })}
-              >
-                <MaterialUI.Typography variant="body1" component="div">
+              <AccordionSummary expandIcon={<Icon>expand_more</Icon>} sx={{ bgcolor: "primary.main", color: "primary.contrastText" }}>
+                <Typography fontWeight="medium">About</Typography>
+              </AccordionSummary>
+              <AccordionDetails sx={(theme) => ({ bgcolor: alpha(theme.palette.primary.main, 0.08) })}>
+                <Typography variant="body1" component="div">
                   <span dangerouslySetInnerHTML={{ __html: this.state.msg }} />
-                </MaterialUI.Typography>
-              </MaterialUI.AccordionDetails>
-            </MaterialUI.Accordion>
+                </Typography>
+              </AccordionDetails>
+            </Accordion>
             {(this.state.pyodideLoading || this.state.progress) && (
-              <MaterialUI.Box sx={{ m: 2 }}>
-                <MaterialUI.LinearProgress
+              <Box sx={{ m: 2 }}>
+                <LinearProgress
                   variant={
                     this.state.pyodideLoading ? "determinate" : "indeterminate"
                   }
@@ -662,7 +529,7 @@ json.dumps({"families": families_out, "results": results_out})
                       : undefined
                   }
                 />
-                <MaterialUI.Typography
+                <Typography
                   variant="caption"
                   sx={{ display: "block", mt: 1 }}
                 >
@@ -671,32 +538,32 @@ json.dumps({"families": families_out, "results": results_out})
                       ? `${this.state.pyodideMessage} — ${this.state.pyodideProgress}%`
                       : `Pyodide loading: ${this.state.pyodideProgress}%`
                     : "reading repository"}
-                </MaterialUI.Typography>
-              </MaterialUI.Box>
+                </Typography>
+              </Box>
             )}
             {this.state.err_msg && (
-              <MaterialUI.Typography
-                variant="body1"
-                component="div"
-                color="error"
-                sx={{ p: 2 }}
-              >
-                <span
-                  dangerouslySetInnerHTML={{ __html: this.state.err_msg }}
-                />
-              </MaterialUI.Typography>
+              <Typography variant="body1" component="div" color="error" sx={{ p: 2 }}>
+                <span dangerouslySetInnerHTML={{ __html: this.state.err_msg }} />
+              </Typography>
             )}
             {displayResults && (
-              <React.Fragment>
-                <MaterialUI.Typography variant="h6" sx={{ px: 2, pt: 1 }}>
+              <>
+                <Typography variant="h6" sx={{ px: 2, pt: 1 }}>
                   {resultsHeading}
-                </MaterialUI.Typography>
+                </Typography>
                 <Results results={displayResults} families={displayFamilies} />
-              </React.Fragment>
+              </>
             )}
-          </MaterialUI.Paper>
-        </MaterialUI.Box>
+          </Paper>
+        </Box>
       </MyThemeProvider>
     );
   }
 }
+
+export function mountApp(opts = {}) {
+  const root = ReactDOM.createRoot(document.getElementById("root"));
+  root.render(<App {...opts} />);
+}
+
+export default App;
