@@ -1,8 +1,12 @@
-export async function prepare_pyodide(deps, onProgress) {
+export async function prepare_pyodide(
+  deps: string[],
+  onProgress?: (p: number, m?: string) => void,
+) {
   const deps_str = deps.map((i) => `\"${i}\"`).join(", ");
   try {
     if (onProgress) onProgress(5, "Initializing Pyodide runtime");
-    const pyodide = await loadPyodide();
+    // loadPyodide is provided by the Pyodide script at runtime
+    const pyodide: any = await (window as any).loadPyodide();
     if (onProgress) onProgress(50, "Core Pyodide loaded");
 
     if (onProgress) onProgress(65, "Loading micropip");
@@ -22,7 +26,7 @@ export async function prepare_pyodide(deps, onProgress) {
   }
 }
 
-export function run_process(pyodide, repo, branch) {
+export function run_process(pyodide: any, repo: string, branch: string) {
   pyodide.globals.set("repo", repo);
   pyodide.globals.set("branch", branch);
   const families_checks = pyodide.runPython(`
@@ -43,7 +47,7 @@ export function run_process(pyodide, repo, branch) {
   return families_checks;
 }
 
-export function load_known_checks(pyodide) {
+export function load_known_checks(pyodide: any) {
   const dataStr = pyodide.runPython(`
 import json
 from repo_review.processor import collect_all
@@ -63,5 +67,6 @@ for name, check in collected.checks.items():
 json.dumps({"families": families_out, "results": results_out})
       `);
 
+  // pyodide may return a PyProxy; ensure string
   return JSON.parse(dataStr.toString ? dataStr.toString() : dataStr);
 }
