@@ -20,7 +20,7 @@ import Heading from "./components/Heading";
 import Results from "./components/Results";
 import MyThemeProvider from "./components/MyThemeProvider";
 import { fetchRepoRefs } from "./utils/github";
-import { prepare_pyodide } from "./utils/pyodide";
+import { prepare_pyodide, run_process, load_known_checks } from "./utils/pyodide";
 
 const DEFAULT_MSG =
   "Enter a GitHub repo and branch/tag to review. Runs Python entirely in your browser using WebAssembly. Built with React, MaterialUI, and Pyodide.";
@@ -95,23 +95,7 @@ class App extends React.Component {
     this.pyodide_promise.then((pyodide) => {
       var families_checks;
       try {
-        pyodide.globals.set("repo", state.repo);
-        pyodide.globals.set("branch", state.ref);
-        families_checks = pyodide.runPython(`
-          from repo_review.processor import process, md_as_html
-          from repo_review.ghpath import GHPath
-          from dataclasses import replace
-
-          package = GHPath(repo=repo, branch=branch)
-          families, checks = process(package)
-
-          for v in families.values():
-              if v.get("description"):
-                  v["description"] = md_as_html(v["description"])
-          checks = [res.md_as_html() for res in checks]
-
-          (families, checks)
-          `);
+        families_checks = run_process(pyodide, state.repo, state.ref);
       } catch (e) {
         if (e.message && e.message.includes("KeyError: 'tree'")) {
           this.setState({ progress: false, err_msg: "Invalid repository or branch/tag. Please try again." });
@@ -144,36 +128,11 @@ class App extends React.Component {
 
   async loadKnownChecks() {
     const pyodide = await this.pyodide_promise;
-    let dataStr;
-    try {
-      dataStr = pyodide.runPython(`
-import json
-from repo_review.processor import collect_all
-from repo_review.checks import get_check_url
-
-collected = collect_all()
-families_out = {k: {"name": v.get("name", k)} for k, v in collected.families.items()}
-results_out = []
-for name, check in collected.checks.items():
-    desc = (check.__doc__ or "").strip()
-    results_out.append({
-        "name": name,
-        "family": check.family,
-        "description": desc,
-        "url": get_check_url(name, check),
-    })
-json.dumps({"families": families_out, "results": results_out})
-      `);
-    } catch (e) {
-      console.error("Error loading known checks:", e);
-      return;
-    }
-
     let data;
     try {
-      data = JSON.parse(dataStr.toString ? dataStr.toString() : dataStr);
+      data = load_known_checks(pyodide);
     } catch (e) {
-      console.error("Error parsing known checks JSON:", e, dataStr);
+      console.error("Error loading known checks:", e);
       return;
     }
 
