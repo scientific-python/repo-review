@@ -116,10 +116,7 @@ function Results(props) {
       return (
         <MaterialUI.ListItem disablePadding key={result.name}>
           <MaterialUI.ListItemIcon>{icon}</MaterialUI.ListItemIcon>
-          <MaterialUI.ListItemText
-            primary={msg}
-            secondary={details}
-          />
+          <MaterialUI.ListItemText primary={msg} secondary={details} />
         </MaterialUI.ListItem>
       );
     });
