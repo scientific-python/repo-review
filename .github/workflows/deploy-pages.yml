@@ -5,16 +5,25 @@ on:
     branches: [main]
   workflow_dispatch:
 
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build-and-deploy:
+    name: Build and Deploy
     runs-on: ubuntu-latest
     permissions:
-      pages: write
-      id-token: write
+      pages: write # needed for pages
+      id-token: write # needed for pages
       contents: read
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
       - name: Setup bun
         uses: oven-sh/setup-bun@v2

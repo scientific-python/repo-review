@@ -11,7 +11,7 @@ repos:
         additional_dependencies: [black==24.*]
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: "v0.15.4"
+    rev: "v0.15.8"
     hooks:
       - id: ruff-check
         args: ["--fix", "--show-fixes"]
@@ -59,7 +59,7 @@ repos:
           - types-PyYAML
 
   - repo: https://github.com/codespell-project/codespell
-    rev: v2.4.1
+    rev: v2.4.2
     hooks:
       - id: codespell
         args: ["-Lhist,absense", "-w"]
@@ -78,13 +78,25 @@ repos:
         exclude: .pre-commit-config.yaml
 
   - repo: https://github.com/henryiii/validate-pyproject-schema-store
-    rev: 2026.03.02
+    rev: 2026.03.29
     hooks:
       - id: validate-pyproject
 
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.37.0
+    rev: 0.37.1
     hooks:
       - id: check-dependabot
       - id: check-github-workflows
       - id: check-readthedocs
+
+  - repo: https://github.com/zizmorcore/zizmor-pre-commit
+    rev: v1.23.1
+    hooks:
+      - id: zizmor
+        files: "^\\.github"
+        args: [--persona=pedantic]
+
+  - repo: https://github.com/rhysd/actionlint
+    rev: v1.7.12
+    hooks:
+      - id: actionlint
