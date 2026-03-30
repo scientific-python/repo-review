@@ -273,11 +273,11 @@ def _remote_path_processor(package: Path) -> Path | GHPath:
         return package
 
     _, org_repo_branch, *p = str(package).split(":", maxsplit=2)
-    if "@" not in org_repo_branch:
-        msg = "online repo must be of the form 'gh:org/repo@branch[:path]' (:branch missing)"
-        print(f"Error: {msg}", file=sys.stderr)
-        raise SystemExit(2)
-    org_repo, branch = org_repo_branch.split("@", maxsplit=1)
+    if "@" in org_repo_branch:
+        org_repo, branch = org_repo_branch.split("@", maxsplit=1)
+    else:
+        org_repo = org_repo_branch
+        branch = "HEAD"
     try:
         return GHPath(repo=org_repo, branch=branch, path=p[0] if p else "")
     except urllib.error.HTTPError as e:
@@ -288,14 +288,14 @@ def _remote_path_processor(package: Path) -> Path | GHPath:
 
 def main(args: list[str] | None = None) -> None:
     """
-    Pass in a local Path or gh:org/repo@branch. Will run on the current
+    Pass in a local Path or gh:org/repo[@branch][:path]. Will run on the current
     directory if no path passed.
     """
     _ensure_unicode_streams()
 
     parser = argparse.ArgumentParser(
         prog="repo-review",
-        description="Pass in a local Path or gh:org/repo@branch. Will run on the current directory if no path passed.",
+        description="Pass in a local Path or gh:org/repo[@branch][:path]. Will run on the current directory if no path passed.",
     )
     parser.add_argument("--version", action="version", version=__version__)
     parser.add_argument(
@@ -312,7 +312,7 @@ def main(args: list[str] | None = None) -> None:
         "packages",
         type=Path,
         nargs="*",
-        help="Local path or gh:org/repo@branch",
+        help="Local path or gh:org/repo[@branch][:path]",
     )
     parser.add_argument(
         "--format",

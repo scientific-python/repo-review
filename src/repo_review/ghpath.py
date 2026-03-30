@@ -33,7 +33,7 @@ class GHPath(Traversable):
     downloading it.
 
     :param repo: The repo name, in "org/repo" style.
-    :param branch: The branch name. Required, even if using the default branch.
+    :param branch: The branch name. "HEAD" works too.
     :param path: A sub-path inside the repo. Defaults to the repo root.
     :param _info: Some internal info stored to keep accesses fast.
     """
@@ -41,7 +41,7 @@ class GHPath(Traversable):
     #: The repository name, in `"org/repo"` style.
     repo: str
 
-    #: The branch name. Required, even if using the default branch.
+    #: The branch name.
     branch: str
 
     #: A path inside the repo

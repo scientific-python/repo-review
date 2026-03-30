@@ -9,7 +9,7 @@ Repo-review has a CLI interface.
 ## Remote inputs
 
 You can input a local directory, or you can input a GitHub repository
-via `gh:org/repo@branch`. This will use the Web API and won't download
+via `gh:org/repo[@branch][:path]`. This will use the Web API and won't download
 the whole repository. If the root of a package is not in the repository root,
 pass `--package-dir <path>`.
 
