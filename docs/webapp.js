@@ -337,7 +337,6 @@ class App extends React.Component {
           description: descr && descr.toString(),
         };
       }
-      console.log(families);
       for (const val of results_list) {
         results[val.family].push({
           name: val.name.toString(),
