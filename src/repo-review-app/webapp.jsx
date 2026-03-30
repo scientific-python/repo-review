@@ -2,16 +2,6 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import {
   Box,
-  AppBar,
-  Toolbar,
-  Typography,
-  Button,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  ListSubheader,
-  Icon,
   CssBaseline,
   CircularProgress,
   Stack,
@@ -22,172 +12,19 @@ import {
   Accordion,
   AccordionSummary,
   AccordionDetails,
+  Button,
+  Icon,
+  Typography,
 } from "@mui/material";
-import { ThemeProvider, createTheme, alpha } from "@mui/material/styles";
-import useMediaQuery from "@mui/material/useMediaQuery";
+import Heading from "./components/Heading";
+import Results from "./components/Results";
+import MyThemeProvider from "./components/MyThemeProvider";
+import { fetchRepoRefs } from "./utils/github";
+import { prepare_pyodide } from "./utils/pyodide";
 
 const DEFAULT_MSG =
   "Enter a GitHub repo and branch/tag to review. Runs Python entirely in your browser using WebAssembly. Built with React, MaterialUI, and Pyodide.";
 
-function Heading(props) {
-  return (
-    <Box sx={{ flexGrow: 1, mb: 2 }}>
-      <AppBar position="static">
-        <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            Repo-Review
-          </Typography>
-          <Button href="https://github.com/scientific-python/repo-review" color="inherit">
-            Source
-          </Button>
-        </Toolbar>
-      </AppBar>
-    </Box>
-  );
-}
-
-function IfUrlLink({ name, url, color }) {
-  if (url) {
-    return (
-      <Typography
-        sx={{ display: "inline" }}
-        variant="body2"
-        color={color}
-        component="a"
-        href={url}
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        {name}
-      </Typography>
-    );
-  }
-  return (
-    <Typography sx={{ display: "inline" }} component="span" variant="body2" color={color}>
-      {name}
-    </Typography>
-  );
-}
-
-function Results(props) {
-  const output = [];
-  for (const key in props.results) {
-    const inner_results = props.results[key];
-    const results_components = inner_results.map((result) => {
-      const text_color =
-        result.state === false ? "error.main" : result.state === true ? "text.primary" : "info.main";
-      const details = result.state === false ? <span dangerouslySetInnerHTML={{ __html: result.err_msg }} /> : null;
-      const color = result.state === false ? "error" : result.state === true ? "success" : "info";
-      const icon = (
-        <Icon color={color}>{result.state === false ? "report" : result.state === true ? "check_box" : "info"}</Icon>
-      );
-
-      const skipped = (
-        <Typography sx={{ display: "inline" }} component="span" variant="body2" color="text.disabled">
-          {` [skipped] ${result.skip_reason}`}
-        </Typography>
-      );
-      const msg = (
-        <>
-          <IfUrlLink name={result.name} url={result.url} color={text_color} />
-          <IfUrlLink name={": "} url={""} color={text_color} />
-          <>
-            <Typography sx={{ display: "inline" }} component="span" color={text_color}>
-              {result.description}
-            </Typography>
-          </>
-          {result.state === undefined && skipped}
-        </>
-      );
-      return (
-        <ListItem disablePadding key={result.name}>
-          <ListItemIcon>{icon}</ListItemIcon>
-          <ListItemText primary={msg} secondary={details} />
-        </ListItem>
-      );
-    });
-
-    output.push(
-      <li key={`section-${key}`}>
-        <ul>
-          <ListSubheader>{props.families[key].name}</ListSubheader>
-          {props.families[key].description && (
-            <ListItem>
-              <span dangerouslySetInnerHTML={{ __html: props.families[key].description }} />
-            </ListItem>
-          )}
-          {results_components}
-        </ul>
-      </li>
-    );
-  }
-
-  return (
-    <Box sx={{ bgcolor: "background.paper" }}>
-      <List subheader={<li />} sx={{ overflow: "auto" }}>
-        {output}
-      </List>
-    </Box>
-  );
-}
-
-async function fetchRepoRefs(repo) {
-  if (!repo) return { branches: [], tags: [] };
-  try {
-    const [branchesResponse, tagsResponse] = await Promise.all([
-      fetch(`https://api.github.com/repos/${repo}/branches`),
-      fetch(`https://api.github.com/repos/${repo}/tags`),
-    ]);
-
-    if (!branchesResponse.ok || !tagsResponse.ok) {
-      console.error("Error fetching repo data");
-      return { branches: [], tags: [] };
-    }
-
-    const branches = await branchesResponse.json();
-    const tags = await tagsResponse.json();
-
-    return {
-      branches: branches.map((branch) => ({ name: branch.name, type: "branch" })),
-      tags: tags.map((tag) => ({ name: tag.name, type: "tag" })),
-    };
-  } catch (error) {
-    console.error("Error fetching repo references:", error);
-    return { branches: [], tags: [] };
-  }
-}
-
-async function prepare_pyodide(deps, onProgress) {
-  const deps_str = deps.map((i) => `\"${i}\"`).join(", ");
-  try {
-    if (onProgress) onProgress(5, "Initializing Pyodide runtime");
-    const pyodide = await loadPyodide();
-    if (onProgress) onProgress(50, "Core Pyodide loaded");
-
-    if (onProgress) onProgress(65, "Loading micropip");
-    await pyodide.loadPackage("micropip");
-    if (onProgress) onProgress(80, "Installing Python packages");
-
-    await pyodide.runPythonAsync(`
-        import micropip
-        await micropip.install([${deps_str}])
-    `);
-
-    if (onProgress) onProgress(100, "Ready");
-    return pyodide;
-  } catch (e) {
-    if (onProgress) onProgress(100, "Error during load");
-    throw e;
-  }
-}
-
-function MyThemeProvider(props) {
-  const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
-
-  const theme = React.useMemo(() => createTheme({ palette: { mode: prefersDarkMode ? "dark" : "light" } }), [prefersDarkMode]);
-
-  return <ThemeProvider theme={theme}>{props.children}</ThemeProvider>;
-}
 
 class App extends React.Component {
   constructor(props) {
@@ -430,12 +267,7 @@ json.dumps({"families": families_out, "results": results_out})
         <CssBaseline />
         <Box>
           {this.props.header && <Heading />}
-          <Stack
-            direction="row"
-            spacing={2}
-            alignItems="flex-start"
-            sx={{ m: 1, mb: 3 }}
-          >
+          <Stack direction="row" spacing={2} alignItems="flex-start" sx={{ m: 1, mb: 3 }}>
             <TextField
               id="repo-select"
               label="Org/Repo"
@@ -511,7 +343,7 @@ json.dumps({"families": families_out, "results": results_out})
               <AccordionSummary expandIcon={<Icon>expand_more</Icon>} sx={{ bgcolor: "primary.main", color: "primary.contrastText" }}>
                 <Typography fontWeight="medium">About</Typography>
               </AccordionSummary>
-              <AccordionDetails sx={(theme) => ({ bgcolor: alpha(theme.palette.primary.main, 0.08) })}>
+              <AccordionDetails sx={{ bgcolor: "transparent" }}>
                 <Typography variant="body1" component="div">
                   <span dangerouslySetInnerHTML={{ __html: this.state.msg }} />
                 </Typography>
@@ -519,25 +351,9 @@ json.dumps({"families": families_out, "results": results_out})
             </Accordion>
             {(this.state.pyodideLoading || this.state.progress) && (
               <Box sx={{ m: 2 }}>
-                <LinearProgress
-                  variant={
-                    this.state.pyodideLoading ? "determinate" : "indeterminate"
-                  }
-                  value={
-                    this.state.pyodideLoading
-                      ? this.state.pyodideProgress
-                      : undefined
-                  }
-                />
-                <Typography
-                  variant="caption"
-                  sx={{ display: "block", mt: 1 }}
-                >
-                  {this.state.pyodideLoading
-                    ? this.state.pyodideMessage
-                      ? `${this.state.pyodideMessage} — ${this.state.pyodideProgress}%`
-                      : `Pyodide loading: ${this.state.pyodideProgress}%`
-                    : "reading repository"}
+                <LinearProgress variant={this.state.pyodideLoading ? "determinate" : "indeterminate"} value={this.state.pyodideLoading ? this.state.pyodideProgress : undefined} />
+                <Typography variant="caption" sx={{ display: "block", mt: 1 }}>
+                  {this.state.pyodideLoading ? (this.state.pyodideMessage ? `${this.state.pyodideMessage} — ${this.state.pyodideProgress}%` : `Pyodide loading: ${this.state.pyodideProgress}%`) : "reading repository"}
                 </Typography>
               </Box>
             )}
