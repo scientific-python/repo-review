@@ -6,6 +6,9 @@ on:
     types:
       - published
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+
 permissions: {}
 
 jobs:
@@ -26,7 +29,7 @@ jobs:
     needs: [dist]
     environment: pypi
     permissions:
-      id-token: write
+      id-token: write # needed for attestations
     runs-on: ubuntu-latest
     if: github.event_name == 'release' && github.event.action == 'published'
     steps:
