@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "repo_review"
-version = "1.0.0"
+version = "1.0.0rc1"
 authors = [
   { name = "Henry Schreiner", email = "henryfs@princeton.edu" },
 ]
@@ -243,16 +243,15 @@ parse = """(?x)
     (?P<minor>0|[1-9]\\d*)\\.
     (?P<patch>0|[1-9]\\d*)
     (?:
-        \\.                           # dash separator for pre-release section
-        (?P<pre_l>[a-zA-Z-]+)         # pre-release label
-        (?P<pre_n>0|[1-9]\\d*)        # pre-release version number
-    )?                                # pre-release section is optional
+        (?P<pre_l>\\.dev|a|b|rc|\\.post) # pre-release label
+        (?P<pre_n>0|[1-9]\\d*)           # pre-release version number
+    )?                                   # pre-release section is optional
 """
 serialize = [
-    "{major}.{minor}.{patch}.{pre_l}{pre_n}",
+    "{major}.{minor}.{patch}{pre_l}{pre_n}",
     "{major}.{minor}.{patch}",
 ]
-values = ["dev", "a", "b", "rc", "final", "post"]
+values = [".dev", "a", "b", "rc", "final", ".post"]
 optional_value = "final"
 
 [[tool.bumpversion.files]]
