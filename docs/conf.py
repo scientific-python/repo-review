@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import importlib
-import importlib.metadata
 import inspect
 import os
 from pathlib import Path
@@ -14,7 +13,7 @@ DIR = Path(__file__).parent.resolve()
 project = "repo-review"
 copyright = "2022, Henry Schreiner"
 author = "Henry Schreiner"
-version = importlib.metadata.version("repo-review").split("+")[0]
+version = repo_review.__version__
 release = version
 
 extensions = [
@@ -65,6 +64,8 @@ html_theme_options: dict[str, Any] = {
     "source_branch": "main",
     "source_directory": "docs/",
 }
+html_copy_source = False
+html_show_sourcelink = False
 
 myst_enable_extensions = [
     "colon_fence",

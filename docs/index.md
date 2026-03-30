@@ -14,6 +14,7 @@ families
 webapp
 live-demo
 changelog
+GitHub repository <https://github.com/scientific-python/repo-review>
 ```
 
 ```{toctree}
