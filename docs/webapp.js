@@ -295,12 +295,14 @@ class App extends React.Component {
     this.pyodide_promise.then((pyodide) => {
       var families_checks;
       try {
+        pyodide.globals.set("repo", state.repo);
+        pyodide.globals.set("branch", state.ref);
         families_checks = pyodide.runPython(`
           from repo_review.processor import process, md_as_html
           from repo_review.ghpath import GHPath
           from dataclasses import replace
 
-          package = GHPath(repo="${state.repo}", branch="${state.ref}")
+          package = GHPath(repo=repo, branch=branch)
           families, checks = process(package)
 
           for v in families.values():
@@ -320,7 +322,7 @@ class App extends React.Component {
         }
         this.setState({
           progress: false,
-          err_msg: `<pre><code>${e.message}</code><pre>`,
+          err_msg: `<pre><code>${e.message}</code></pre>`,
         });
         return;
       }
