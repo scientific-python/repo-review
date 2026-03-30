@@ -38,6 +38,7 @@ function IfUrlLink({ name, url, color }) {
         component="a"
         href={url}
         target="_blank"
+        rel="noopener noreferrer"
       >
         {name}
       </MaterialUI.Typography>
@@ -115,11 +116,7 @@ function Results(props) {
       return (
         <MaterialUI.ListItem disablePadding key={result.name}>
           <MaterialUI.ListItemIcon>{icon}</MaterialUI.ListItemIcon>
-          <MaterialUI.ListItemText
-            primary={msg}
-            secondary={details}
-            href={result.url}
-          />
+          <MaterialUI.ListItemText primary={msg} secondary={details} />
         </MaterialUI.ListItem>
       );
     });
