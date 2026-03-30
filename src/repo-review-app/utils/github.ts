@@ -1,4 +1,4 @@
-export async function fetchRepoRefs(repo) {
+export async function fetchRepoRefs(repo: string) {
   if (!repo) return { branches: [], tags: [] };
   try {
     const [branchesResponse, tagsResponse] = await Promise.all([
@@ -15,11 +15,11 @@ export async function fetchRepoRefs(repo) {
     const tags = await tagsResponse.json();
 
     return {
-      branches: branches.map((branch) => ({
+      branches: branches.map((branch: any) => ({
         name: branch.name,
         type: "branch",
       })),
-      tags: tags.map((tag) => ({ name: tag.name, type: "tag" })),
+      tags: tags.map((tag: any) => ({ name: tag.name, type: "tag" })),
     };
   } catch (error) {
     console.error("Error fetching repo references:", error);

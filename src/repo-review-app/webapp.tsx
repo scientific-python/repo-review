@@ -20,14 +20,20 @@ import Heading from "./components/Heading";
 import Results from "./components/Results";
 import MyThemeProvider from "./components/MyThemeProvider";
 import { fetchRepoRefs } from "./utils/github";
-import { prepare_pyodide, run_process, load_known_checks } from "./utils/pyodide";
+import {
+  prepare_pyodide,
+  run_process,
+  load_known_checks,
+} from "./utils/pyodide";
 
 const DEFAULT_MSG =
   "Enter a GitHub repo and branch/tag to review. Runs Python entirely in your browser using WebAssembly. Built with React, MaterialUI, and Pyodide.";
 
+class App extends React.Component<any, any> {
+  pyodide_promise: Promise<any> | null;
+  refInputDebounce: any;
 
-class App extends React.Component {
-  constructor(props) {
+  constructor(props: any) {
     super(props);
     const inner_deps_str = props.deps.join("\n");
     const deps_str = `<pre><code>${inner_deps_str}</code></pre>`;
@@ -35,7 +41,8 @@ class App extends React.Component {
       results: [],
       repo: new URLSearchParams(window.location.search).get("repo") || "",
       ref: new URLSearchParams(window.location.search).get("ref") || "",
-      refType: new URLSearchParams(window.location.search).get("refType") || "branch",
+      refType:
+        new URLSearchParams(window.location.search).get("refType") || "branch",
       refs: { branches: [], tags: [] },
       msg: `<p>${DEFAULT_MSG}</p><h4>Packages:</h4> ${deps_str}`,
       progress: false,
@@ -50,17 +57,19 @@ class App extends React.Component {
       pyodideLoading: true,
       pyodideMessage: "",
     };
-    this.pyodide_promise = prepare_pyodide(props.deps, (p, m) =>
-      this.setState({
-        pyodideProgress: p,
-        pyodideLoading: p < 100,
-        pyodideMessage: m || "",
-      }),
+    this.pyodide_promise = prepare_pyodide(
+      props.deps,
+      (p: number, m?: string) =>
+        this.setState({
+          pyodideProgress: p,
+          pyodideLoading: p < 100,
+          pyodideMessage: m || "",
+        }),
     );
     this.refInputDebounce = null;
   }
 
-  async fetchRepoReferences(repo) {
+  async fetchRepoReferences(repo: string) {
     if (!repo) return;
 
     this.setState({ loadingRefs: true });
@@ -68,7 +77,7 @@ class App extends React.Component {
     this.setState({ refs: refs, loadingRefs: false });
   }
 
-  handleRepoChange(repo) {
+  handleRepoChange(repo: string) {
     this.setState({ repo });
 
     clearTimeout(this.refInputDebounce);
@@ -77,7 +86,7 @@ class App extends React.Component {
     }, 500);
   }
 
-  handleRefChange(ref, refType) {
+  handleRefChange(ref: string, refType: string) {
     this.setState({ ref, refType });
   }
 
@@ -85,41 +94,74 @@ class App extends React.Component {
     if (!this.state.repo || !this.state.ref) {
       this.setState({ results: [], msg: DEFAULT_MSG });
       window.history.replaceState(null, "", window.location.pathname);
-      alert(`Please enter a repo (${this.state.repo}) and branch/tag (${this.state.ref})`);
+      alert(
+        `Please enter a repo (${this.state.repo}) and branch/tag (${this.state.ref})`,
+      );
       return;
     }
-    const local_params = new URLSearchParams({ repo: this.state.repo, ref: this.state.ref, refType: this.state.refType });
-    window.history.replaceState(null, "", `${window.location.pathname}?${local_params}`);
+    const local_params = new URLSearchParams({
+      repo: this.state.repo,
+      ref: this.state.ref,
+      refType: this.state.refType,
+    });
+    window.history.replaceState(
+      null,
+      "",
+      `${window.location.pathname}?${local_params}`,
+    );
     this.setState({ results: [], progress: true, infoOpen: false });
     const state = this.state;
-    this.pyodide_promise.then((pyodide) => {
+    this.pyodide_promise!.then((pyodide: any) => {
       var families_checks;
       try {
         families_checks = run_process(pyodide, state.repo, state.ref);
-      } catch (e) {
+      } catch (e: any) {
         if (e.message && e.message.includes("KeyError: 'tree'")) {
-          this.setState({ progress: false, err_msg: "Invalid repository or branch/tag. Please try again." });
+          this.setState({
+            progress: false,
+            err_msg: "Invalid repository or branch/tag. Please try again.",
+          });
           return;
         }
-        this.setState({ progress: false, err_msg: `<pre><code>${e.message}</code><pre>` });
+        this.setState({
+          progress: false,
+          err_msg: `<pre><code>${e.message}</code><pre>`,
+        });
         return;
       }
 
       const families_dict = families_checks.get(0);
       const results_list = families_checks.get(1);
 
-      const results = {};
-      const families = {};
+      const results: any = {};
+      const families: any = {};
       for (const val of families_dict) {
         const descr = families_dict.get(val).get("description");
         results[val] = [];
-        families[val] = { name: families_dict.get(val).get("name").toString(), description: descr && descr.toString() };
+        families[val] = {
+          name: families_dict.get(val).get("name").toString(),
+          description: descr && descr.toString(),
+        };
       }
       for (const val of results_list) {
-        results[val.family].push({ name: val.name.toString(), description: val.description.toString(), state: val.result, err_msg: val.err_msg.toString(), url: val.url.toString(), skip_reason: val.skip_reason.toString() });
+        results[val.family].push({
+          name: val.name.toString(),
+          description: val.description.toString(),
+          state: val.result,
+          err_msg: val.err_msg.toString(),
+          url: val.url.toString(),
+          skip_reason: val.skip_reason.toString(),
+        });
       }
 
-      this.setState({ results: results, families: families, progress: false, err_msg: "", url: "", infoOpen: false });
+      this.setState({
+        results: results,
+        families: families,
+        progress: false,
+        err_msg: "",
+        url: "",
+        infoOpen: false,
+      });
 
       results_list.destroy();
       families_dict.destroy();
@@ -128,7 +170,7 @@ class App extends React.Component {
 
   async loadKnownChecks() {
     const pyodide = await this.pyodide_promise;
-    let data;
+    let data: any;
     try {
       data = load_known_checks(pyodide);
     } catch (e) {
@@ -136,8 +178,8 @@ class App extends React.Component {
       return;
     }
 
-    const knownResults = {};
-    const knownFamilies = {};
+    const knownResults: any = {};
+    const knownFamilies: any = {};
 
     for (const key of Object.keys(data.families || {})) {
       knownResults[key] = [];
@@ -165,22 +207,28 @@ class App extends React.Component {
   componentDidMount() {
     const params = new URLSearchParams(window.location.search);
     if (params.get("repo")) {
-      this.fetchRepoReferences(params.get("repo"));
+      this.fetchRepoReferences(params.get("repo")!);
     }
     if (params.get("repo") && params.get("ref")) {
       this.handleCompute();
     } else {
-      this.pyodide_promise.then(() => this.loadKnownChecks());
+      this.pyodide_promise!.then(() => this.loadKnownChecks());
     }
   }
 
   render() {
     const priorityBranches = ["HEAD", "main", "master", "develop", "stable"];
-    const branchMap = new Map(this.state.refs.branches.map((branch) => [branch.name, branch]));
+    const branchMap = new Map(
+      this.state.refs.branches.map((branch: any) => [branch.name, branch]),
+    );
 
-    let availableOptions = [];
+    let availableOptions: any[] = [];
 
-    if (this.state.repo === "" || (this.state.refs.branches.length === 0 && this.state.refs.tags.length === 0)) {
+    if (
+      this.state.repo === "" ||
+      (this.state.refs.branches.length === 0 &&
+        this.state.refs.tags.length === 0)
+    ) {
       availableOptions = [
         { label: "HEAD (default branch)", value: "HEAD", type: "branch" },
         { label: "main (branch)", value: "main", type: "branch" },
@@ -189,34 +237,54 @@ class App extends React.Component {
         { label: "stable (branch)", value: "stable", type: "branch" },
       ];
     } else {
-      const prioritizedBranches = [{ label: "HEAD (default branch)", value: "HEAD", type: "branch" }];
+      const prioritizedBranches = [
+        { label: "HEAD (default branch)", value: "HEAD", type: "branch" },
+      ];
 
       priorityBranches.slice(1).forEach((branchName) => {
         if (branchMap.has(branchName)) {
-          prioritizedBranches.push({ label: `${branchName} (branch)`, value: branchName, type: "branch" });
+          prioritizedBranches.push({
+            label: `${branchName} (branch)`,
+            value: branchName,
+            type: "branch",
+          });
           branchMap.delete(branchName);
         }
       });
 
-      const otherBranches = [];
-      branchMap.forEach((branch) => {
-        otherBranches.push({ label: `${branch.name} (branch)`, value: branch.name, type: "branch" });
+      const otherBranches: any[] = [];
+      branchMap.forEach((branch: any) => {
+        otherBranches.push({
+          label: `${branch.name} (branch)`,
+          value: branch.name,
+          type: "branch",
+        });
       });
       otherBranches.sort((a, b) => a.value.localeCompare(b.value));
 
-      const tagOptions = this.state.refs.tags.map((tag) => ({ label: `${tag.name} (tag)`, value: tag.name, type: "tag" }));
+      const tagOptions = this.state.refs.tags.map((tag: any) => ({
+        label: `${tag.name} (tag)`,
+        value: tag.name,
+        type: "tag",
+      }));
       tagOptions.sort((a, b) => a.value.localeCompare(b.value));
 
-      availableOptions = [...prioritizedBranches, ...otherBranches, ...tagOptions];
+      availableOptions = [
+        ...prioritizedBranches,
+        ...otherBranches,
+        ...tagOptions,
+      ];
     }
 
     const hasResults = !Array.isArray(this.state.results);
     const displayResults = hasResults
       ? this.state.results
       : !this.state.progress && this.state.knownChecks
-      ? this.state.knownChecks
-      : null;
-    const displayFamilies = hasResults ? this.state.families : this.state.knownFamilies;
+        ? this.state.knownChecks
+        : null;
+    const displayFamilies = hasResults
+      ? this.state.families
+      : this.state.knownFamilies;
     const resultsHeading = hasResults
       ? `Results for ${this.state.repo}@${this.state.ref} (${this.state.refType})`
       : "Available checks";
@@ -226,18 +294,26 @@ class App extends React.Component {
         <CssBaseline />
         <Box>
           {this.props.header && <Heading />}
-          <Stack direction="row" spacing={2} alignItems="flex-start" sx={{ m: 1, mb: 3 }}>
+          <Stack
+            direction="row"
+            spacing={2}
+            alignItems="flex-start"
+            sx={{ m: 1, mb: 3 }}
+          >
             <TextField
               id="repo-select"
               label="Org/Repo"
               helperText="e.g. scikit-hep/hist"
               variant="outlined"
               autoFocus={true}
-              onKeyDown={(e) => {
-                if (e.keyCode === 13) document.getElementById("ref-select").focus();
+              onKeyDown={(e: any) => {
+                if (e.keyCode === 13)
+                  document.getElementById("ref-select")!.focus();
               }}
-              onInput={(e) => this.handleRepoChange(e.target.value)}
-              defaultValue={new URLSearchParams(window.location.search).get("repo")}
+              onInput={(e: any) => this.handleRepoChange(e.target.value)}
+              defaultValue={new URLSearchParams(window.location.search).get(
+                "repo",
+              )}
               sx={{ flexGrow: 3 }}
             />
             <Autocomplete
@@ -246,17 +322,21 @@ class App extends React.Component {
               options={availableOptions}
               loading={this.state.loadingRefs}
               freeSolo={true}
-              onKeyDown={(e) => {
+              onKeyDown={(e: any) => {
                 if (e.keyCode === 13) this.handleCompute();
               }}
-              getOptionLabel={(option) => (typeof option === "string" ? option : option.label)}
-              renderOption={(props, option) => <li {...props}>{option.label}</li>}
-              onInputChange={(e, value) => {
+              getOptionLabel={(option: any) =>
+                typeof option === "string" ? option : option.label
+              }
+              renderOption={(props, option) => (
+                <li {...props}>{option.label}</li>
+              )}
+              onInputChange={(e: any, value: any) => {
                 if (typeof value === "string") {
                   this.handleRefChange(value, "branch");
                 }
               }}
-              onChange={(e, option) => {
+              onChange={(e: any, option: any) => {
                 if (option) {
                   if (typeof option === "object") {
                     this.handleRefChange(option.value, option.type);
@@ -265,7 +345,9 @@ class App extends React.Component {
                   }
                 }
               }}
-              defaultValue={new URLSearchParams(window.location.search).get("ref")}
+              defaultValue={new URLSearchParams(window.location.search).get(
+                "ref",
+              )}
               renderInput={(params) => (
                 <TextField
                   {...params}
@@ -277,7 +359,9 @@ class App extends React.Component {
                     ...params.InputProps,
                     endAdornment: (
                       <>
-                        {this.state.loadingRefs ? <CircularProgress color="inherit" size={20} /> : null}
+                        {this.state.loadingRefs ? (
+                          <CircularProgress color="inherit" size={20} />
+                        ) : null}
                         {params.InputProps.endAdornment}
                       </>
                     ),
@@ -286,20 +370,32 @@ class App extends React.Component {
               )}
             />
 
-            <Button onClick={() => this.handleCompute()} variant="contained" size="large" disabled={this.state.progress || !this.state.repo || !this.state.ref}>
+            <Button
+              onClick={() => this.handleCompute()}
+              variant="contained"
+              size="large"
+              disabled={
+                this.state.progress || !this.state.repo || !this.state.ref
+              }
+            >
               <Icon>start</Icon>
             </Button>
           </Stack>
           <Paper elevation={3}>
             <Accordion
               expanded={this.state.infoOpen}
-              onChange={(e, open) => this.setState({ infoOpen: open })}
+              onChange={(e: any, open: boolean) =>
+                this.setState({ infoOpen: open })
+              }
               elevation={0}
               disableGutters
               square
               sx={{ borderBottom: 1, borderColor: "divider" }}
             >
-              <AccordionSummary expandIcon={<Icon>expand_more</Icon>} sx={{ bgcolor: "primary.main", color: "primary.contrastText" }}>
+              <AccordionSummary
+                expandIcon={<Icon>expand_more</Icon>}
+                sx={{ bgcolor: "primary.main", color: "primary.contrastText" }}
+              >
                 <Typography fontWeight="medium">About</Typography>
               </AccordionSummary>
               <AccordionDetails sx={{ bgcolor: "transparent" }}>
@@ -310,15 +406,35 @@ class App extends React.Component {
             </Accordion>
             {(this.state.pyodideLoading || this.state.progress) && (
               <Box sx={{ m: 2 }}>
-                <LinearProgress variant={this.state.pyodideLoading ? "determinate" : "indeterminate"} value={this.state.pyodideLoading ? this.state.pyodideProgress : undefined} />
+                <LinearProgress
+                  variant={
+                    this.state.pyodideLoading ? "determinate" : "indeterminate"
+                  }
+                  value={
+                    this.state.pyodideLoading
+                      ? this.state.pyodideProgress
+                      : undefined
+                  }
+                />
                 <Typography variant="caption" sx={{ display: "block", mt: 1 }}>
-                  {this.state.pyodideLoading ? (this.state.pyodideMessage ? `${this.state.pyodideMessage} — ${this.state.pyodideProgress}%` : `Pyodide loading: ${this.state.pyodideProgress}%`) : "reading repository"}
+                  {this.state.pyodideLoading
+                    ? this.state.pyodideMessage
+                      ? `${this.state.pyodideMessage} — ${this.state.pyodideProgress}%`
+                      : `Pyodide loading: ${this.state.pyodideProgress}%`
+                    : "reading repository"}
                 </Typography>
               </Box>
             )}
             {this.state.err_msg && (
-              <Typography variant="body1" component="div" color="error" sx={{ p: 2 }}>
-                <span dangerouslySetInnerHTML={{ __html: this.state.err_msg }} />
+              <Typography
+                variant="body1"
+                component="div"
+                color="error"
+                sx={{ p: 2 }}
+              >
+                <span
+                  dangerouslySetInnerHTML={{ __html: this.state.err_msg }}
+                />
               </Typography>
             )}
             {displayResults && (
@@ -336,8 +452,8 @@ class App extends React.Component {
   }
 }
 
-export function mountApp(opts = {}) {
-  const root = ReactDOM.createRoot(document.getElementById("root"));
+export function mountApp(opts: any = {}) {
+  const root = ReactDOM.createRoot(document.getElementById("root")!);
   root.render(<App {...opts} />);
 }
 

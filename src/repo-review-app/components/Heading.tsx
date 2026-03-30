@@ -1,7 +1,7 @@
 import React from "react";
 import { Box, AppBar, Toolbar, Typography, Button } from "@mui/material";
 
-export default function Heading(props) {
+export default function Heading(props: any) {
   return (
     <Box sx={{ flexGrow: 1, mb: 2 }}>
       <AppBar position="static">
@@ -9,7 +9,10 @@ export default function Heading(props) {
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             Repo-Review
           </Typography>
-          <Button href="https://github.com/scientific-python/repo-review" color="inherit">
+          <Button
+            href="https://github.com/scientific-python/repo-review"
+            color="inherit"
+          >
             Source
           </Button>
         </Toolbar>

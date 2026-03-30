@@ -1,7 +1,15 @@
 import React from "react";
 import { Typography } from "@mui/material";
 
-export default function IfUrlLink({ name, url, color }) {
+export default function IfUrlLink({
+  name,
+  url,
+  color,
+}: {
+  name: string;
+  url?: string;
+  color?: string;
+}) {
   if (url) {
     return (
       <Typography
@@ -18,7 +26,12 @@ export default function IfUrlLink({ name, url, color }) {
     );
   }
   return (
-    <Typography sx={{ display: "inline" }} component="span" variant="body2" color={color}>
+    <Typography
+      sx={{ display: "inline" }}
+      component="span"
+      variant="body2"
+      color={color}
+    >
       {name}
     </Typography>
   );
