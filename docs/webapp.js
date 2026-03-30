@@ -650,23 +650,30 @@ json.dumps({"families": families_out, "results": results_out})
                 </MaterialUI.Typography>
               </MaterialUI.AccordionDetails>
             </MaterialUI.Accordion>
-            {this.state.pyodideLoading && (
+            {(this.state.pyodideLoading || this.state.progress) && (
               <MaterialUI.Box sx={{ m: 2 }}>
                 <MaterialUI.LinearProgress
-                  variant="determinate"
-                  value={this.state.pyodideProgress}
+                  variant={
+                    this.state.pyodideLoading ? "determinate" : "indeterminate"
+                  }
+                  value={
+                    this.state.pyodideLoading
+                      ? this.state.pyodideProgress
+                      : undefined
+                  }
                 />
                 <MaterialUI.Typography
                   variant="caption"
                   sx={{ display: "block", mt: 1 }}
                 >
-                  {this.state.pyodideMessage
-                    ? `${this.state.pyodideMessage} — ${this.state.pyodideProgress}%`
-                    : `Pyodide loading: ${this.state.pyodideProgress}%`}
+                  {this.state.pyodideLoading
+                    ? this.state.pyodideMessage
+                      ? `${this.state.pyodideMessage} — ${this.state.pyodideProgress}%`
+                      : `Pyodide loading: ${this.state.pyodideProgress}%`
+                    : "reading repository"}
                 </MaterialUI.Typography>
               </MaterialUI.Box>
             )}
-            {this.state.progress && <MaterialUI.LinearProgress />}
             {this.state.err_msg && (
               <MaterialUI.Typography
                 variant="body1"
