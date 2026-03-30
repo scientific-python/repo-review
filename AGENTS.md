@@ -53,11 +53,11 @@ uvx hatch run api-docs:build
 
 ### Important Files
 
-- `processor.py` → orchestrates checks
-- `checks.py` → discovers checks (entry points)
-- `fixtures.py` → dependency injection system
-- `__main__.py` → CLI interface
-- `docs/webapp.js` → A JavaScript webapp using Pyodide
+- `src/repo_review/processor.py` → orchestrates checks
+- `src/repo_review/checks.py` → discovers checks (entry points)
+- `src/repo_review/fixtures.py` → dependency injection system
+- `src/repo_review/__main__.py` → CLI interface
+- `src/repo-review-app/` → A JavaScript webapp using Pyodide
 
 ### Plugin System
 

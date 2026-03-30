@@ -38,3 +38,11 @@ jobs:
       - name: Pre-install checks
         run: |
           prek prepare-hooks
+
+      - name: Setup bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: stable
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
