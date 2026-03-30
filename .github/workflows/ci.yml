@@ -108,7 +108,7 @@ jobs:
       - name: Install with cache
         run: bun install --frozen-lockfile
 
-      - name: Test
+      - name: Build webapp
         run: bun run build
 
       - name: Linkcheck
