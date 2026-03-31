@@ -19,6 +19,8 @@ import {
   Select,
   MenuItem,
   Typography,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import Heading from "./components/Heading";
 import Results from "./components/Results";
@@ -28,6 +30,7 @@ import {
   prepare_pyodide,
   run_process,
   load_known_checks,
+  generate_html,
 } from "./utils/pyodide";
 
 const DEFAULT_MSG =
@@ -44,6 +47,11 @@ class App extends React.Component<any, any> {
     this.state = {
       show: new URLSearchParams(window.location.search).get("show") || "all",
       results: [],
+      pyFamilies: null,
+      pyChecks: null,
+      snackbarOpen: false,
+      snackbarMsg: "",
+      snackbarSeverity: "info",
       repo: new URLSearchParams(window.location.search).get("repo") || "",
       ref: new URLSearchParams(window.location.search).get("ref") || "",
       refType:
@@ -83,7 +91,7 @@ class App extends React.Component<any, any> {
   }
 
   handleRepoChange(repo: string) {
-    this.setState({ repo });
+    this.setState({ repo, pyFamilies: null, pyChecks: null });
 
     clearTimeout(this.refInputDebounce);
     this.refInputDebounce = setTimeout(() => {
@@ -92,16 +100,18 @@ class App extends React.Component<any, any> {
   }
 
   handleRefChange(ref: string, refType: string) {
-    this.setState({ ref, refType });
+    this.setState({ ref, refType, pyFamilies: null, pyChecks: null });
   }
 
   handleCompute() {
     if (!this.state.repo || !this.state.ref) {
       this.setState({ results: [], msg: DEFAULT_MSG });
       window.history.replaceState(null, "", window.location.pathname);
-      alert(
-        `Please enter a repo (${this.state.repo}) and branch/tag (${this.state.ref})`,
-      );
+      this.setState({
+        snackbarOpen: true,
+        snackbarMsg: `Please enter a repo and branch/tag`,
+        snackbarSeverity: "warning",
+      });
       return;
     }
     const local_params = new URLSearchParams({
@@ -160,6 +170,18 @@ class App extends React.Component<any, any> {
         });
       }
 
+      // Destroy any previously stored PyProxies for a different run
+      try {
+        if (this.state.pyFamilies && this.state.pyFamilies !== families_dict) {
+          this.state.pyFamilies.destroy();
+        }
+        if (this.state.pyChecks && this.state.pyChecks !== results_list) {
+          this.state.pyChecks.destroy();
+        }
+      } catch (e) {
+        // ignore destroy errors
+      }
+
       this.setState({
         results: results,
         families: families,
@@ -167,11 +189,61 @@ class App extends React.Component<any, any> {
         err_msg: "",
         url: "",
         infoOpen: false,
-      });
+        pyFamilies: families_dict,
+        pyChecks: results_list,
 
-      results_list.destroy();
-      families_dict.destroy();
+      });
     });
+  }
+
+  async handleCopyHtml() {
+    if (!this.state.repo || !this.state.ref) {
+      this.setState({
+        snackbarOpen: true,
+        snackbarMsg: `Please enter a repo and branch/tag`,
+        snackbarSeverity: "warning",
+      });
+      return;
+    }
+
+    try {
+      const pyodide = await this.pyodide_promise;
+
+      let htmlOut: any;
+
+      // Reuse previously stored PyProxy results if they correspond to the
+      // same repo/ref to avoid rerunning the expensive `process(package)`.
+      if (this.state.pyFamilies && this.state.pyChecks) {
+        // Use stored pyFamilies/pyChecks; they are cleared when repo/ref change
+        htmlOut = await generate_html(pyodide, this.state.pyFamilies, this.state.pyChecks, this.state.show || "all");
+      } else {
+        // Shouldn't be possible: if we have a copy button, we should have
+        // a stored run result for that repo/ref. Show an error instead of
+        // rerunning the expensive process.
+        this.setState({
+          snackbarOpen: true,
+          snackbarMsg: "Stored results do not match current repo/ref — please run the checks first",
+          snackbarSeverity: "error",
+        });
+        return;
+      }
+
+      const htmlStr = htmlOut.toString ? htmlOut.toString() : htmlOut;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(htmlStr);
+        this.setState({ snackbarOpen: true, snackbarMsg: "HTML output copied to clipboard", snackbarSeverity: "success" });
+      } else {
+        // Fallback: open in new window for manual copy
+        const w = window.open("", "repo-review-html");
+        if (w) {
+          w.document.write(htmlStr);
+          w.document.close();
+        }
+      }
+    } catch (e: any) {
+      console.error("Error generating HTML:", e);
+      this.setState({ snackbarOpen: true, snackbarMsg: "Error generating HTML: " + (e?.message || e), snackbarSeverity: "error" });
+    }
   }
 
   async loadKnownChecks() {
@@ -505,14 +577,40 @@ class App extends React.Component<any, any> {
             )}
             {displayResults && (
               <>
-                <Typography variant="h6" sx={{ px: 2, pt: 1 }}>
-                  {resultsHeading}
-                </Typography>
+                <Box sx={{ display: "flex", alignItems: "center", px: 2, pt: 1 }}>
+                  <Typography variant="h6" sx={{ flexGrow: 1 }}>
+                    {resultsHeading}
+                  </Typography>
+                  {hasResults && (
+                    <Button
+                      onClick={() => this.handleCopyHtml()}
+                      variant="outlined"
+                      size="small"
+                      disabled={this.state.progress || this.state.pyodideLoading}
+                    >
+                      <Icon>content_copy</Icon>
+                    </Button>
+                  )}
+                </Box>
                 <Results results={filteredResults} families={filteredFamilies} />
               </>
             )}
           </Paper>
         </Box>
+        <Snackbar
+          open={this.state.snackbarOpen}
+          autoHideDuration={4000}
+          onClose={() => this.setState({ snackbarOpen: false })}
+          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        >
+          <Alert
+            onClose={() => this.setState({ snackbarOpen: false })}
+            severity={this.state.snackbarSeverity as any}
+            sx={{ width: "100%" }}
+          >
+            {this.state.snackbarMsg}
+          </Alert>
+        </Snackbar>
       </MyThemeProvider>
     );
   }
