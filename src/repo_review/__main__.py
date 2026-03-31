@@ -436,18 +436,15 @@ def on_each(
     extend_select_list = {x.strip() for x in extend_select.split(",") if x}
 
     # Local paths support pointing at pyproject.toml as a special case
-    if isinstance(package, GHPath):
-        if format_opt == "rich":
-            rich.print(f"[bold]Processing [blue]{package}[/blue] from GitHub\n")
-        base_package = package
-        header = package.repo
-    elif package.name == "pyproject.toml" and package.is_file():
-        # Special case for passing a path to a pyproject.toml
-        base_package = package.parent
-        header = package.parent.name
-    else:
-        base_package = package
-        header = package.name
+    match package:
+        case GHPath(repo=header) as base_package:
+            if format_opt == "rich":
+                rich.print(f"[bold]Processing [blue]{package}[/blue] from GitHub\n")
+        case object(parent=base_package, name="pyproject.toml") if package.is_file():
+            # Special case for passing a path to a pyproject.toml
+            header = base_package.name
+        case base_package:
+            header = getattr(package, "name", str(package))
 
     collected = collect_all(base_package, subdir=package_dir)
     if len(collected.checks) == 0:
