@@ -174,6 +174,43 @@ class App extends React.Component<any, any> {
     });
   }
 
+  async handleCopyHtml() {
+    if (!this.state.repo || !this.state.ref) {
+      alert(`Please enter a repo (${this.state.repo}) and branch/tag (${this.state.ref})`);
+      return;
+    }
+
+    try {
+      const pyodide = await this.pyodide_promise;
+      pyodide.globals.set("repo_for_html", this.state.repo);
+      pyodide.globals.set("ref_for_html", this.state.ref);
+      const htmlOut = await pyodide.runPythonAsync(`
+from repo_review.processor import process
+from repo_review.html import to_html
+from repo_review.ghpath import GHPath
+package = GHPath(repo=repo_for_html, branch=ref_for_html)
+families, checks = process(package)
+to_html(families, checks)
+      `);
+
+      const htmlStr = htmlOut.toString ? htmlOut.toString() : htmlOut;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(htmlStr);
+        alert("HTML output copied to clipboard");
+      } else {
+        // Fallback: open in new window for manual copy
+        const w = window.open("", "repo-review-html");
+        if (w) {
+          w.document.write(htmlStr);
+          w.document.close();
+        }
+      }
+    } catch (e: any) {
+      console.error("Error generating HTML:", e);
+      alert("Error generating HTML: " + (e?.message || e));
+    }
+  }
+
   async loadKnownChecks() {
     const pyodide = await this.pyodide_promise;
     let data: any;
@@ -505,9 +542,21 @@ class App extends React.Component<any, any> {
             )}
             {displayResults && (
               <>
-                <Typography variant="h6" sx={{ px: 2, pt: 1 }}>
-                  {resultsHeading}
-                </Typography>
+                <Box sx={{ display: "flex", alignItems: "center", px: 2, pt: 1 }}>
+                  <Typography variant="h6" sx={{ flexGrow: 1 }}>
+                    {resultsHeading}
+                  </Typography>
+                  {hasResults && (
+                    <Button
+                      onClick={() => this.handleCopyHtml()}
+                      variant="outlined"
+                      size="small"
+                      disabled={this.state.progress || this.state.pyodideLoading}
+                    >
+                      <Icon>content_copy</Icon>
+                    </Button>
+                  )}
+                </Box>
                 <Results results={filteredResults} families={filteredFamilies} />
               </>
             )}
