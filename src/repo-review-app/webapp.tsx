@@ -30,6 +30,7 @@ import {
   prepare_pyodide,
   run_process,
   load_known_checks,
+  generate_html,
 } from "./utils/pyodide";
 
 const DEFAULT_MSG =
@@ -221,23 +222,7 @@ class App extends React.Component<any, any> {
         this.state.pyFamiliesRepo === this.state.repo &&
         this.state.pyFamiliesRef === this.state.ref
       ) {
-        pyodide.globals.set("families_for_html", this.state.pyFamilies);
-        pyodide.globals.set("checks_for_html", this.state.pyChecks);
-        pyodide.globals.set("show_for_html", this.state.show || "all");
-        htmlOut = await pyodide.runPythonAsync(`
-from repo_review.html import to_html
-def _filter_checks(checks, show):
-    if show == "all":
-        return checks
-    if show == "err":
-        return [c for c in checks if c.result is False]
-    if show == "errskip":
-        return [c for c in checks if c.result is not True]
-    return checks
-
-filtered = _filter_checks(checks_for_html, show_for_html)
-to_html(families_for_html, filtered)
-        `);
+        htmlOut = await generate_html(pyodide, this.state.pyFamilies, this.state.pyChecks, this.state.show || "all");
       } else {
         // Shouldn't be possible: if we have a copy button, we should have
         // a stored run result for that repo/ref. Show an error instead of
