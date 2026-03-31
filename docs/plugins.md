@@ -67,7 +67,9 @@ It takes the check name and any fixtures as keyword arguments. It returns a
 {class}`~repo_review.checks.Check` instance, so you can see if the `.result` is
 `True`/`False`/`None`, or check any of the other properties.
 
-.. versionadded:: 0.10.5
+```{versionadded} 0.10.5
+
+```
 
 ## An existing package
 

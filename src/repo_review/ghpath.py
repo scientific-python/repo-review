@@ -9,11 +9,13 @@ __lazy_modules__ = ["io", "json", "sys", "typing"]
 import dataclasses
 import io
 import json
+import logging
 import sys
 import typing
 from typing import Literal
 
 from ._compat.importlib.resources.abc import Traversable
+from ._timer import log_timer
 
 TYPE_CHECKING = False
 if TYPE_CHECKING:
@@ -24,6 +26,10 @@ __all__ = ["EmptyTraversable", "GHPath"]
 
 def __dir__() -> list[str]:
     return __all__
+
+
+# Module-level logger
+logger = logging.getLogger(__name__)
 
 
 @dataclasses.dataclass(frozen=True, kw_only=True)
@@ -57,11 +63,15 @@ class GHPath(Traversable):
         if sys.platform == "emscripten":
             import pyodide.http  # noqa: PLC0415
 
-            return pyodide.http.open_url(url)
+            with log_timer(logger, "Fetching %s", url):
+                return pyodide.http.open_url(url)
 
         import urllib.request  # noqa: PLC0415
 
-        with urllib.request.urlopen(url) as response:
+        with (
+            log_timer(logger, "Fetching %s", url),
+            urllib.request.urlopen(url) as response,
+        ):
             return io.StringIO(response.read().decode("utf-8"))
 
     def __post_init__(self) -> None:
