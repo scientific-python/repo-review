@@ -44,6 +44,10 @@ class App extends React.Component<any, any> {
     this.state = {
       show: new URLSearchParams(window.location.search).get("show") || "all",
       results: [],
+      pyFamilies: null,
+      pyChecks: null,
+      pyFamiliesRepo: "",
+      pyFamiliesRef: "",
       repo: new URLSearchParams(window.location.search).get("repo") || "",
       ref: new URLSearchParams(window.location.search).get("ref") || "",
       refType:
@@ -160,6 +164,18 @@ class App extends React.Component<any, any> {
         });
       }
 
+      // Destroy any previously stored PyProxies for a different run
+      try {
+        if (this.state.pyFamilies && this.state.pyFamilies !== families_dict) {
+          this.state.pyFamilies.destroy();
+        }
+        if (this.state.pyChecks && this.state.pyChecks !== results_list) {
+          this.state.pyChecks.destroy();
+        }
+      } catch (e) {
+        // ignore destroy errors
+      }
+
       this.setState({
         results: results,
         families: families,
@@ -167,10 +183,11 @@ class App extends React.Component<any, any> {
         err_msg: "",
         url: "",
         infoOpen: false,
+        pyFamilies: families_dict,
+        pyChecks: results_list,
+        pyFamiliesRepo: state.repo,
+        pyFamiliesRef: state.ref,
       });
-
-      results_list.destroy();
-      families_dict.destroy();
     });
   }
 
@@ -182,16 +199,36 @@ class App extends React.Component<any, any> {
 
     try {
       const pyodide = await this.pyodide_promise;
-      pyodide.globals.set("repo_for_html", this.state.repo);
-      pyodide.globals.set("ref_for_html", this.state.ref);
-      const htmlOut = await pyodide.runPythonAsync(`
+
+      let htmlOut: any;
+
+      // Reuse previously stored PyProxy results if they correspond to the
+      // same repo/ref to avoid rerunning the expensive `process(package)`.
+      if (
+        this.state.pyFamilies &&
+        this.state.pyChecks &&
+        this.state.pyFamiliesRepo === this.state.repo &&
+        this.state.pyFamiliesRef === this.state.ref
+      ) {
+        pyodide.globals.set("families_for_html", this.state.pyFamilies);
+        pyodide.globals.set("checks_for_html", this.state.pyChecks);
+        htmlOut = await pyodide.runPythonAsync(`
+from repo_review.html import to_html
+to_html(families_for_html, checks_for_html)
+        `);
+      } else {
+        // Fallback: run process(package) (expensive)
+        pyodide.globals.set("repo_for_html", this.state.repo);
+        pyodide.globals.set("ref_for_html", this.state.ref);
+        htmlOut = await pyodide.runPythonAsync(`
 from repo_review.processor import process
 from repo_review.html import to_html
 from repo_review.ghpath import GHPath
 package = GHPath(repo=repo_for_html, branch=ref_for_html)
 families, checks = process(package)
 to_html(families, checks)
-      `);
+        `);
+      }
 
       const htmlStr = htmlOut.toString ? htmlOut.toString() : htmlOut;
       if (navigator.clipboard && navigator.clipboard.writeText) {
