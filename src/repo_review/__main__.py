@@ -30,8 +30,10 @@ __lazy_modules__ = [
 import argparse
 import functools
 import importlib.metadata
+import importlib.util
 import itertools
 import json
+import logging
 import os
 import sys
 import urllib.error
@@ -45,6 +47,7 @@ import rich.syntax
 import rich.terminal_theme
 import rich.text
 import rich.tree
+from rich.logging import RichHandler
 
 from repo_review import __version__
 from repo_review._compat.typing import assert_never
@@ -52,7 +55,12 @@ from repo_review.checks import get_check_description, get_check_url
 from repo_review.families import Family, get_family_description, get_family_name
 from repo_review.ghpath import GHPath
 from repo_review.html import to_html
-from repo_review.processor import Result, as_simple_dict, collect_all, process
+from repo_review.processor import (
+    Result,
+    as_simple_dict,
+    collect_all,
+    process,
+)
 
 TYPE_CHECKING = False
 if TYPE_CHECKING:
@@ -304,6 +312,11 @@ def main(args: list[str] | None = None) -> None:
         help="List all plugin versions and exit",
     )
     parser.add_argument(
+        "--log-level",
+        help="Set logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL).",
+        metavar="LEVEL",
+    )
+    parser.add_argument(
         "--list-all",
         action="store_true",
         help="List all checks and exit",
@@ -361,6 +374,17 @@ def main(args: list[str] | None = None) -> None:
     )
 
     parsed = parser.parse_args(args)
+
+    # Configure logging (Rich handler) for only our package if requested
+    lvl = parsed.log_level or os.getenv("REPO_REVIEW_LOG_LEVEL")
+    if lvl:
+        level = getattr(logging, lvl.upper(), logging.INFO)
+        handler = RichHandler()
+        # Configure only the `repo_review` logger to avoid enabling global logging
+        repo_logger = logging.getLogger("repo_review")
+        repo_logger.setLevel(level)
+        repo_logger.addHandler(handler)
+        repo_logger.propagate = False
 
     if parsed.versions:
         _all_versions()

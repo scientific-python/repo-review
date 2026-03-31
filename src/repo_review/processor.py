@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import logging
+
 __lazy_modules__ = [
     "collections",
     "collections.abc",
@@ -24,6 +26,7 @@ from typing import Any, TypeVar
 
 import markdown_it
 
+from ._timer import log_timer
 from .checks import (
     Check,
     collect_checks,
@@ -63,6 +66,7 @@ def __dir__() -> list[str]:
     return __all__
 
 
+logger = logging.getLogger(__name__)
 md = markdown_it.MarkdownIt()
 
 
@@ -172,6 +176,7 @@ def _sort_by_family(
     )
 
 
+@log_timer(logger, "Collecting all checks and fixtures")
 def collect_all(
     root: Traversable = EmptyTraversable(),  # noqa: B008 (frozen dataclass OK)
     subdir: str = "",
@@ -213,6 +218,7 @@ def collect_all(
     return CollectionReturn(fixtures, checks, families)
 
 
+@log_timer(logger, "Processing checks")
 def process(
     root: Traversable,
     *,
