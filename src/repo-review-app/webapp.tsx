@@ -49,8 +49,6 @@ class App extends React.Component<any, any> {
       results: [],
       pyFamilies: null,
       pyChecks: null,
-      pyFamiliesRepo: "",
-      pyFamiliesRef: "",
       snackbarOpen: false,
       snackbarMsg: "",
       snackbarSeverity: "info",
@@ -93,7 +91,7 @@ class App extends React.Component<any, any> {
   }
 
   handleRepoChange(repo: string) {
-    this.setState({ repo });
+    this.setState({ repo, pyFamilies: null, pyChecks: null });
 
     clearTimeout(this.refInputDebounce);
     this.refInputDebounce = setTimeout(() => {
@@ -102,7 +100,7 @@ class App extends React.Component<any, any> {
   }
 
   handleRefChange(ref: string, refType: string) {
-    this.setState({ ref, refType });
+    this.setState({ ref, refType, pyFamilies: null, pyChecks: null });
   }
 
   handleCompute() {
@@ -193,8 +191,7 @@ class App extends React.Component<any, any> {
         infoOpen: false,
         pyFamilies: families_dict,
         pyChecks: results_list,
-        pyFamiliesRepo: state.repo,
-        pyFamiliesRef: state.ref,
+
       });
     });
   }
@@ -216,12 +213,8 @@ class App extends React.Component<any, any> {
 
       // Reuse previously stored PyProxy results if they correspond to the
       // same repo/ref to avoid rerunning the expensive `process(package)`.
-      if (
-        this.state.pyFamilies &&
-        this.state.pyChecks &&
-        this.state.pyFamiliesRepo === this.state.repo &&
-        this.state.pyFamiliesRef === this.state.ref
-      ) {
+      if (this.state.pyFamilies && this.state.pyChecks) {
+        // Use stored pyFamilies/pyChecks; they are cleared when repo/ref change
         htmlOut = await generate_html(pyodide, this.state.pyFamilies, this.state.pyChecks, this.state.show || "all");
       } else {
         // Shouldn't be possible: if we have a copy button, we should have
