@@ -435,12 +435,7 @@ def on_each(
     extend_ignore_list = {x.strip() for x in extend_ignore.split(",") if x}
     extend_select_list = {x.strip() for x in extend_select.split(",") if x}
 
-    collected = collect_all(package, subdir=package_dir)
-    if len(collected.checks) == 0:
-        msg = "No checks registered. Please install a repo-review plugin."
-        print(f"Error: {msg}", file=sys.stderr)
-        raise SystemExit(1)
-
+    # Local paths support pointing at pyproject.toml as a special case
     if isinstance(package, GHPath):
         if format_opt == "rich":
             rich.print(f"[bold]Processing [blue]{package}[/blue] from GitHub\n")
@@ -453,6 +448,12 @@ def on_each(
     else:
         base_package = package
         header = package.name
+
+    collected = collect_all(base_package, subdir=package_dir)
+    if len(collected.checks) == 0:
+        msg = "No checks registered. Please install a repo-review plugin."
+        print(f"Error: {msg}", file=sys.stderr)
+        raise SystemExit(1)
 
     families, processed = process(
         base_package,
