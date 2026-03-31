@@ -19,6 +19,8 @@ import {
   Select,
   MenuItem,
   Typography,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import Heading from "./components/Heading";
 import Results from "./components/Results";
@@ -48,6 +50,9 @@ class App extends React.Component<any, any> {
       pyChecks: null,
       pyFamiliesRepo: "",
       pyFamiliesRef: "",
+      snackbarOpen: false,
+      snackbarMsg: "",
+      snackbarSeverity: "info",
       repo: new URLSearchParams(window.location.search).get("repo") || "",
       ref: new URLSearchParams(window.location.search).get("ref") || "",
       refType:
@@ -103,9 +108,11 @@ class App extends React.Component<any, any> {
     if (!this.state.repo || !this.state.ref) {
       this.setState({ results: [], msg: DEFAULT_MSG });
       window.history.replaceState(null, "", window.location.pathname);
-      alert(
-        `Please enter a repo (${this.state.repo}) and branch/tag (${this.state.ref})`,
-      );
+      this.setState({
+        snackbarOpen: true,
+        snackbarMsg: `Please enter a repo and branch/tag`,
+        snackbarSeverity: "warning",
+      });
       return;
     }
     const local_params = new URLSearchParams({
@@ -193,7 +200,11 @@ class App extends React.Component<any, any> {
 
   async handleCopyHtml() {
     if (!this.state.repo || !this.state.ref) {
-      alert(`Please enter a repo (${this.state.repo}) and branch/tag (${this.state.ref})`);
+      this.setState({
+        snackbarOpen: true,
+        snackbarMsg: `Please enter a repo and branch/tag`,
+        snackbarSeverity: "warning",
+      });
       return;
     }
 
@@ -233,7 +244,7 @@ to_html(families, checks)
       const htmlStr = htmlOut.toString ? htmlOut.toString() : htmlOut;
       if (navigator.clipboard && navigator.clipboard.writeText) {
         await navigator.clipboard.writeText(htmlStr);
-        alert("HTML output copied to clipboard");
+        this.setState({ snackbarOpen: true, snackbarMsg: "HTML output copied to clipboard", snackbarSeverity: "success" });
       } else {
         // Fallback: open in new window for manual copy
         const w = window.open("", "repo-review-html");
@@ -244,7 +255,7 @@ to_html(families, checks)
       }
     } catch (e: any) {
       console.error("Error generating HTML:", e);
-      alert("Error generating HTML: " + (e?.message || e));
+      this.setState({ snackbarOpen: true, snackbarMsg: "Error generating HTML: " + (e?.message || e), snackbarSeverity: "error" });
     }
   }
 
@@ -599,6 +610,20 @@ to_html(families, checks)
             )}
           </Paper>
         </Box>
+        <Snackbar
+          open={this.state.snackbarOpen}
+          autoHideDuration={4000}
+          onClose={() => this.setState({ snackbarOpen: false })}
+          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        >
+          <Alert
+            onClose={() => this.setState({ snackbarOpen: false })}
+            severity={this.state.snackbarSeverity as any}
+            sx={{ width: "100%" }}
+          >
+            {this.state.snackbarMsg}
+          </Alert>
+        </Snackbar>
       </MyThemeProvider>
     );
   }
