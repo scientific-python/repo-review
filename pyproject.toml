@@ -145,6 +145,7 @@ strict = true
 log_level = "INFO"
 filterwarnings = [
   "error",
+  "ignore:os.path.commonprefix\\(\\) is deprecated\\. Use os.path.commonpath\\(\\) for longest path prefix\\.:DeprecationWarning:pygments.*",
 ]
 testpaths = ["tests"]
 pythonpath = ["tests/test_utilities"]
