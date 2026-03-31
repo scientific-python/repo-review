@@ -223,9 +223,20 @@ class App extends React.Component<any, any> {
       ) {
         pyodide.globals.set("families_for_html", this.state.pyFamilies);
         pyodide.globals.set("checks_for_html", this.state.pyChecks);
+        pyodide.globals.set("show_for_html", this.state.show || "all");
         htmlOut = await pyodide.runPythonAsync(`
 from repo_review.html import to_html
-to_html(families_for_html, checks_for_html)
+def _filter_checks(checks, show):
+    if show == "all":
+        return checks
+    if show == "err":
+        return [c for c in checks if c.result is False]
+    if show == "errskip":
+        return [c for c in checks if c.result is not True]
+    return checks
+
+filtered = _filter_checks(checks_for_html, show_for_html)
+to_html(families_for_html, filtered)
         `);
       } else {
         // Shouldn't be possible: if we have a copy button, we should have
