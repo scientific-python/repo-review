@@ -38,15 +38,16 @@ Example implementation:
 ```python
 from importlib.resources.abc import Traversable
 
-def prefetch_files() -> set[str]:
-		"""Return files that would benefit from prefetching.
 
-		Keep this list small and focused on files your checks actually read.
-		"""
-		return {
-				".github/workflows/*.yml",
-				".pre-commit-config.yaml",
-		}
+def prefetch_files() -> set[str]:
+    """Return files that would benefit from prefetching.
+
+    Keep this list small and focused on files your checks actually read.
+    """
+    return {
+        ".github/workflows/*.yml",
+        ".pre-commit-config.yaml",
+    }
 ```
 
 ## How repo-review uses this
@@ -57,4 +58,3 @@ entry points and unions their returned sets. When running the CLI against a
 the matching files in parallel using the async `GHPath.prefetch()` helper.
 If async support (e.g. `httpx`) is not available repo-review falls back to the
 regular synchronous loading path.
-
