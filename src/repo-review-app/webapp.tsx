@@ -228,17 +228,15 @@ from repo_review.html import to_html
 to_html(families_for_html, checks_for_html)
         `);
       } else {
-        // Fallback: run process(package) (expensive)
-        pyodide.globals.set("repo_for_html", this.state.repo);
-        pyodide.globals.set("ref_for_html", this.state.ref);
-        htmlOut = await pyodide.runPythonAsync(`
-from repo_review.processor import process
-from repo_review.html import to_html
-from repo_review.ghpath import GHPath
-package = GHPath(repo=repo_for_html, branch=ref_for_html)
-families, checks = process(package)
-to_html(families, checks)
-        `);
+        // Shouldn't be possible: if we have a copy button, we should have
+        // a stored run result for that repo/ref. Show an error instead of
+        // rerunning the expensive process.
+        this.setState({
+          snackbarOpen: true,
+          snackbarMsg: "Stored results do not match current repo/ref — please run the checks first",
+          snackbarSeverity: "error",
+        });
+        return;
       }
 
       const htmlStr = htmlOut.toString ? htmlOut.toString() : htmlOut;
