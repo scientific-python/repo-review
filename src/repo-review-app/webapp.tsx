@@ -14,6 +14,10 @@ import {
   AccordionDetails,
   Button,
   Icon,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
   Typography,
 } from "@mui/material";
 import Heading from "./components/Heading";
@@ -38,6 +42,7 @@ class App extends React.Component<any, any> {
     const inner_deps_str = props.deps.join("\n");
     const deps_str = `<pre><code>${inner_deps_str}</code></pre>`;
     this.state = {
+      show: new URLSearchParams(window.location.search).get("show") || "all",
       results: [],
       repo: new URLSearchParams(window.location.search).get("repo") || "",
       ref: new URLSearchParams(window.location.search).get("ref") || "",
@@ -103,6 +108,7 @@ class App extends React.Component<any, any> {
       repo: this.state.repo,
       ref: this.state.ref,
       refType: this.state.refType,
+      show: this.state.show,
     });
     window.history.replaceState(
       null,
@@ -289,6 +295,36 @@ class App extends React.Component<any, any> {
       ? `Results for ${this.state.repo}@${this.state.ref} (${this.state.refType})`
       : "Available checks";
 
+    // Apply CLI-like --show filtering: all | err | errskip
+    let filteredResults = displayResults;
+    let filteredFamilies = displayFamilies;
+    if (displayResults && this.state.show && this.state.show !== "all") {
+      const newResults: any = {};
+      for (const fam of Object.keys(displayResults)) {
+        const items = displayResults[fam];
+        // first keep items that are not passing (i.e., state !== true)
+        let kept = items.filter((it: any) => it.state !== true);
+        // if 'err', then keep only those that are not undefined (i.e., errors only)
+        if (this.state.show === "err") {
+          kept = kept.filter((it: any) => it.state !== undefined);
+        }
+        if (kept.length > 0) {
+          newResults[fam] = kept;
+        }
+      }
+
+      const knownFamilies = new Set(Object.keys(newResults));
+      const newFamilies: any = {};
+      for (const k of Object.keys(displayFamilies)) {
+        if (knownFamilies.has(k) || (displayFamilies[k] && displayFamilies[k].description)) {
+          newFamilies[k] = displayFamilies[k];
+        }
+      }
+
+      filteredResults = newResults;
+      filteredFamilies = newFamilies;
+    }
+
     return (
       <MyThemeProvider>
         <CssBaseline />
@@ -369,6 +405,36 @@ class App extends React.Component<any, any> {
                 />
               )}
             />
+            <FormControl sx={{ minWidth: 140 }}>
+              <InputLabel id="show-select-label">Show</InputLabel>
+              <Select
+                labelId="show-select-label"
+                id="show-select"
+                value={this.state.show}
+                label="Show"
+                onChange={(e: any) => {
+                  const val = e.target.value;
+                  this.setState({ show: val });
+                  // update query string to persist show selection
+                  const params = new URLSearchParams(window.location.search);
+                  if (val && val !== "all") {
+                    params.set("show", val);
+                  } else {
+                    params.delete("show");
+                  }
+                  // preserve repo/ref/refType if present
+                  if (!params.get("repo") && this.state.repo) params.set("repo", this.state.repo);
+                  if (!params.get("ref") && this.state.ref) params.set("ref", this.state.ref);
+                  if (!params.get("refType") && this.state.refType) params.set("refType", this.state.refType);
+                  window.history.replaceState(null, "", `${window.location.pathname}?${params}`);
+                }}
+                size="small"
+              >
+                <MenuItem value="all">All</MenuItem>
+                <MenuItem value="err">Errors only</MenuItem>
+                <MenuItem value="errskip">Errors + Skips</MenuItem>
+              </Select>
+            </FormControl>
 
             <Button
               onClick={() => this.handleCompute()}
@@ -442,7 +508,7 @@ class App extends React.Component<any, any> {
                 <Typography variant="h6" sx={{ px: 2, pt: 1 }}>
                   {resultsHeading}
                 </Typography>
-                <Results results={displayResults} families={displayFamilies} />
+                <Results results={filteredResults} families={filteredFamilies} />
               </>
             )}
           </Paper>
