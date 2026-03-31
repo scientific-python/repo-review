@@ -126,7 +126,11 @@ def collect_fixtures() -> dict[str, Callable[[Traversable], Any]]:
 
     :return: A dict of unevaluated fixtures.
     """
-    return {
+    values = {
         ep.name: ep.load()
         for ep in importlib.metadata.entry_points(group="repo_review.fixtures")
     }
+    # This is required for repo-review to look for config, so add it in if not present.
+    if "pyproject" not in values:
+        values["pyproject"] = pyproject
+    return values

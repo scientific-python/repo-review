@@ -459,6 +459,7 @@ def on_each(
         extend_select=extend_select_list,
         extend_ignore=extend_ignore_list,
         subdir=package_dir,
+        collected=collected,
     )
 
     status: Status = "passed" if processed else "empty"

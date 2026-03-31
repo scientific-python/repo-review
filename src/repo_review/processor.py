@@ -33,7 +33,7 @@ from .checks import (
     process_result_bool,
 )
 from .families import Family, collect_families
-from .fixtures import apply_fixtures, collect_fixtures, compute_fixtures, pyproject
+from .fixtures import apply_fixtures, collect_fixtures, compute_fixtures
 from .ghpath import EmptyTraversable
 
 TYPE_CHECKING = False
@@ -221,6 +221,7 @@ def process(
     extend_select: AbstractSet[str] = frozenset(),
     extend_ignore: AbstractSet[str] = frozenset(),
     subdir: str = "",
+    collected: CollectionReturn | None = None,
 ) -> ProcessReturn:
     """
     Process the package and return a dictionary of results.
@@ -234,12 +235,10 @@ def process(
     :return: The families and a list of checks. Families is guaranteed to
              include all families and be in order.
     """
-    package = root.joinpath(subdir) if subdir else root
-
-    fixtures, tasks, families = collect_all(root, subdir)
+    fixtures, tasks, families = collected or collect_all(root, subdir)
 
     # Collect our own config
-    config = pyproject(package).get("tool", {}).get("repo-review", {})
+    config = fixtures["pyproject"].get("tool", {}).get("repo-review", {})
     ignore_pyproject: list[str] | dict[str, str] = config.get("ignore", [])
     select_checks = (select or frozenset(config.get("select", ()))) | extend_select
     skip_checks = (ignore or frozenset(ignore_pyproject)) | extend_ignore
