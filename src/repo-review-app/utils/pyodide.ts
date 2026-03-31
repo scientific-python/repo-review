@@ -83,16 +83,17 @@ export async function generate_html(
 
   const htmlOut = await pyodide.runPythonAsync(`
     from repo_review.html import to_html
-    def _filter_checks(checks, show):
-        if show == "all":
-            return checks
-        if show == "err":
-            return [c for c in checks if c.result is False]
-        if show == "errskip":
-            return [c for c in checks if c.result is not True]
-        return checks
 
-    filtered = _filter_checks(checks_for_html, show_for_html)
+    match show_for_html:
+        case "all":
+            filtered = checks_for_html
+        case "err":
+            filtered = [c for c in checks_for_html if c.result is False]
+        case "errskip":
+            filtered = [c for c in checks_for_html if c.result is not True]
+        case _:
+            filtered = checks_for_html
+
     to_html(families_for_html, filtered)
     `);
 
