@@ -415,7 +415,11 @@ def main(args: list[str] | None = None) -> None:
     for n, package in enumerate(packages):
         if supports_async and isinstance(package, GHPath):
             prefetch_files = collect_prefetch_files()
-            asyncio.run(process_prefetch_files(package, prefetch_files))
+            asyncio.run(
+                process_prefetch_files(
+                    package, prefetch_files, subdir=parsed.package_dir
+                )
+            )
 
         result |= on_each(
             package,

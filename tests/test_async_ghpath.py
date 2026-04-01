@@ -1,11 +1,13 @@
 import asyncio
 import json
 
+import pytest
+
 from repo_review.ghpath import GHPath
 
 
-def test_async_from_repo_monkeypatched(monkeypatch) -> None:
-    async def fake_open(url: str) -> str:
+def test_async_from_repo_monkeypatched(monkeypatch: pytest.MonkeyPatch) -> None:
+    async def fake_open(url: str) -> str:  # noqa: ARG001
         # Return a simple tree with one file
         return json.dumps({"tree": [{"path": "pyproject.toml", "type": "blob"}]})
 
@@ -16,12 +18,12 @@ def test_async_from_repo_monkeypatched(monkeypatch) -> None:
     assert any(d["path"] == "pyproject.toml" for d in gh._info)
 
 
-def test_prefetch_populates_cache(monkeypatch) -> None:
+def test_prefetch_populates_cache(monkeypatch: pytest.MonkeyPatch) -> None:
     # Prepare a GHPath with a single file in _info
     info = [{"path": "pyproject.toml", "type": "blob"}]
     gh = GHPath(repo="org/repo", branch="main", path="pyproject.toml", _info=info)
 
-    async def fake_open(url: str) -> str:
+    async def fake_open(url: str) -> str:  # noqa: ARG001
         return "[tool.poetry]\nname = 'x'\n"
 
     monkeypatch.setattr(GHPath, "open_url_async", staticmethod(fake_open))
