@@ -45,7 +45,7 @@ class GHPath(Traversable):
     :param path: A sub-path inside the repo. Defaults to the repo root.
     :param _info: Some internal info stored to keep accesses fast.
 
-    Making new paths from this path will propagate a copy of the `_fetched`
+    Making new paths from this path will propagate the `_fetched`
     dict.
     """
 
