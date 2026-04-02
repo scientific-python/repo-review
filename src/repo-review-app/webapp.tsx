@@ -31,6 +31,8 @@ import {
   run_process,
   load_known_checks,
   generate_html,
+  prefetch,
+  collect_checks,
 } from "./utils/pyodide";
 
 const DEFAULT_MSG =

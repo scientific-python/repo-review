@@ -26,16 +26,40 @@ export async function prepare_pyodide(
   }
 }
 
-export function run_process(pyodide: any, repo: string, branch: string) {
+export async function prefetch(pyodide: any, repo: string, branch: string) {
   pyodide.globals.set("repo", repo);
   pyodide.globals.set("branch", branch);
+  const package = pyodide.runPythonAsync(`
+    import asyncio
+    from repo_review.files import collect_prefetch_files, process_prefetch_files
+    from repo_review.ghpath import GHPath
+
+    package = await GHPath.async_from_repo(repo, branch)
+    prefetch_files = collect_prefetch_files()
+    await process_prefetch_files(package, prefetch_files)
+    package
+  `);
+  return package;
+}
+
+// Package can be None
+export function collect_checks(pyodide: any, package: any) {
+  pyodide.globals.set("package", package);
+  const collected = pyodide.runPython(`
+    from repo_review.processor import process, md_as_html
+
+    collect_all(package)
+    `);
+    return collected;
+}
+
+export function run_process(pyodide: any, package: any, collected: any) {
+  pyodide.globals.set("package", package);
+  pyodide.globals.set("collected", collected);
   const families_checks = pyodide.runPython(`
     from repo_review.processor import process, md_as_html
-    from repo_review.ghpath import GHPath
-    from dataclasses import replace
 
-    package = GHPath(repo=repo, branch=branch)
-    families, checks = process(package)
+    families, checks = process(package, collected=collected)
 
     for v in families.values():
         if v.get("description"):

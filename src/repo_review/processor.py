@@ -178,23 +178,28 @@ def _sort_by_family(
 
 @log_timer(logger, "Collecting all checks and fixtures")
 def collect_all(
-    root: Traversable = EmptyTraversable(),  # noqa: B008 (frozen dataclass OK)
+    root: Traversable | None = None,
     subdir: str = "",
 ) -> CollectionReturn:
     """
-    Collect all checks. If ``root`` is not passed, then checks are collected
-    with a :class:`~repo_review.ghpath.EmptyTraversable`. Any checks that are
-    returned conditionally based on fixture results might not be collected
-    unless :func:`~repo_review.fixtures.list_all` is used.
+    Collect all checks. If ``root`` is not passed or ``None``, then checks are
+    collected with a :class:`~repo_review.ghpath.EmptyTraversable`. Any checks
+    that are returned conditionally based on fixture results might not be
+    collected unless :func:`~repo_review.fixtures.list_all` is used.
 
     :param root: If passed, this is the root of the repo (for fixture computation).
+                 ``None`` will use :class:`~repo_review.ghpath.EmptyTraversable`.
     :param subdir: The subdirectory (for fixture computation).
 
     :return: The collected fixtures, checks, and families. Families is
              guaranteed to include all families and be in order.
 
     .. versionadded:: 0.8
+    .. versionchanged:: 1.0
+       Now None is supported.
     """
+    if root is None:
+        root = EmptyTraversable()
     package = root.joinpath(subdir) if subdir else root
 
     # Collect the fixtures
@@ -237,6 +242,9 @@ def process(
     :param ignore: A list of checks to ignore.
     :param subdir: The path to the package in the subdirectory, if not at the
                    root of the repository.
+    :param collected: The return from a collection run. Skips collecting checks
+                      and rerunning fixtures if given.
+
 
     :return: The families and a list of checks. Families is guaranteed to
              include all families and be in order.
