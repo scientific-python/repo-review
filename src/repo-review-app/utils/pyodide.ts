@@ -1,12 +1,20 @@
+import type { PyodideInterface, PyProxy } from "pyodide";
+
+declare global {
+  interface Window {
+    loadPyodide?: () => Promise<PyodideInterface>;
+  }
+}
+
 export async function prepare_pyodide(
   deps: string[],
   onProgress?: (p: number, m?: string) => void,
-) {
+): Promise<PyodideInterface> {
   const deps_str = deps.map((i) => `\"${i}\"`).join(", ");
   try {
     if (onProgress) onProgress(5, "Initializing Pyodide runtime");
     // loadPyodide is provided by the Pyodide script at runtime
-    const pyodide: any = await (window as any).loadPyodide();
+    const pyodide: PyodideInterface = await (window as Window).loadPyodide!();
     if (onProgress) onProgress(50, "Core Pyodide loaded");
 
     if (onProgress) onProgress(65, "Loading micropip");
@@ -26,10 +34,14 @@ export async function prepare_pyodide(
   }
 }
 
-export async function prefetch(pyodide: any, repo: string, branch: string) {
+export async function prefetch(
+  pyodide: PyodideInterface,
+  repo: string,
+  branch: string,
+): Promise<PyProxy | null> {
   pyodide.globals.set("repo", repo);
   pyodide.globals.set("branch", branch);
-  const package = pyodide.runPythonAsync(`
+  const packagePy = await pyodide.runPythonAsync(`
     import asyncio
     from repo_review.files import collect_prefetch_files, process_prefetch_files
     from repo_review.ghpath import GHPath
@@ -39,22 +51,28 @@ export async function prefetch(pyodide: any, repo: string, branch: string) {
     await process_prefetch_files(package, prefetch_files)
     package
   `);
-  return package;
+
+  // package can be None in Python land -> map to null
+  return packagePy === undefined ? null : (packagePy as PyProxy | null);
 }
 
 // Package can be None
-export function collect_checks(pyodide: any, package: any) {
-  pyodide.globals.set("package", package);
+export function collect_checks(pyodide: PyodideInterface, pyPackage: PyProxy | null): PyProxy {
+  pyodide.globals.set("package", pyPackage);
   const collected = pyodide.runPython(`
     from repo_review.processor import process, md_as_html
 
     collect_all(package)
     `);
-    return collected;
+  return collected as PyProxy;
 }
 
-export function run_process(pyodide: any, package: any, collected: any) {
-  pyodide.globals.set("package", package);
+export function run_process(
+  pyodide: PyodideInterface,
+  pyPackage: PyProxy | null,
+  collected: PyProxy,
+): PyProxy {
+  pyodide.globals.set("package", pyPackage);
   pyodide.globals.set("collected", collected);
   const families_checks = pyodide.runPython(`
     from repo_review.processor import process, md_as_html
@@ -71,7 +89,7 @@ export function run_process(pyodide: any, package: any, collected: any) {
   return families_checks;
 }
 
-export function load_known_checks(pyodide: any) {
+export function load_known_checks(pyodide: PyodideInterface): { families: Record<string, { name: string }>; results: Array<Record<string, any>> } {
   const dataStr = pyodide.runPython(`
     import json
     from repo_review.processor import collect_all
@@ -96,11 +114,11 @@ export function load_known_checks(pyodide: any) {
 }
 
 export async function generate_html(
-  pyodide: any,
-  familiesPy: any,
-  checksPy: any,
+  pyodide: PyodideInterface,
+  familiesPy: PyProxy | Record<string, unknown>,
+  checksPy: PyProxy | Array<unknown>,
   show: string = "all",
-) {
+): Promise<string> {
   pyodide.globals.set("families_for_html", familiesPy);
   pyodide.globals.set("checks_for_html", checksPy);
   pyodide.globals.set("show_for_html", show || "all");
