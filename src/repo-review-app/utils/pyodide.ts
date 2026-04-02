@@ -23,8 +23,8 @@ export async function prepare_pyodide(
     if (onProgress) onProgress(80, "Installing Python packages");
 
     await pyodide.runPythonAsync(`
-        import micropip
-        await micropip.install([${deps_str}])
+      import micropip
+      await micropip.install([${deps_str}])
     `);
 
     if (onProgress) onProgress(100, "Ready");
@@ -35,20 +35,54 @@ export async function prepare_pyodide(
   }
 }
 
-export function run_process(
+export async function prefetch(
   pyodide: PyodideInterface,
   repo: string,
   branch: string,
-): PyProxy {
+): Promise<PyProxy | null> {
   pyodide.globals.set("repo", repo);
   pyodide.globals.set("branch", branch);
+  const packagePy = await pyodide.runPythonAsync(`
+    import asyncio
+
+    from repo_review.files import collect_prefetch_files, process_prefetch_files
+    from repo_review.ghpath import GHPath
+
+    package = await GHPath.async_from_repo(repo, branch)
+    prefetch_files = collect_prefetch_files()
+    await process_prefetch_files(package, prefetch_files)
+    package
+  `);
+
+  // package can be None in Python land -> map to null
+  return packagePy === undefined ? null : (packagePy as PyProxy | null);
+}
+
+// Package can be None
+export function collect_checks(
+  pyodide: PyodideInterface,
+  pyPackage: PyProxy | null,
+): PyProxy {
+  pyodide.globals.set("package", pyPackage);
+  const collected = pyodide.runPython(`
+    from repo_review.processor import collect_all
+
+    collect_all(package)
+  `);
+  return collected as PyProxy;
+}
+
+export function run_process(
+  pyodide: PyodideInterface,
+  pyPackage: PyProxy | null,
+  collected: PyProxy,
+): PyProxy {
+  pyodide.globals.set("package", pyPackage);
+  pyodide.globals.set("collected", collected);
   const families_checks = pyodide.runPython(`
     from repo_review.processor import process, md_as_html
-    from repo_review.ghpath import GHPath
-    from dataclasses import replace
 
-    package = GHPath(repo=repo, branch=branch)
-    families, checks = process(package)
+    families, checks = process(package, collected=collected)
 
     for v in families.values():
         if v.get("description"):
