@@ -111,7 +111,7 @@ skip-install = true
 scripts.lint = "prek run --all-files --show-diff-on-failure {args}"
 
 [tool.hatch.envs.pylint]
-features = ["cli"]
+features = ["cli", "async"]
 dependencies = ["pylint>=3.2"]
 scripts.lint = "pylint repo_review {args}"
 

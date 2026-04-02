@@ -125,6 +125,7 @@ class GHPath(Traversable):
         :param repo: repository name in "org/repo" form
         :param branch: branch or ref to inspect
         :param path: optional path inside the repo
+
         :return: A `GHPath` instance with `_info` populated
         """
         url = f"https://api.github.com/repos/{repo}/git/trees/{branch}?recursive=1"
@@ -204,7 +205,8 @@ class GHPath(Traversable):
         Yield paths matching the given glob-style `pattern` relative to this
         `GHPath`. Patterns support `**` recursion via PurePosixPath.match.
 
-        :param pattern: A glob pattern (e.g. "**/*.py" or "subdir/*.md").
+        :param pattern: A glob pattern (e.g. ``"**/*.py"`` or ``"subdir/*.md"``).
+
         :return: An iterator of `GHPath` instances matching the pattern.
         """
 
