@@ -31,8 +31,6 @@ import {
   run_process,
   load_known_checks,
   generate_html,
-  prefetch,
-  collect_checks,
 } from "./utils/pyodide";
 
 const DEFAULT_MSG =
@@ -105,7 +103,7 @@ class App extends React.Component<any, any> {
     this.setState({ ref, refType, pyFamilies: null, pyChecks: null });
   }
 
-  async handleCompute() {
+  handleCompute() {
     if (!this.state.repo || !this.state.ref) {
       this.setState({ results: [], msg: DEFAULT_MSG });
       window.history.replaceState(null, "", window.location.pathname);
@@ -129,13 +127,24 @@ class App extends React.Component<any, any> {
     );
     this.setState({ results: [], progress: true, infoOpen: false });
     const state = this.state;
-    let pyPackage: any = null;
-    let collected: any = null;
-    try {
-      const pyodide: any = await this.pyodide_promise;
-      pyPackage = await prefetch(pyodide, state.repo, state.ref);
-      collected = collect_checks(pyodide, pyPackage);
-      const families_checks = run_process(pyodide, pyPackage, collected);
+    this.pyodide_promise!.then((pyodide: any) => {
+      var families_checks;
+      try {
+        families_checks = run_process(pyodide, state.repo, state.ref);
+      } catch (e: any) {
+        if (e.message && e.message.includes("KeyError: 'tree'")) {
+          this.setState({
+            progress: false,
+            err_msg: "Invalid repository or branch/tag. Please try again.",
+          });
+          return;
+        }
+        this.setState({
+          progress: false,
+          err_msg: `<pre><code>${e.message}</code><pre>`,
+        });
+        return;
+      }
 
       const families_dict = families_checks.get(0);
       const results_list = families_checks.get(1);
@@ -182,36 +191,9 @@ class App extends React.Component<any, any> {
         infoOpen: false,
         pyFamilies: families_dict,
         pyChecks: results_list,
+
       });
-    } catch (e: any) {
-      if (e.message && e.message.includes("KeyError: 'tree'")) {
-        this.setState({
-          progress: false,
-          err_msg: "Invalid repository or branch/tag. Please try again.",
-        });
-      } else {
-        this.setState({
-          progress: false,
-          err_msg: `<pre><code>${e.message}</code><pre>`,
-        });
-      }
-    } finally {
-      // prefetch and collected are run-scoped only; release them after processing
-      try {
-        if (collected && typeof collected.destroy === "function") {
-          collected.destroy();
-        }
-      } catch (e) {
-        // ignore destroy errors
-      }
-      try {
-        if (pyPackage && typeof pyPackage.destroy === "function") {
-          pyPackage.destroy();
-        }
-      } catch (e) {
-        // ignore destroy errors
-      }
-    }
+    });
   }
 
   async handleCopyHtml() {
