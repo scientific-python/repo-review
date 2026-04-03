@@ -598,7 +598,14 @@ class App extends React.Component<AppProps, AppState> {
                 />
               )}
             />
-            <Box sx={{ display: "flex", flexDirection: "row", gap: 1, alignItems: "center" }}>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "row",
+                gap: 1,
+                alignItems: "center",
+              }}
+            >
               <FormControl sx={{ minWidth: 140 }}>
                 <InputLabel id="show-select-label">Show</InputLabel>
                 <Select
