@@ -1,12 +1,21 @@
+import type { PyodideInterface } from "pyodide";
+import type { PyProxy } from "pyodide/ffi";
+
+declare global {
+  interface Window {
+    loadPyodide?: () => Promise<PyodideInterface>;
+  }
+}
+
 export async function prepare_pyodide(
   deps: string[],
   onProgress?: (p: number, m?: string) => void,
-) {
+): Promise<PyodideInterface> {
   const deps_str = deps.map((i) => `\"${i}\"`).join(", ");
   try {
     if (onProgress) onProgress(5, "Initializing Pyodide runtime");
     // loadPyodide is provided by the Pyodide script at runtime
-    const pyodide: any = await (window as any).loadPyodide();
+    const pyodide: PyodideInterface = await (window as Window).loadPyodide!();
     if (onProgress) onProgress(50, "Core Pyodide loaded");
 
     if (onProgress) onProgress(65, "Loading micropip");
@@ -26,7 +35,7 @@ export async function prepare_pyodide(
   }
 }
 
-export function run_process(pyodide: any, repo: string, branch: string) {
+export function run_process(pyodide: PyodideInterface, repo: string, branch: string): PyProxy {
   pyodide.globals.set("repo", repo);
   pyodide.globals.set("branch", branch);
   const families_checks = pyodide.runPython(`
@@ -47,7 +56,7 @@ export function run_process(pyodide: any, repo: string, branch: string) {
   return families_checks;
 }
 
-export function load_known_checks(pyodide: any) {
+export function load_known_checks(pyodide: PyodideInterface): Record<string, unknown> {
   const dataStr = pyodide.runPython(`
     import json
     from repo_review.processor import collect_all
@@ -72,11 +81,11 @@ export function load_known_checks(pyodide: any) {
 }
 
 export async function generate_html(
-  pyodide: any,
-  familiesPy: any,
-  checksPy: any,
+  pyodide: PyodideInterface,
+  familiesPy: PyProxy | Record<string, unknown>,
+  checksPy: PyProxy | unknown[],
   show: string = "all",
-) {
+): Promise<string> {
   pyodide.globals.set("families_for_html", familiesPy);
   pyodide.globals.set("checks_for_html", checksPy);
   pyodide.globals.set("show_for_html", show || "all");
