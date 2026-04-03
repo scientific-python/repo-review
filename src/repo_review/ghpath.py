@@ -4,7 +4,7 @@
 
 from __future__ import annotations
 
-__lazy_modules__ = ["io", "json", "sys", "typing"]
+__lazy_modules__ = [f"{__spec__.parent}._timer", "io", "json", "sys", "typing"]
 
 import dataclasses
 import io
