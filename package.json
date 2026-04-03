@@ -1,7 +1,7 @@
 {
   "name": "repo-review-webapp",
   "private": true,
-  "version": "1.0.0rc1",
+  "version": "1.0.0rc3",
   "type": "module",
   "scripts": {
     "build": "bunx esbuild src/repo-review-app/repo-review-app.tsx --bundle --minify --sourcemap --outfile=docs/_static/scripts/repo-review-app.min.js --platform=browser --format=esm",
