@@ -45,7 +45,6 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
-          fetch-depth: 0
           persist-credentials: false
 
       # Last one is activated
@@ -77,7 +76,6 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
-          fetch-depth: 0
           persist-credentials: false
 
       - uses: hynek/build-and-inspect-python-package@v2
@@ -88,7 +86,6 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
-          fetch-depth: 0
           persist-credentials: false
 
       - name: Setup uv
@@ -128,7 +125,6 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
-          fetch-depth: 0
           persist-credentials: false
 
       - name: Run repo-review action
