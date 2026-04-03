@@ -28,6 +28,7 @@ __lazy_modules__ = [
 ]
 
 import argparse
+import asyncio
 import functools
 import importlib.metadata
 import importlib.util
@@ -53,6 +54,7 @@ from repo_review import __version__
 from repo_review._compat.typing import assert_never
 from repo_review.checks import get_check_description, get_check_url
 from repo_review.families import Family, get_family_description, get_family_name
+from repo_review.files import collect_prefetch_files, process_prefetch_files
 from repo_review.ghpath import GHPath
 from repo_review.html import to_html
 from repo_review.processor import (
@@ -408,8 +410,19 @@ def main(args: list[str] | None = None) -> None:
         if stderr_fmt == "json":
             print("{", file=sys.stderr)
 
+    supports_async = (
+        sys.version_info >= (3, 11) and importlib.util.find_spec("httpx") is not None
+    )
     result = 0
     for n, package in enumerate(packages):
+        if supports_async and isinstance(package, GHPath):
+            prefetch_files = collect_prefetch_files()
+            asyncio.run(
+                process_prefetch_files(
+                    package, prefetch_files, subdir=parsed.package_dir
+                )
+            )
+
         result |= on_each(
             package,
             format_opt,

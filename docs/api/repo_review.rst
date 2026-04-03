@@ -33,6 +33,14 @@ repo\_review.families module
    :show-inheritance:
    :undoc-members:
 
+repo\_review.files module
+-------------------------
+
+.. automodule:: repo_review.files
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
 repo\_review.fixtures module
 ----------------------------
 

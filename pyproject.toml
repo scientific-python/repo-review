@@ -52,6 +52,10 @@ repo-review = "repo_review.__main__:main"
 pyproject = "repo_review.fixtures:pyproject"
 list_all = "repo_review.fixtures:list_all"
 
+[project.entry-points."repo_review.prefetch_files"]
+root = "repo_review.files:prefetch_root"
+package = "repo_review.files:prefetch_package"
+
 [project.entry-points."validate_pyproject.tool_schema"]
 repo-review = "repo_review.schema:get_schema"
 
@@ -59,10 +63,15 @@ repo-review = "repo_review.schema:get_schema"
 cli = [
   "rich >=12.2",
 ]
+async = [
+  "httpx; python_version >= '3.11'",
+]
 
 [dependency-groups]
 test = [
   "pytest >=9",
+  "pytest-asyncio",
+  "httpx; python_version >= '3.11'",
   "sp-repo-review >=2025.11.04",
   "validate-pyproject >=0.14",
 ]
@@ -102,7 +111,7 @@ skip-install = true
 scripts.lint = "prek run --all-files --show-diff-on-failure {args}"
 
 [tool.hatch.envs.pylint]
-features = ["cli"]
+features = ["cli", "async"]
 dependencies = ["pylint>=3.2"]
 scripts.lint = "pylint repo_review {args}"
 
@@ -224,7 +233,7 @@ flake8-builtins.ignorelist = ["copyright", "print"]
 [tool.ruff.lint.per-file-ignores]
 "src/repo_review/_compat/**.py" = ["TID251"]
 "src/**/__main__.py" = ["T20", "FBT001"]
-"tests/**.py" = ["D", "INP001", "FBT001", "ANN"]
+"tests/**.py" = ["D", "INP001", "FBT001", "ANN", "SLF001"]
 "docs/**.py" = ["INP001"]
 
 [tool.coverage]

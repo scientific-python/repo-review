@@ -51,6 +51,7 @@ repos:
         files: (src|web|tests)
         args: []
         additional_dependencies:
+          - httpx
           - markdown-it-py
           - orjson
           - pytest

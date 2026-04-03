@@ -11,6 +11,7 @@ plugins
 fixtures
 checks
 families
+files
 webapp
 live-demo
 changelog
