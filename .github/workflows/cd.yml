@@ -65,6 +65,8 @@ jobs:
 
       - name: Upload webapp asset to release
         run: gh release upload "$GITHUB_REF_NAME" repo-review-app.zip
+        env:
+          GH_TOKEN: ${{ github.token }}
 
   publish:
     name: Publish
