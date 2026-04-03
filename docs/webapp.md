@@ -21,7 +21,7 @@ When bundling the app for the web, Pyodide is NOT bundled via an npm package.
 The webapp expects `loadPyodide()` to be available at runtime (for example by
 including Pyodide from the official CDN or otherwise providing it on the host
 page). Running `bun run build` writes a bundled ESM file to
-`docs/_static/scripts/webapp.min.js`, which the Live Demo imports as a module.
+`docs/_static/scripts/repo-review-app.min.js`, which the Live Demo imports as a module.
 
 ## Custom app
 
@@ -34,7 +34,7 @@ Global (script) example:
 ```html
 <script src="https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js"></script>
 <script type="module">
-  import { mountApp } from "./_static/scripts/webapp.min.js";
+  import { mountApp } from "./_static/scripts/repo-review-app.min.js";
   await loadPyodide();
   mountApp({ header: false, deps: ["repo-review"] });
 </script>

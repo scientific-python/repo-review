@@ -140,4 +140,4 @@ cython_debug/
 node_modules/
 /.vscode
 uv.lock
-/docs/_static/scripts/webapp.*
+/docs/_static/scripts/repo-review-app.*
