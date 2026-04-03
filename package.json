@@ -4,7 +4,7 @@
   "version": "1.0.0rc1",
   "type": "module",
   "scripts": {
-    "build": "bunx esbuild src/repo-review-app/webapp.tsx --bundle --minify --sourcemap --outfile=docs/_static/scripts/webapp.min.js --platform=browser --format=esm",
+    "build": "bunx esbuild src/repo-review-app/repo-review-app.tsx --bundle --minify --sourcemap --outfile=docs/_static/scripts/repo-review-app.min.js --platform=browser --format=esm",
     "format": "prettier --write .",
     "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
     "type": "tsc --noEmit"
