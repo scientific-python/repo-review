@@ -598,54 +598,63 @@ class App extends React.Component<AppProps, AppState> {
                 />
               )}
             />
-            <FormControl sx={{ minWidth: 140 }}>
-              <InputLabel id="show-select-label">Show</InputLabel>
-              <Select
-                labelId="show-select-label"
-                id="show-select"
-                value={this.state.show}
-                label="Show"
-                onChange={(e: SelectChangeEvent<string>) => {
-                  const val = e.target.value as string;
-                  this.setState({ show: val });
-                  // update query string to persist show selection
-                  const params = new URLSearchParams(window.location.search);
-                  if (val && val !== "all") {
-                    params.set("show", val);
-                  } else {
-                    params.delete("show");
-                  }
-                  // preserve repo/ref/refType if present
-                  if (!params.get("repo") && this.state.repo)
-                    params.set("repo", this.state.repo);
-                  if (!params.get("ref") && this.state.ref)
-                    params.set("ref", this.state.ref);
-                  if (!params.get("refType") && this.state.refType)
-                    params.set("refType", this.state.refType);
-                  window.history.replaceState(
-                    null,
-                    "",
-                    `${window.location.pathname}?${params}`,
-                  );
-                }}
-                size="small"
-              >
-                <MenuItem value="all">All</MenuItem>
-                <MenuItem value="err">Errors only</MenuItem>
-                <MenuItem value="errskip">Errors + Skips</MenuItem>
-              </Select>
-            </FormControl>
-
-            <Button
-              onClick={() => this.handleCompute()}
-              variant="contained"
-              size="large"
-              disabled={
-                this.state.progress || !this.state.repo || !this.state.ref
-              }
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "row",
+                gap: 1,
+                alignItems: "center",
+              }}
             >
-              <Icon>start</Icon>
-            </Button>
+              <FormControl sx={{ minWidth: 140 }}>
+                <InputLabel id="show-select-label">Show</InputLabel>
+                <Select
+                  labelId="show-select-label"
+                  id="show-select"
+                  value={this.state.show}
+                  label="Show"
+                  onChange={(e: SelectChangeEvent<string>) => {
+                    const val = e.target.value as string;
+                    this.setState({ show: val });
+                    // update query string to persist show selection
+                    const params = new URLSearchParams(window.location.search);
+                    if (val && val !== "all") {
+                      params.set("show", val);
+                    } else {
+                      params.delete("show");
+                    }
+                    // preserve repo/ref/refType if present
+                    if (!params.get("repo") && this.state.repo)
+                      params.set("repo", this.state.repo);
+                    if (!params.get("ref") && this.state.ref)
+                      params.set("ref", this.state.ref);
+                    if (!params.get("refType") && this.state.refType)
+                      params.set("refType", this.state.refType);
+                    window.history.replaceState(
+                      null,
+                      "",
+                      `${window.location.pathname}?${params}`,
+                    );
+                  }}
+                  size="small"
+                >
+                  <MenuItem value="all">All</MenuItem>
+                  <MenuItem value="err">Errors only</MenuItem>
+                  <MenuItem value="errskip">Errors + Skips</MenuItem>
+                </Select>
+              </FormControl>
+
+              <Button
+                onClick={() => this.handleCompute()}
+                variant="contained"
+                size="large"
+                disabled={
+                  this.state.progress || !this.state.repo || !this.state.ref
+                }
+              >
+                <Icon>start</Icon>
+              </Button>
+            </Box>
           </Stack>
           <Paper elevation={3}>
             <Accordion
