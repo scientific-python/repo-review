@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "repo_review"
-version = "1.0.0rc3"
+version = "1.0.0"
 authors = [
   { name = "Henry Schreiner", email = "henryfs@princeton.edu" },
 ]
