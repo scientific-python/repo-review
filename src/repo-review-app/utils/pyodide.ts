@@ -43,8 +43,6 @@ export async function prefetch(
   pyodide.globals.set("repo", repo);
   pyodide.globals.set("branch", branch);
   const packagePy = await pyodide.runPythonAsync(`
-    import asyncio
-
     from repo_review.files import collect_prefetch_files, process_prefetch_files
     from repo_review.ghpath import GHPath
 
@@ -79,7 +77,7 @@ export function run_process(
 ): PyProxy {
   pyodide.globals.set("package", pyPackage);
   pyodide.globals.set("collected", collected);
-  const families_checks = pyodide.runPython(`
+  const checks = pyodide.runPython(`
     from repo_review.processor import process, md_as_html
 
     families, checks = process(package, collected=collected)
@@ -87,11 +85,9 @@ export function run_process(
     for v in families.values():
         if v.get("description"):
             v["description"] = md_as_html(v["description"])
-    checks = [res.md_as_html() for res in checks]
-
-    (families, checks)
+    [res.md_as_html() for res in checks]
     `);
-  return families_checks;
+  return checks;
 }
 
 export function load_known_checks(

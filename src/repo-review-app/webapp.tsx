@@ -204,10 +204,8 @@ class App extends React.Component<AppProps, AppState> {
       const pyodide = await this.pyodide_promise!;
       pyPackage = await prefetch(pyodide, state.repo, state.ref);
       collected = collect_checks(pyodide, pyPackage);
-      const families_checks = run_process(pyodide, pyPackage, collected);
-
-      const families_dict = families_checks.get(0);
-      const results_list = families_checks.get(1);
+      const results_list = run_process(pyodide, pyPackage, collected) as any;
+      const families_dict = (collected as any).families;
 
       const results: Record<string, CheckItem[]> = {};
       const families: Record<string, { name: string; description?: string }> =

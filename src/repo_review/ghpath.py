@@ -132,8 +132,11 @@ class GHPath(Traversable):
         url = f"https://api.github.com/repos/{repo}/git/trees/{branch}?recursive=1"
         txt = await cls.open_url_async(url)
         vals = json.loads(txt)
-        _info = vals.get("tree", [])
-        return cls(repo=repo, branch=branch, path=path, _info=_info)
+        if "tree" not in vals:
+            print("Failed to find tree. Result:")  # noqa: T201
+            print(vals)  # noqa: T201
+            raise KeyError("tree")
+        return cls(repo=repo, branch=branch, path=path, _info=vals["tree"])
 
     def __str__(self) -> str:
         return f"gh:{self.repo}@{self.branch}:{self.path or '.'}"
