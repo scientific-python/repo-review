@@ -32,15 +32,68 @@ import {
   load_known_checks,
   generate_html,
 } from "./utils/pyodide";
+import type { PyodideInterface, PyProxy } from "pyodide";
+import type { SelectChangeEvent } from "@mui/material";
 
 const DEFAULT_MSG =
   "Enter a GitHub repo and branch/tag to review. Runs Python entirely in your browser using WebAssembly. Built with React, MaterialUI, and Pyodide.";
 
-class App extends React.Component<any, any> {
-  pyodide_promise: Promise<any> | null;
-  refInputDebounce: any;
+interface CheckItem {
+  name: string;
+  description?: string;
+  state?: boolean | undefined;
+  err_msg?: string;
+  url?: string;
+  skip_reason?: string;
+}
 
-  constructor(props: any) {
+interface Refs {
+  branches: { name: string }[];
+  tags: { name: string }[];
+}
+
+interface Option {
+  label: string;
+  value: string;
+  type: "branch" | "tag";
+}
+
+interface AppProps {
+  deps: string[];
+  header?: boolean;
+}
+
+interface AppState {
+  show: string;
+  results: Record<string, CheckItem[]> | CheckItem[];
+  pyFamilies: PyProxy | null;
+  pyChecks: PyProxy | null;
+  snackbarOpen: boolean;
+  snackbarMsg: string;
+  snackbarSeverity: "info" | "error" | "warning" | "success";
+  repo: string;
+  ref: string;
+  refType: "branch" | "tag";
+  refs: Refs;
+  msg: string;
+  progress: boolean;
+  loadingRefs: boolean;
+  err_msg: string;
+  skip_reason: string;
+  url: string;
+  knownChecks: Record<string, CheckItem[]> | null;
+  knownFamilies: Record<string, { name: string; description?: string }>;
+  infoOpen: boolean;
+  pyodideProgress: number;
+  pyodideLoading: boolean;
+  pyodideMessage?: string;
+}
+
+class App extends React.Component<AppProps, AppState> {
+  pyodide_promise: Promise<PyodideInterface> | null;
+  refInputDebounce: number | null;
+
+  constructor(props: AppProps) {
     super(props);
     const inner_deps_str = props.deps.join("\n");
     const deps_str = `<pre><code>${inner_deps_str}</code></pre>`;
@@ -127,12 +180,13 @@ class App extends React.Component<any, any> {
     );
     this.setState({ results: [], progress: true, infoOpen: false });
     const state = this.state;
-    this.pyodide_promise!.then((pyodide: any) => {
-      var families_checks;
+    this.pyodide_promise!.then((pyodide: PyodideInterface) => {
+      let families_checks: PyProxy;
       try {
         families_checks = run_process(pyodide, state.repo, state.ref);
-      } catch (e: any) {
-        if (e.message && e.message.includes("KeyError: 'tree'")) {
+      } catch (e: unknown) {
+        const emsg = (e as Error)?.message || String(e);
+        if (emsg.includes("KeyError: 'tree'")) {
           this.setState({
             progress: false,
             err_msg: "Invalid repository or branch/tag. Please try again.",
@@ -141,7 +195,7 @@ class App extends React.Component<any, any> {
         }
         this.setState({
           progress: false,
-          err_msg: `<pre><code>${e.message}</code><pre>`,
+          err_msg: `<pre><code>${emsg}</code><pre>`,
         });
         return;
       }
@@ -149,8 +203,8 @@ class App extends React.Component<any, any> {
       const families_dict = families_checks.get(0);
       const results_list = families_checks.get(1);
 
-      const results: any = {};
-      const families: any = {};
+      const results: Record<string, CheckItem[]> = {};
+      const families: Record<string, { name: string; description?: string }> = {};
       for (const val of families_dict) {
         const descr = families_dict.get(val).get("description");
         results[val] = [];
@@ -209,7 +263,7 @@ class App extends React.Component<any, any> {
     try {
       const pyodide = await this.pyodide_promise;
 
-      let htmlOut: any;
+      let htmlOut: string;
 
       // Reuse previously stored PyProxy results if they correspond to the
       // same repo/ref to avoid rerunning the expensive `process(package)`.
@@ -240,15 +294,16 @@ class App extends React.Component<any, any> {
           w.document.close();
         }
       }
-    } catch (e: any) {
+    } catch (e: unknown) {
       console.error("Error generating HTML:", e);
-      this.setState({ snackbarOpen: true, snackbarMsg: "Error generating HTML: " + (e?.message || e), snackbarSeverity: "error" });
+      const emsg = (e as Error)?.message || String(e);
+      this.setState({ snackbarOpen: true, snackbarMsg: "Error generating HTML: " + emsg, snackbarSeverity: "error" });
     }
   }
 
   async loadKnownChecks() {
     const pyodide = await this.pyodide_promise;
-    let data: any;
+    let data: { families?: Record<string, { name: string }>; results?: any[] } = {};
     try {
       data = load_known_checks(pyodide);
     } catch (e) {
@@ -256,8 +311,8 @@ class App extends React.Component<any, any> {
       return;
     }
 
-    const knownResults: any = {};
-    const knownFamilies: any = {};
+    const knownResults: Record<string, CheckItem[]> = {};
+    const knownFamilies: Record<string, { name: string }> = {};
 
     for (const key of Object.keys(data.families || {})) {
       knownResults[key] = [];
@@ -297,10 +352,10 @@ class App extends React.Component<any, any> {
   render() {
     const priorityBranches = ["HEAD", "main", "master", "develop", "stable"];
     const branchMap = new Map(
-      this.state.refs.branches.map((branch: any) => [branch.name, branch]),
+      this.state.refs.branches.map((branch) => [branch.name, branch]),
     );
 
-    let availableOptions: any[] = [];
+    let availableOptions: Option[] = [];
 
     if (
       this.state.repo === "" ||
@@ -330,8 +385,8 @@ class App extends React.Component<any, any> {
         }
       });
 
-      const otherBranches: any[] = [];
-      branchMap.forEach((branch: any) => {
+      const otherBranches: Option[] = [];
+      branchMap.forEach((branch) => {
         otherBranches.push({
           label: `${branch.name} (branch)`,
           value: branch.name,
@@ -340,7 +395,7 @@ class App extends React.Component<any, any> {
       });
       otherBranches.sort((a, b) => a.value.localeCompare(b.value));
 
-      const tagOptions = this.state.refs.tags.map((tag: any) => ({
+      const tagOptions = this.state.refs.tags.map((tag) => ({
         label: `${tag.name} (tag)`,
         value: tag.name,
         type: "tag",
@@ -371,14 +426,14 @@ class App extends React.Component<any, any> {
     let filteredResults = displayResults;
     let filteredFamilies = displayFamilies;
     if (displayResults && this.state.show && this.state.show !== "all") {
-      const newResults: any = {};
+      const newResults: Record<string, CheckItem[]> = {};
       for (const fam of Object.keys(displayResults)) {
-        const items = displayResults[fam];
+        const items = displayResults[fam] as CheckItem[];
         // first keep items that are not passing (i.e., state !== true)
-        let kept = items.filter((it: any) => it.state !== true);
+        let kept = items.filter((it: CheckItem) => it.state !== true);
         // if 'err', then keep only those that are not undefined (i.e., errors only)
         if (this.state.show === "err") {
-          kept = kept.filter((it: any) => it.state !== undefined);
+          kept = kept.filter((it: CheckItem) => it.state !== undefined);
         }
         if (kept.length > 0) {
           newResults[fam] = kept;
@@ -386,7 +441,7 @@ class App extends React.Component<any, any> {
       }
 
       const knownFamilies = new Set(Object.keys(newResults));
-      const newFamilies: any = {};
+      const newFamilies: Record<string, { name: string; description?: string }> = {};
       for (const k of Object.keys(displayFamilies)) {
         if (knownFamilies.has(k) || (displayFamilies[k] && displayFamilies[k].description)) {
           newFamilies[k] = displayFamilies[k];
@@ -414,11 +469,11 @@ class App extends React.Component<any, any> {
               helperText="e.g. scikit-hep/hist"
               variant="outlined"
               autoFocus={true}
-              onKeyDown={(e: any) => {
-                if (e.keyCode === 13)
+              onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+                if (e.key === "Enter")
                   document.getElementById("ref-select")!.focus();
               }}
-              onInput={(e: any) => this.handleRepoChange(e.target.value)}
+              onInput={(e: React.FormEvent<HTMLInputElement>) => this.handleRepoChange((e.target as HTMLInputElement).value)}
               defaultValue={new URLSearchParams(window.location.search).get(
                 "repo",
               )}
@@ -430,24 +485,24 @@ class App extends React.Component<any, any> {
               options={availableOptions}
               loading={this.state.loadingRefs}
               freeSolo={true}
-              onKeyDown={(e: any) => {
-                if (e.keyCode === 13) this.handleCompute();
+              onKeyDown={(e: React.KeyboardEvent) => {
+                if (e.key === "Enter") this.handleCompute();
               }}
-              getOptionLabel={(option: any) =>
+              getOptionLabel={(option: string | { label: string }) =>
                 typeof option === "string" ? option : option.label
               }
-              renderOption={(props, option) => (
+              renderOption={(props, option: { label: string }) => (
                 <li {...props}>{option.label}</li>
               )}
-              onInputChange={(e: any, value: any) => {
+              onInputChange={(e: React.SyntheticEvent, value: string | { label: string; value: string; type: string } | null) => {
                 if (typeof value === "string") {
                   this.handleRefChange(value, "branch");
                 }
               }}
-              onChange={(e: any, option: any) => {
+              onChange={(e: React.SyntheticEvent, option: string | { value: string; type: string } | null) => {
                 if (option) {
                   if (typeof option === "object") {
-                    this.handleRefChange(option.value, option.type);
+                    this.handleRefChange(option.value, option.type as string);
                   } else {
                     this.handleRefChange(option, "branch");
                   }
@@ -484,8 +539,8 @@ class App extends React.Component<any, any> {
                 id="show-select"
                 value={this.state.show}
                 label="Show"
-                onChange={(e: any) => {
-                  const val = e.target.value;
+                onChange={(e: SelectChangeEvent<string>) => {
+                  const val = e.target.value as string;
                   this.setState({ show: val });
                   // update query string to persist show selection
                   const params = new URLSearchParams(window.location.search);
@@ -522,7 +577,7 @@ class App extends React.Component<any, any> {
           <Paper elevation={3}>
             <Accordion
               expanded={this.state.infoOpen}
-              onChange={(e: any, open: boolean) =>
+              onChange={(e: React.SyntheticEvent, open: boolean) =>
                 this.setState({ infoOpen: open })
               }
               elevation={0}
@@ -616,7 +671,7 @@ class App extends React.Component<any, any> {
   }
 }
 
-export function mountApp(opts: any = {}) {
+export function mountApp(opts: Partial<AppProps> = {}) {
   const root = ReactDOM.createRoot(document.getElementById("root")!);
   root.render(<App {...opts} />);
 }
