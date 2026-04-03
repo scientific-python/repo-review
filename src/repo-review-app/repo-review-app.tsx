@@ -522,9 +522,9 @@ class App extends React.Component<AppProps, AppState> {
         <Box>
           {this.props.header && <Heading />}
           <Stack
-            direction="row"
+            direction={{ xs: "column", sm: "row" }}
             spacing={2}
-            alignItems="flex-start"
+            alignItems={{ xs: "stretch", sm: "flex-start" }}
             sx={{ m: 1, mb: 3 }}
           >
             <TextField
