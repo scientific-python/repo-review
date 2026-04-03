@@ -109,8 +109,6 @@ async def process_prefetch_files(
     if sys.version_info >= (3, 11):
         with log_timer(logger, "Prefetching files for %s", start):
             async with asyncio.TaskGroup() as tg:
-                if isinstance(files, set):
-                    files = {"root": files}
                 for key, patterns in files.items():
                     base = (
                         start.joinpath(subdir) if key == "package" and subdir else start

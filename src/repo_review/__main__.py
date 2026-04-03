@@ -410,7 +410,9 @@ def main(args: list[str] | None = None) -> None:
         if stderr_fmt == "json":
             print("{", file=sys.stderr)
 
-    supports_async = importlib.util.find_spec("httpx") is not None
+    supports_async = (
+        sys.version_info >= (3, 11) and importlib.util.find_spec("httpx") is not None
+    )
     result = 0
     for n, package in enumerate(packages):
         if supports_async and isinstance(package, GHPath):
