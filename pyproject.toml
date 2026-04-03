@@ -54,7 +54,6 @@ list_all = "repo_review.fixtures:list_all"
 
 [project.entry-points."repo_review.prefetch_files"]
 root = "repo_review.files:prefetch_root"
-package = "repo_review.files:prefetch_package"
 
 [project.entry-points."validate_pyproject.tool_schema"]
 repo-review = "repo_review.schema:get_schema"
