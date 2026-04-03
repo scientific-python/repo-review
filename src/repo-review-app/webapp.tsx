@@ -205,7 +205,7 @@ class App extends React.Component<AppProps, AppState> {
         }
         this.setState({
           progress: false,
-          err_msg: `<pre><code>${emsg}</code><pre>`,
+          err_msg: `<pre><code>${emsg}</code></pre>`,
         });
         return;
       }
@@ -448,9 +448,9 @@ class App extends React.Component<AppProps, AppState> {
         const items = groupedResults[fam];
         // first keep items that are not passing (i.e., state !== true)
         let kept = items.filter((it: CheckItem) => it.state !== true);
-        // if 'err', then keep only those that are not undefined (i.e., errors only)
+        // if 'err', then keep only failing checks
         if (this.state.show === "err") {
-          kept = kept.filter((it: CheckItem) => it.state !== undefined);
+          kept = kept.filter((it: CheckItem) => it.state === false);
         }
         if (kept.length > 0) {
           newResults[fam] = kept;
