@@ -39,7 +39,7 @@ jobs:
       - name: Prepare Pages artifact
         run: |
           mkdir -p out
-          cp docs/_static/scripts/webapp.min.js* out/
+          cp docs/_static/scripts/repo-review-app.min.js* out/
           cp docs/_static/scripts/index.html out/index.html
 
       - name: Configure Pages

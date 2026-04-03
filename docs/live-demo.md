@@ -23,7 +23,7 @@ This demo is using two of the most popular plugins: `sp-repo-review` and
 
 <script type="module">
 
-  import { mountApp } from "./_static/scripts/webapp.min.js";
+  import { mountApp } from "./_static/scripts/repo-review-app.min.js";
 
   mountApp({
     header: false,
