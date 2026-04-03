@@ -35,7 +35,11 @@ export async function prepare_pyodide(
   }
 }
 
-export function run_process(pyodide: PyodideInterface, repo: string, branch: string): PyProxy {
+export function run_process(
+  pyodide: PyodideInterface,
+  repo: string,
+  branch: string,
+): PyProxy {
   pyodide.globals.set("repo", repo);
   pyodide.globals.set("branch", branch);
   const families_checks = pyodide.runPython(`
@@ -56,7 +60,9 @@ export function run_process(pyodide: PyodideInterface, repo: string, branch: str
   return families_checks;
 }
 
-export function load_known_checks(pyodide: PyodideInterface): Record<string, unknown> {
+export function load_known_checks(
+  pyodide: PyodideInterface,
+): Record<string, unknown> {
   const dataStr = pyodide.runPython(`
     import json
     from repo_review.processor import collect_all
