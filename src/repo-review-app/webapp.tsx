@@ -42,7 +42,7 @@ const DEFAULT_MSG =
 interface CheckItem {
   name: string;
   description?: string;
-  state?: boolean | undefined;
+  state?: boolean | null | undefined;
   err_msg?: string;
   url?: string;
   skip_reason?: string;
@@ -97,7 +97,7 @@ function parseRefType(value: string | null): "branch" | "tag" {
 
 class App extends React.Component<AppProps, AppState> {
   pyodide_promise: Promise<PyodideInterface> | null;
-  refInputDebounce: number | null;
+  refInputDebounce: ReturnType<typeof setTimeout> | null;
 
   constructor(props: AppProps) {
     super(props);
@@ -154,7 +154,9 @@ class App extends React.Component<AppProps, AppState> {
   handleRepoChange(repo: string) {
     this.setState({ repo, pyFamilies: null, pyChecks: null });
 
-    clearTimeout(this.refInputDebounce);
+    if (this.refInputDebounce !== null) {
+      clearTimeout(this.refInputDebounce);
+    }
     this.refInputDebounce = setTimeout(() => {
       this.fetchRepoReferences(repo);
     }, 500);
@@ -269,7 +271,7 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     try {
-      const pyodide = await this.pyodide_promise;
+      const pyodide = await this.pyodide_promise!;
 
       let htmlOut: string;
 
@@ -310,7 +312,7 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   async loadKnownChecks() {
-    const pyodide = await this.pyodide_promise;
+    const pyodide = await this.pyodide_promise!;
     let data: { families?: Record<string, { name: string }>; results?: any[] } = {};
     try {
       data = load_known_checks(pyodide);
@@ -322,10 +324,12 @@ class App extends React.Component<AppProps, AppState> {
     const knownResults: Record<string, CheckItem[]> = {};
     const knownFamilies: Record<string, { name: string }> = {};
 
-    for (const key of Object.keys(data.families || {})) {
+    const knownFamiliesInput = data.families || {};
+
+    for (const key of Object.keys(knownFamiliesInput)) {
       knownResults[key] = [];
       knownFamilies[key] = {
-        name: data.families[key].name,
+        name: knownFamiliesInput[key].name,
       };
     }
 
@@ -434,9 +438,14 @@ class App extends React.Component<AppProps, AppState> {
     let filteredResults = displayResults;
     let filteredFamilies = displayFamilies;
     if (displayResults && this.state.show && this.state.show !== "all") {
+      const groupedResults = displayResults as Record<string, CheckItem[]>;
+      const groupedFamilies = displayFamilies as Record<
+        string,
+        { name: string; description?: string }
+      >;
       const newResults: Record<string, CheckItem[]> = {};
-      for (const fam of Object.keys(displayResults)) {
-        const items = displayResults[fam] as CheckItem[];
+      for (const fam of Object.keys(groupedResults)) {
+        const items = groupedResults[fam];
         // first keep items that are not passing (i.e., state !== true)
         let kept = items.filter((it: CheckItem) => it.state !== true);
         // if 'err', then keep only those that are not undefined (i.e., errors only)
@@ -450,9 +459,9 @@ class App extends React.Component<AppProps, AppState> {
 
       const knownFamilies = new Set(Object.keys(newResults));
       const newFamilies: Record<string, { name: string; description?: string }> = {};
-      for (const k of Object.keys(displayFamilies)) {
-        if (knownFamilies.has(k) || (displayFamilies[k] && displayFamilies[k].description)) {
-          newFamilies[k] = displayFamilies[k];
+      for (const k of Object.keys(groupedFamilies)) {
+        if (knownFamilies.has(k) || (groupedFamilies[k] && groupedFamilies[k].description)) {
+          newFamilies[k] = groupedFamilies[k];
         }
       }
 
