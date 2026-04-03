@@ -31,6 +31,8 @@ import {
   run_process,
   load_known_checks,
   generate_html,
+  prefetch,
+  collect_checks,
 } from "./utils/pyodide";
 import type { PyodideInterface } from "pyodide";
 import type { PyProxy } from "pyodide/ffi";
@@ -172,7 +174,7 @@ class App extends React.Component<AppProps, AppState> {
     this.setState({ ref, refType, pyFamilies: null, pyChecks: null });
   }
 
-  handleCompute() {
+  async handleCompute() {
     if (!this.state.repo || !this.state.ref) {
       this.setState({ results: [], msg: DEFAULT_MSG });
       window.history.replaceState(null, "", window.location.pathname);
@@ -196,28 +198,14 @@ class App extends React.Component<AppProps, AppState> {
     );
     this.setState({ results: [], progress: true, infoOpen: false });
     const state = this.state;
-    this.pyodide_promise!.then((pyodide: PyodideInterface) => {
-      let families_checks: PyProxy;
-      try {
-        families_checks = run_process(pyodide, state.repo, state.ref);
-      } catch (e: unknown) {
-        const emsg = (e as Error)?.message || String(e);
-        if (emsg.includes("KeyError: 'tree'")) {
-          this.setState({
-            progress: false,
-            err_msg: "Invalid repository or branch/tag. Please try again.",
-          });
-          return;
-        }
-        this.setState({
-          progress: false,
-          err_msg: `<pre><code>${emsg}</code></pre>`,
-        });
-        return;
-      }
-
-      const families_dict = families_checks.get(0);
-      const results_list = families_checks.get(1);
+    let pyPackage: PyProxy | null = null;
+    let collected: PyProxy | null = null;
+    try {
+      const pyodide = await this.pyodide_promise!;
+      pyPackage = await prefetch(pyodide, state.repo, state.ref);
+      collected = collect_checks(pyodide, pyPackage);
+      const results_list = run_process(pyodide, pyPackage, collected) as any;
+      const families_dict = (collected as any).families;
 
       const results: Record<string, CheckItem[]> = {};
       const families: Record<string, { name: string; description?: string }> =
@@ -266,7 +254,36 @@ class App extends React.Component<AppProps, AppState> {
         completedRef: state.ref,
         completedRefType: state.refType,
       });
-    });
+    } catch (e: unknown) {
+      const emsg = (e as Error)?.message || String(e);
+      if (emsg.includes("KeyError: 'tree'")) {
+        this.setState({
+          progress: false,
+          err_msg: "Invalid repository or branch/tag. Please try again.",
+        });
+      } else {
+        this.setState({
+          progress: false,
+          err_msg: `<pre><code>${emsg}</code></pre>`,
+        });
+      }
+    } finally {
+      // prefetch and collected are run-scoped only; release them after processing
+      try {
+        if (collected && typeof collected.destroy === "function") {
+          collected.destroy();
+        }
+      } catch (e) {
+        // ignore destroy errors
+      }
+      try {
+        if (pyPackage && typeof pyPackage.destroy === "function") {
+          pyPackage.destroy();
+        }
+      } catch (e) {
+        // ignore destroy errors
+      }
+    }
   }
 
   async handleCopyHtml() {

@@ -3,7 +3,6 @@ from __future__ import annotations
 import asyncio
 import importlib.metadata
 import logging
-import os
 import sys
 
 from ._timer import log_timer
@@ -19,7 +18,6 @@ if TYPE_CHECKING:
 
 __all__ = [
     "collect_prefetch_files",
-    "prefetch_package",
     "prefetch_root",
     "process_prefetch_files",
 ]
@@ -35,37 +33,7 @@ def prefetch_root() -> set[str]:
     for async loading.
     """
 
-    # Temporary way to test async loading
-    if "REPO_REVIEW_PREFETCH_SP_DEBUG" in os.environ:
-        return {
-            "pyproject.toml",
-            "setup.cfg",
-        }
-
     return {"pyproject.toml"}
-
-
-def prefetch_package() -> set[str]:
-    """
-    This entry-point lists files that should be prefetched. This is a suggestion
-    for async loading.
-    """
-
-    # Temporary way to test async loading
-    if "REPO_REVIEW_PREFETCH_SP_DEBUG" in os.environ:
-        return {
-            ".github/dependabot.yml",
-            ".github/dependabot.yaml",
-            ".github/workflows/*.yml",
-            ".github/workflows/*.yaml",
-            ".pre-commit-config.yaml",
-            ".readthedocs.yml",
-            "noxfile.py",
-            "ruff.toml",
-            ".ruff.toml",
-        }
-
-    return set()
 
 
 def collect_prefetch_files() -> dict[str, set[str]]:

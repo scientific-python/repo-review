@@ -40,6 +40,8 @@ class GHPath(Traversable):
     This is a Traversable that can be used to navigate a GitHub repo without
     downloading it.
 
+    Will throw an KeyError if the response is not valid.
+
     :param repo: The repo name, in "org/repo" style.
     :param branch: The branch name. "HEAD" works too.
     :param path: A sub-path inside the repo. Defaults to the repo root.
@@ -109,12 +111,8 @@ class GHPath(Traversable):
             url = f"https://api.github.com/repos/{self.repo}/git/trees/{self.branch}?recursive=1"
             val: str = self.open_url(url)
             vals = json.loads(val)
-            try:
-                object.__setattr__(self, "_info", vals["tree"])
-            except KeyError:
-                print("Failed to find tree. Result:")  # noqa: T201
-                print(vals)  # noqa: T201
-                raise
+            _info = vals["tree"]
+            object.__setattr__(self, "_info", _info)
 
     @classmethod
     async def async_from_repo(cls, repo: str, branch: str, path: str = "") -> Self:
@@ -122,6 +120,8 @@ class GHPath(Traversable):
         Async constructor that populates `_info` by fetching the GitHub tree
         using `open_url_async` instead of performing synchronous network IO
         in `__post_init__`.
+
+        Can throw a KeyError.
 
         :param repo: repository name in "org/repo" form
         :param branch: branch or ref to inspect
@@ -132,7 +132,7 @@ class GHPath(Traversable):
         url = f"https://api.github.com/repos/{repo}/git/trees/{branch}?recursive=1"
         txt = await cls.open_url_async(url)
         vals = json.loads(txt)
-        _info = vals.get("tree", [])
+        _info = vals["tree"]
         return cls(repo=repo, branch=branch, path=path, _info=_info)
 
     def __str__(self) -> str:
