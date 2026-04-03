@@ -75,13 +75,14 @@ class GHPath(Traversable):
             import pyodide.http  # noqa: PLC0415
 
             result = await pyodide.http.pyfetch(url)
-            return result.text()
+            return await result.text()
 
         import httpx  # noqa: PLC0415
 
         with log_timer(logger, "Fetching %s - async", url):
-            async with httpx.AsyncClient() as client:
+            async with httpx.AsyncClient(timeout=30.0) as client:
                 response = await client.get(url)
+                response.raise_for_status()
                 return response.text
 
     @staticmethod
@@ -163,7 +164,7 @@ class GHPath(Traversable):
         assert encoding is None or encoding == "utf-8", "Only utf-8 is supported"
         url = f"https://raw.githubusercontent.com/{self.repo}/{self.branch}/{self.path}"
         if url not in self._fetched:
-            logger.warning("Cache miss for %r Refetching.", url)
+            logger.debug("Cache miss for %r; fetching.", url)
             self._fetched[url] = self.open_url(url)
 
         if mode == "r":
@@ -211,11 +212,21 @@ class GHPath(Traversable):
         """
 
         base = self.path.rstrip("/")
-        combined = f"{base}/{pattern}" if base else pattern
+        base_path = PurePosixPath(base) if base else None
 
         for entry in self._info:
             entry_path = entry.get("path", "")
-            if PurePosixPath(entry_path).match(combined):
+            entry_pure_path = PurePosixPath(entry_path)
+
+            if base_path is not None:
+                try:
+                    relative_path = entry_pure_path.relative_to(base_path)
+                except ValueError:
+                    continue
+            else:
+                relative_path = entry_pure_path
+
+            if relative_path.match(pattern):
                 yield self._with_path(entry_path)
 
     def is_dir(self) -> bool:
