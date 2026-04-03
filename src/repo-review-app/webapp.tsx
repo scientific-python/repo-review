@@ -89,6 +89,9 @@ interface AppState {
   pyodideProgress: number;
   pyodideLoading: boolean;
   pyodideMessage?: string;
+  completedRepo: string;
+  completedRef: string;
+  completedRefType: "branch" | "tag";
 }
 
 function parseRefType(value: string | null): "branch" | "tag" {
@@ -130,6 +133,9 @@ class App extends React.Component<AppProps, AppState> {
       pyodideProgress: 0,
       pyodideLoading: true,
       pyodideMessage: "",
+      completedRepo: "",
+      completedRef: "",
+      completedRefType: "branch",
     };
     this.pyodide_promise = prepare_pyodide(
       props.deps,
@@ -256,6 +262,9 @@ class App extends React.Component<AppProps, AppState> {
         infoOpen: false,
         pyFamilies: families_dict,
         pyChecks: results_list,
+        completedRepo: state.repo,
+        completedRef: state.ref,
+        completedRefType: state.refType,
       });
     });
   }
@@ -446,7 +455,7 @@ class App extends React.Component<AppProps, AppState> {
       ? this.state.families
       : this.state.knownFamilies;
     const resultsHeading = hasResults
-      ? `Results for ${this.state.repo}@${this.state.ref} (${this.state.refType})`
+      ? `Results for ${this.state.completedRepo}@${this.state.completedRef} (${this.state.completedRefType})`
       : "Available checks";
 
     // Apply CLI-like --show filtering: all | err | errskip
