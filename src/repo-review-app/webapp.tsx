@@ -214,7 +214,8 @@ class App extends React.Component<AppProps, AppState> {
       const results_list = families_checks.get(1);
 
       const results: Record<string, CheckItem[]> = {};
-      const families: Record<string, { name: string; description?: string }> = {};
+      const families: Record<string, { name: string; description?: string }> =
+        {};
       for (const val of families_dict) {
         const descr = families_dict.get(val).get("description");
         results[val] = [];
@@ -255,7 +256,6 @@ class App extends React.Component<AppProps, AppState> {
         infoOpen: false,
         pyFamilies: families_dict,
         pyChecks: results_list,
-
       });
     });
   }
@@ -279,14 +279,20 @@ class App extends React.Component<AppProps, AppState> {
       // same repo/ref to avoid rerunning the expensive `process(package)`.
       if (this.state.pyFamilies && this.state.pyChecks) {
         // Use stored pyFamilies/pyChecks; they are cleared when repo/ref change
-        htmlOut = await generate_html(pyodide, this.state.pyFamilies, this.state.pyChecks, this.state.show || "all");
+        htmlOut = await generate_html(
+          pyodide,
+          this.state.pyFamilies,
+          this.state.pyChecks,
+          this.state.show || "all",
+        );
       } else {
         // Shouldn't be possible: if we have a copy button, we should have
         // a stored run result for that repo/ref. Show an error instead of
         // rerunning the expensive process.
         this.setState({
           snackbarOpen: true,
-          snackbarMsg: "Stored results do not match current repo/ref — please run the checks first",
+          snackbarMsg:
+            "Stored results do not match current repo/ref — please run the checks first",
           snackbarSeverity: "error",
         });
         return;
@@ -295,7 +301,11 @@ class App extends React.Component<AppProps, AppState> {
       const htmlStr = htmlOut.toString ? htmlOut.toString() : htmlOut;
       if (navigator.clipboard && navigator.clipboard.writeText) {
         await navigator.clipboard.writeText(htmlStr);
-        this.setState({ snackbarOpen: true, snackbarMsg: "HTML output copied to clipboard", snackbarSeverity: "success" });
+        this.setState({
+          snackbarOpen: true,
+          snackbarMsg: "HTML output copied to clipboard",
+          snackbarSeverity: "success",
+        });
       } else {
         // Fallback: open in new window for manual copy
         const w = window.open("", "repo-review-html");
@@ -307,13 +317,18 @@ class App extends React.Component<AppProps, AppState> {
     } catch (e: unknown) {
       console.error("Error generating HTML:", e);
       const emsg = (e as Error)?.message || String(e);
-      this.setState({ snackbarOpen: true, snackbarMsg: "Error generating HTML: " + emsg, snackbarSeverity: "error" });
+      this.setState({
+        snackbarOpen: true,
+        snackbarMsg: "Error generating HTML: " + emsg,
+        snackbarSeverity: "error",
+      });
     }
   }
 
   async loadKnownChecks() {
     const pyodide = await this.pyodide_promise!;
-    let data: { families?: Record<string, { name: string }>; results?: any[] } = {};
+    let data: { families?: Record<string, { name: string }>; results?: any[] } =
+      {};
     try {
       data = load_known_checks(pyodide);
     } catch (e) {
@@ -458,9 +473,15 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       const knownFamilies = new Set(Object.keys(newResults));
-      const newFamilies: Record<string, { name: string; description?: string }> = {};
+      const newFamilies: Record<
+        string,
+        { name: string; description?: string }
+      > = {};
       for (const k of Object.keys(groupedFamilies)) {
-        if (knownFamilies.has(k) || (groupedFamilies[k] && groupedFamilies[k].description)) {
+        if (
+          knownFamilies.has(k) ||
+          (groupedFamilies[k] && groupedFamilies[k].description)
+        ) {
           newFamilies[k] = groupedFamilies[k];
         }
       }
@@ -569,10 +590,17 @@ class App extends React.Component<AppProps, AppState> {
                     params.delete("show");
                   }
                   // preserve repo/ref/refType if present
-                  if (!params.get("repo") && this.state.repo) params.set("repo", this.state.repo);
-                  if (!params.get("ref") && this.state.ref) params.set("ref", this.state.ref);
-                  if (!params.get("refType") && this.state.refType) params.set("refType", this.state.refType);
-                  window.history.replaceState(null, "", `${window.location.pathname}?${params}`);
+                  if (!params.get("repo") && this.state.repo)
+                    params.set("repo", this.state.repo);
+                  if (!params.get("ref") && this.state.ref)
+                    params.set("ref", this.state.ref);
+                  if (!params.get("refType") && this.state.refType)
+                    params.set("refType", this.state.refType);
+                  window.history.replaceState(
+                    null,
+                    "",
+                    `${window.location.pathname}?${params}`,
+                  );
                 }}
                 size="small"
               >
@@ -651,7 +679,9 @@ class App extends React.Component<AppProps, AppState> {
             )}
             {displayResults && (
               <>
-                <Box sx={{ display: "flex", alignItems: "center", px: 2, pt: 1 }}>
+                <Box
+                  sx={{ display: "flex", alignItems: "center", px: 2, pt: 1 }}
+                >
                   <Typography variant="h6" sx={{ flexGrow: 1 }}>
                     {resultsHeading}
                   </Typography>
@@ -660,13 +690,18 @@ class App extends React.Component<AppProps, AppState> {
                       onClick={() => this.handleCopyHtml()}
                       variant="outlined"
                       size="small"
-                      disabled={this.state.progress || this.state.pyodideLoading}
+                      disabled={
+                        this.state.progress || this.state.pyodideLoading
+                      }
                     >
                       <Icon>content_copy</Icon>
                     </Button>
                   )}
                 </Box>
-                <Results results={filteredResults} families={filteredFamilies} />
+                <Results
+                  results={filteredResults}
+                  families={filteredFamilies}
+                />
               </>
             )}
           </Paper>
