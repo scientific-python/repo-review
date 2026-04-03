@@ -1,4 +1,5 @@
-import type { PyodideInterface, PyProxy } from "pyodide";
+import type { PyodideInterface } from "pyodide";
+import type { PyProxy } from "pyodide/ffi";
 
 declare global {
   interface Window {

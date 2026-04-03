@@ -32,7 +32,8 @@ import {
   load_known_checks,
   generate_html,
 } from "./utils/pyodide";
-import type { PyodideInterface, PyProxy } from "pyodide";
+import type { PyodideInterface } from "pyodide";
+import type { PyProxy } from "pyodide/ffi";
 import type { SelectChangeEvent } from "@mui/material";
 
 const DEFAULT_MSG =
@@ -82,11 +83,16 @@ interface AppState {
   skip_reason: string;
   url: string;
   knownChecks: Record<string, CheckItem[]> | null;
+  families: Record<string, { name: string; description?: string }>;
   knownFamilies: Record<string, { name: string; description?: string }>;
   infoOpen: boolean;
   pyodideProgress: number;
   pyodideLoading: boolean;
   pyodideMessage?: string;
+}
+
+function parseRefType(value: string | null): "branch" | "tag" {
+  return value === "tag" ? "tag" : "branch";
 }
 
 class App extends React.Component<AppProps, AppState> {
@@ -107,8 +113,9 @@ class App extends React.Component<AppProps, AppState> {
       snackbarSeverity: "info",
       repo: new URLSearchParams(window.location.search).get("repo") || "",
       ref: new URLSearchParams(window.location.search).get("ref") || "",
-      refType:
-        new URLSearchParams(window.location.search).get("refType") || "branch",
+      refType: parseRefType(
+        new URLSearchParams(window.location.search).get("refType"),
+      ),
       refs: { branches: [], tags: [] },
       msg: `<p>${DEFAULT_MSG}</p><h4>Packages:</h4> ${deps_str}`,
       progress: false,
@@ -117,6 +124,7 @@ class App extends React.Component<AppProps, AppState> {
       skip_reason: "",
       url: "",
       knownChecks: null,
+      families: {},
       knownFamilies: {},
       infoOpen: true,
       pyodideProgress: 0,
@@ -152,7 +160,7 @@ class App extends React.Component<AppProps, AppState> {
     }, 500);
   }
 
-  handleRefChange(ref: string, refType: string) {
+  handleRefChange(ref: string, refType: "branch" | "tag") {
     this.setState({ ref, refType, pyFamilies: null, pyChecks: null });
   }
 
@@ -370,7 +378,7 @@ class App extends React.Component<AppProps, AppState> {
         { label: "stable (branch)", value: "stable", type: "branch" },
       ];
     } else {
-      const prioritizedBranches = [
+      const prioritizedBranches: Option[] = [
         { label: "HEAD (default branch)", value: "HEAD", type: "branch" },
       ];
 
@@ -398,7 +406,7 @@ class App extends React.Component<AppProps, AppState> {
       const tagOptions = this.state.refs.tags.map((tag) => ({
         label: `${tag.name} (tag)`,
         value: tag.name,
-        type: "tag",
+        type: "tag" as const,
       }));
       tagOptions.sort((a, b) => a.value.localeCompare(b.value));
 
@@ -473,13 +481,15 @@ class App extends React.Component<AppProps, AppState> {
                 if (e.key === "Enter")
                   document.getElementById("ref-select")!.focus();
               }}
-              onInput={(e: React.FormEvent<HTMLInputElement>) => this.handleRepoChange((e.target as HTMLInputElement).value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                this.handleRepoChange(e.target.value)
+              }
               defaultValue={new URLSearchParams(window.location.search).get(
                 "repo",
               )}
               sx={{ flexGrow: 3 }}
             />
-            <Autocomplete
+            <Autocomplete<Option, false, false, true>
               disablePortal
               id="ref-select"
               options={availableOptions}
@@ -488,21 +498,21 @@ class App extends React.Component<AppProps, AppState> {
               onKeyDown={(e: React.KeyboardEvent) => {
                 if (e.key === "Enter") this.handleCompute();
               }}
-              getOptionLabel={(option: string | { label: string }) =>
+              getOptionLabel={(option) =>
                 typeof option === "string" ? option : option.label
               }
-              renderOption={(props, option: { label: string }) => (
+              renderOption={(props, option) => (
                 <li {...props}>{option.label}</li>
               )}
-              onInputChange={(e: React.SyntheticEvent, value: string | { label: string; value: string; type: string } | null) => {
+              onInputChange={(_e, value) => {
                 if (typeof value === "string") {
                   this.handleRefChange(value, "branch");
                 }
               }}
-              onChange={(e: React.SyntheticEvent, option: string | { value: string; type: string } | null) => {
+              onChange={(_e, option) => {
                 if (option) {
                   if (typeof option === "object") {
-                    this.handleRefChange(option.value, option.type as string);
+                    this.handleRefChange(option.value, option.type);
                   } else {
                     this.handleRefChange(option, "branch");
                   }
@@ -673,7 +683,8 @@ class App extends React.Component<AppProps, AppState> {
 
 export function mountApp(opts: Partial<AppProps> = {}) {
   const root = ReactDOM.createRoot(document.getElementById("root")!);
-  root.render(<App {...opts} />);
+  const props: AppProps = { deps: [], ...opts };
+  root.render(<App {...props} />);
 }
 
 export default App;
