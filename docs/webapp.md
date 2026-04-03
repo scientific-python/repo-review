@@ -34,7 +34,7 @@ you extract the webapp):
   rel="stylesheet"
   href="https://fonts.googleapis.com/icon?family=Material+Icons"
 />
-<link rel="modulepreload" href="{% link assets/js/repo-review-app.min.js %}" />
+<link rel="modulepreload" href="/assets/js/repo-review-app.min.js" />
 ```
 
 Then to use it:
