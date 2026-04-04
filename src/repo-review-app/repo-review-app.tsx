@@ -151,6 +151,21 @@ class App extends React.Component<AppProps, AppState> {
     this.refInputDebounce = null;
   }
 
+  destroyProxy(proxy: PyProxy | null): void {
+    if (proxy) {
+      try {
+        proxy.destroy();
+      } catch (e) {
+        // ignore destroy errors
+      }
+    }
+  }
+
+  componentWillUnmount() {
+    this.destroyProxy(this.state.pyFamilies);
+    this.destroyProxy(this.state.pyChecks);
+  }
+
   async fetchRepoReferences(repo: string) {
     if (!repo) return;
 
@@ -160,6 +175,8 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   handleRepoChange(repo: string) {
+    this.destroyProxy(this.state.pyFamilies);
+    this.destroyProxy(this.state.pyChecks);
     this.setState({ repo, pyFamilies: null, pyChecks: null });
 
     if (this.refInputDebounce !== null) {
@@ -171,6 +188,8 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   handleRefChange(ref: string, refType: "branch" | "tag") {
+    this.destroyProxy(this.state.pyFamilies);
+    this.destroyProxy(this.state.pyChecks);
     this.setState({ ref, refType, pyFamilies: null, pyChecks: null });
   }
 
@@ -200,12 +219,14 @@ class App extends React.Component<AppProps, AppState> {
     const state = this.state;
     let pyPackage: PyProxy | null = null;
     let collected: PyProxy | null = null;
+    let families_dict: any = null;
+    let results_list: any = null;
     try {
       const pyodide = await this.pyodide_promise!;
       pyPackage = await prefetch(pyodide, state.repo, state.ref);
       collected = collect_checks(pyodide, pyPackage);
-      const results_list = run_process(pyodide, pyPackage, collected) as any;
-      const families_dict = (collected as any).families;
+      results_list = run_process(pyodide, pyPackage, collected) as any;
+      families_dict = (collected as any).families.copy();
 
       const results: Record<string, CheckItem[]> = {};
       const families: Record<string, { name: string; description?: string }> =
@@ -230,15 +251,11 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       // Destroy any previously stored PyProxies for a different run
-      try {
-        if (this.state.pyFamilies && this.state.pyFamilies !== families_dict) {
-          this.state.pyFamilies.destroy();
-        }
-        if (this.state.pyChecks && this.state.pyChecks !== results_list) {
-          this.state.pyChecks.destroy();
-        }
-      } catch (e) {
-        // ignore destroy errors
+      if (this.state.pyFamilies && this.state.pyFamilies !== families_dict) {
+        this.destroyProxy(this.state.pyFamilies);
+      }
+      if (this.state.pyChecks && this.state.pyChecks !== results_list) {
+        this.destroyProxy(this.state.pyChecks);
       }
 
       this.setState({
@@ -254,7 +271,13 @@ class App extends React.Component<AppProps, AppState> {
         completedRef: state.ref,
         completedRefType: state.refType,
       });
+      // Proxies are now owned by state; clear locals to avoid destroying them in catch
+      families_dict = null;
+      results_list = null;
     } catch (e: unknown) {
+      // Destroy any proxies from this run that were not saved to state
+      this.destroyProxy(families_dict);
+      this.destroyProxy(results_list);
       const emsg = (e as Error)?.message || String(e);
       if (emsg.includes("KeyError: 'tree'")) {
         this.setState({
@@ -269,20 +292,8 @@ class App extends React.Component<AppProps, AppState> {
       }
     } finally {
       // prefetch and collected are run-scoped only; release them after processing
-      try {
-        if (collected && typeof collected.destroy === "function") {
-          collected.destroy();
-        }
-      } catch (e) {
-        // ignore destroy errors
-      }
-      try {
-        if (pyPackage && typeof pyPackage.destroy === "function") {
-          pyPackage.destroy();
-        }
-      } catch (e) {
-        // ignore destroy errors
-      }
+      this.destroyProxy(collected);
+      this.destroyProxy(pyPackage);
     }
   }
 
