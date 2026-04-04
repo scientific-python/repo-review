@@ -205,7 +205,7 @@ class App extends React.Component<AppProps, AppState> {
       pyPackage = await prefetch(pyodide, state.repo, state.ref);
       collected = collect_checks(pyodide, pyPackage);
       const results_list = run_process(pyodide, pyPackage, collected) as any;
-      const families_dict = (collected as any).families;
+      const families_dict = (collected as any).families.copy();
 
       const results: Record<string, CheckItem[]> = {};
       const families: Record<string, { name: string; description?: string }> =
