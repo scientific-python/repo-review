@@ -103,7 +103,6 @@ function parseRefType(value: string | null): "branch" | "tag" {
 class App extends React.Component<AppProps, AppState> {
   pyodide_promise: Promise<PyodideInterface> | null;
   refInputDebounce: ReturnType<typeof setTimeout> | null;
-  _isMounted = false;
 
   constructor(props: AppProps) {
     super(props);
@@ -140,20 +139,8 @@ class App extends React.Component<AppProps, AppState> {
       completedRef: "",
       completedRefType: "branch",
     };
-    this.pyodide_promise = prepare_pyodide(
-      props.deps,
-      (p: number, m?: string) =>
-        this.safeSetState({
-          pyodideProgress: p,
-          pyodideLoading: p < 100,
-          pyodideMessage: m || "",
-        }),
-    );
+    this.pyodide_promise = null;
     this.refInputDebounce = null;
-  }
-
-  componentDidMount() {
-    this._isMounted = true;
   }
 
   destroyProxy(proxy: PyProxy | null): void {
@@ -167,17 +154,8 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   componentWillUnmount() {
-    this._isMounted = false;
     this.destroyProxy(this.state.pyFamilies);
     this.destroyProxy(this.state.pyChecks);
-  }
-
-  safeSetState(state: Partial<AppState>) {
-    if (this._isMounted) {
-      this.setState(state as any);
-    } else {
-      Object.assign(this.state, state as any);
-    }
   }
 
   async fetchRepoReferences(repo: string) {
@@ -416,6 +394,15 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   componentDidMount() {
+    this.pyodide_promise = prepare_pyodide(
+      this.props.deps,
+      (p: number, m?: string) =>
+        this.setState({
+          pyodideProgress: p,
+          pyodideLoading: p < 100,
+          pyodideMessage: m || "",
+        }),
+    );
     const params = new URLSearchParams(window.location.search);
     if (params.get("repo")) {
       this.fetchRepoReferences(params.get("repo")!);
@@ -423,7 +410,7 @@ class App extends React.Component<AppProps, AppState> {
     if (params.get("repo") && params.get("ref")) {
       this.handleCompute();
     } else {
-      this.pyodide_promise!.then(() => this.loadKnownChecks());
+      this.pyodide_promise.then(() => this.loadKnownChecks());
     }
   }
 
