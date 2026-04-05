@@ -569,9 +569,10 @@ class App extends React.Component<AppProps, AppState> {
                 typeof option === "string" ? option : option.label
               }
               renderOption={(props, option) => {
-                const { key, ...rest } = props as React.HTMLAttributes<HTMLLIElement> & {
-                  key: React.Key;
-                };
+                const { key, ...rest } =
+                  props as React.HTMLAttributes<HTMLLIElement> & {
+                    key: React.Key;
+                  };
                 return (
                   <li key={key} {...rest}>
                     {option.label}
