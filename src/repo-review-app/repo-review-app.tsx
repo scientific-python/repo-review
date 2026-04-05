@@ -563,7 +563,6 @@ class App extends React.Component<AppProps, AppState> {
               id="repo-select"
               label="Org/Repo"
               helperText="e.g. scikit-hep/hist"
-              variant="outlined"
               autoFocus={true}
               onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
                 if (e.key === "Enter")
@@ -621,7 +620,6 @@ class App extends React.Component<AppProps, AppState> {
                 <TextField
                   {...params}
                   label="Branch/Tag"
-                  variant="outlined"
                   helperText="e.g. HEAD, main, or v1.0.0"
                   sx={{ flexGrow: 2, minWidth: 200 }}
                   InputProps={{
@@ -646,7 +644,6 @@ class App extends React.Component<AppProps, AppState> {
               <TextField
                 id="package-dir-select"
                 label="Package dir (if not at root)"
-                //variant="outlined"
                 value={this.state.packageDir}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                   this.setState({ packageDir: e.target.value })
@@ -785,7 +782,6 @@ class App extends React.Component<AppProps, AppState> {
                   {hasResults && (
                     <Button
                       onClick={() => this.handleCopyHtml()}
-                      variant="outlined"
                       size="small"
                       disabled={
                         this.state.progress || this.state.pyodideLoading
