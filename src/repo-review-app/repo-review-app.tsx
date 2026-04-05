@@ -151,15 +151,7 @@ class App extends React.Component<AppProps, AppState> {
       completedRef: "",
       completedRefType: "branch",
     };
-    this.pyodide_promise = prepare_pyodide(
-      props.deps,
-      (p: number, m?: string) =>
-        this.setState({
-          pyodideProgress: p,
-          pyodideLoading: p < 100,
-          pyodideMessage: m || "",
-        }),
-    );
+    this.pyodide_promise = null;
     this.refInputDebounce = null;
   }
 
@@ -423,6 +415,15 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   componentDidMount() {
+    this.pyodide_promise = prepare_pyodide(
+      this.props.deps,
+      (p: number, m?: string) =>
+        this.setState({
+          pyodideProgress: p,
+          pyodideLoading: p < 100,
+          pyodideMessage: m || "",
+        }),
+    );
     const params = new URLSearchParams(window.location.search);
     if (params.get("repo")) {
       this.fetchRepoReferences(params.get("repo")!);
@@ -430,7 +431,7 @@ class App extends React.Component<AppProps, AppState> {
     if (params.get("repo") && params.get("ref")) {
       this.handleCompute();
     } else {
-      this.pyodide_promise!.then(() => this.loadKnownChecks());
+      this.pyodide_promise.then(() => this.loadKnownChecks());
     }
   }
 
