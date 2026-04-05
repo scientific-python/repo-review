@@ -180,11 +180,12 @@ class App extends React.Component<AppProps, AppState> {
   handleRepoChange(repo: string) {
     this.destroyProxy(this.state.pyFamilies);
     this.destroyProxy(this.state.pyChecks);
-    this.setState({ repo, pyFamilies: null, pyChecks: null });
-  }
-
-  handleRepoBlur() {
-    this.fetchRepoReferences(this.state.repo);
+    this.setState({
+      repo,
+      refs: { branches: [], tags: [] },
+      pyFamilies: null,
+      pyChecks: null,
+    });
   }
 
   handleRefChange(ref: string, refType: "branch" | "tag") {
@@ -562,13 +563,11 @@ class App extends React.Component<AppProps, AppState> {
               helperText="e.g. scikit-hep/hist"
               autoFocus={true}
               onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
-                if (e.key === "Enter")
-                  document.getElementById("ref-select")!.focus();
+                if (e.key === "Enter") this.handleCompute();
               }}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                 this.handleRepoChange(e.target.value)
               }
-              onBlur={() => this.handleRepoBlur()}
               value={this.state.repo}
               sx={{ flexGrow: 3 }}
             />
@@ -599,7 +598,7 @@ class App extends React.Component<AppProps, AppState> {
               onInputChange={(_e, value, reason) => {
                 this.setState({ refInputValue: value });
                 if (reason === "input") {
-                  this.handleRefChange(value, "branch");
+                  this.handleRefChange(value || "HEAD", "branch");
                 }
               }}
               onChange={(_e, option) => {
@@ -616,6 +615,7 @@ class App extends React.Component<AppProps, AppState> {
                   {...params}
                   label="Branch/Tag"
                   helperText="e.g. HEAD, main, or v1.0.0"
+                  onFocus={() => this.fetchRepoReferences(this.state.repo)}
                   sx={{ flexGrow: 2, minWidth: 200 }}
                   InputProps={{
                     ...params.InputProps,
