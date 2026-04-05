@@ -84,6 +84,7 @@ interface AppState {
   snackbarSeverity: "info" | "error" | "warning" | "success";
   repo: string;
   ref: string;
+  refInputValue: string;
   packageDir: string;
   refType: "branch" | "tag";
   refs: Refs;
@@ -111,28 +112,27 @@ function parseRefType(value: string | null): "branch" | "tag" {
 
 class App extends React.Component<AppProps, AppState> {
   pyodide_promise: Promise<PyodideInterface> | null;
-  refInputDebounce: ReturnType<typeof setTimeout> | null;
 
   constructor(props: AppProps) {
     super(props);
     const inner_deps_str = props.deps.join("\n");
     const deps_str = `<pre><code>${inner_deps_str}</code></pre>`;
+    const params = new URLSearchParams(window.location.search);
+    const initialRef = params.get("ref") || "HEAD";
+    const initialRefInput = params.get("ref") || "";
     this.state = {
-      show: new URLSearchParams(window.location.search).get("show") || "all",
+      show: params.get("show") || "all",
       results: [],
       pyFamilies: null,
       pyChecks: null,
       snackbarOpen: false,
       snackbarMsg: "",
       snackbarSeverity: "info",
-      repo: new URLSearchParams(window.location.search).get("repo") || "",
-      ref: new URLSearchParams(window.location.search).get("ref") || "",
-      packageDir: sanitizePackageDir(
-        new URLSearchParams(window.location.search).get("packageDir") || "",
-      ),
-      refType: parseRefType(
-        new URLSearchParams(window.location.search).get("refType"),
-      ),
+      repo: params.get("repo") || "",
+      ref: initialRef,
+      refInputValue: initialRefInput,
+      packageDir: sanitizePackageDir(params.get("packageDir") || ""),
+      refType: parseRefType(params.get("refType")),
       refs: { branches: [], tags: [] },
       msg: `<p>${DEFAULT_MSG}</p><h4>Packages:</h4> ${deps_str}`,
       progress: false,
@@ -152,7 +152,6 @@ class App extends React.Component<AppProps, AppState> {
       completedRefType: "branch",
     };
     this.pyodide_promise = null;
-    this.refInputDebounce = null;
   }
 
   destroyProxy(proxy: PyProxy | null): void {
@@ -182,13 +181,10 @@ class App extends React.Component<AppProps, AppState> {
     this.destroyProxy(this.state.pyFamilies);
     this.destroyProxy(this.state.pyChecks);
     this.setState({ repo, pyFamilies: null, pyChecks: null });
+  }
 
-    if (this.refInputDebounce !== null) {
-      clearTimeout(this.refInputDebounce);
-    }
-    this.refInputDebounce = setTimeout(() => {
-      this.fetchRepoReferences(repo);
-    }, 500);
+  handleRepoBlur() {
+    this.fetchRepoReferences(this.state.repo);
   }
 
   handleRefChange(ref: string, refType: "branch" | "tag") {
@@ -572,9 +568,8 @@ class App extends React.Component<AppProps, AppState> {
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                 this.handleRepoChange(e.target.value)
               }
-              defaultValue={new URLSearchParams(window.location.search).get(
-                "repo",
-              )}
+              onBlur={() => this.handleRepoBlur()}
+              value={this.state.repo}
               sx={{ flexGrow: 3 }}
             />
             <Autocomplete<Option, false, false, true>
@@ -600,23 +595,22 @@ class App extends React.Component<AppProps, AppState> {
                   </li>
                 );
               }}
-              onInputChange={(_e, value) => {
-                if (typeof value === "string") {
+              inputValue={this.state.refInputValue}
+              onInputChange={(_e, value, reason) => {
+                this.setState({ refInputValue: value });
+                if (reason === "input") {
                   this.handleRefChange(value, "branch");
                 }
               }}
               onChange={(_e, option) => {
-                if (option) {
-                  if (typeof option === "object") {
-                    this.handleRefChange(option.value, option.type);
-                  } else {
-                    this.handleRefChange(option, "branch");
-                  }
+                if (option === null) {
+                  this.handleRefChange("", "branch");
+                } else if (typeof option === "object") {
+                  this.handleRefChange(option.value, option.type);
+                } else {
+                  this.handleRefChange(option, "branch");
                 }
               }}
-              defaultValue={new URLSearchParams(window.location.search).get(
-                "ref",
-              )}
               renderInput={(params) => (
                 <TextField
                   {...params}
