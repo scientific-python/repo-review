@@ -568,9 +568,17 @@ class App extends React.Component<AppProps, AppState> {
               getOptionLabel={(option) =>
                 typeof option === "string" ? option : option.label
               }
-              renderOption={(props, option) => (
-                <li {...props}>{option.label}</li>
-              )}
+              renderOption={(props, option) => {
+                const { key, ...rest } =
+                  props as React.HTMLAttributes<HTMLLIElement> & {
+                    key: React.Key;
+                  };
+                return (
+                  <li key={key} {...rest}>
+                    {option.label}
+                  </li>
+                );
+              }}
               onInputChange={(_e, value) => {
                 if (typeof value === "string") {
                   this.handleRefChange(value, "branch");
