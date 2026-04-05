@@ -132,10 +132,6 @@ scripts.build = "sphinx-apidoc -o docs/api/ --module-first --no-toc --force src/
 features = ["cli"]
 post-install-commands = ["$HATCH_UV pip install -e tests/test_utilities"]
 
-[tool.hatch.envs.webapp]
-skip-install = true
-scripts.serve = "cd docs/_static/scripts && echo 'Serving on http://localhost:8080' && python -m http.server 8080"
-
 [tool.hatch.envs.version]
 skip-install = true
 dependencies = ["bump-my-version"]

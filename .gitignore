@@ -141,3 +141,6 @@ node_modules/
 /.vscode
 uv.lock
 /docs/_static/scripts/repo-review-app.*
+
+# Demo page
+/out
