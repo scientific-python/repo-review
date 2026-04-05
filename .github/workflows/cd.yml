@@ -48,7 +48,6 @@ jobs:
         run: |
           mkdir -p out
           cp docs/_static/scripts/repo-review-app.min.js* out/
-          cp docs/_static/scripts/index.html out/index.html
           cd out
           zip -r ../repo-review-app.zip ./*
 

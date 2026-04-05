@@ -34,13 +34,7 @@ jobs:
         run: bun install --frozen-lockfile
 
       - name: Build webapp
-        run: bun run build
-
-      - name: Prepare Pages artifact
-        run: |
-          mkdir -p out
-          cp docs/_static/scripts/repo-review-app.min.js* out/
-          cp docs/_static/scripts/index.html out/index.html
+        run: bun run build-html
 
       - name: Configure Pages
         uses: actions/configure-pages@v6
