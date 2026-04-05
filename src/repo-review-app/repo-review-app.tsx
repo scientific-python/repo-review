@@ -616,7 +616,7 @@ class App extends React.Component<AppProps, AppState> {
                   label="Branch/Tag"
                   helperText="e.g. HEAD, main, or v1.0.0"
                   onFocus={() => this.fetchRepoReferences(this.state.repo)}
-                  sx={{ flexGrow: 2, minWidth: 200 }}
+                  sx={{ flexGrow: 2, minWidth: 170 }}
                   InputProps={{
                     ...params.InputProps,
                     endAdornment: (
@@ -631,84 +631,95 @@ class App extends React.Component<AppProps, AppState> {
                 />
               )}
             />
-            <Stack
-              direction={{ xs: "row", sm: "column" }}
-              spacing={1}
-              sx={{ flexGrow: 1, minWidth: { xs: 240, sm: 180 } }}
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "row",
+                gap: 2,
+                alignItems: "center",
+                flexGrow: 1,
+                minWidth: { xs: 240, sm: 180 },
+              }}
             >
-              <TextField
-                id="package-dir-select"
-                label="Package dir (if not at root)"
-                value={this.state.packageDir}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  this.setState({ packageDir: e.target.value })
-                }
+              <Stack
+                direction={{ xs: "row", sm: "column" }}
+                spacing={1}
                 sx={{ flexGrow: 1 }}
-              />
-              <Box
-                sx={{
-                  display: "flex",
-                  flexDirection: "row",
-                  gap: 1,
-                  alignItems: "center",
-                  justifyContent: "flex-end",
-                  flexGrow: 1,
-                }}
               >
-                <FormControl sx={{ minWidth: 140 }}>
-                  <InputLabel id="show-select-label">Show</InputLabel>
-                  <Select
-                    labelId="show-select-label"
-                    id="show-select"
-                    value={this.state.show}
-                    label="Show"
-                    onChange={(e: SelectChangeEvent<string>) => {
-                      const val = e.target.value as string;
-                      this.setState({ show: val });
-                      // update query string to persist show selection
-                      const params = new URLSearchParams(
-                        window.location.search,
-                      );
-                      if (val && val !== "all") {
-                        params.set("show", val);
-                      } else {
-                        params.delete("show");
-                      }
-                      // preserve repo/ref/refType/packageDir if present
-                      if (!params.get("repo") && this.state.repo)
-                        params.set("repo", this.state.repo);
-                      if (!params.get("ref") && this.state.ref)
-                        params.set("ref", this.state.ref);
-                      if (!params.get("refType") && this.state.refType)
-                        params.set("refType", this.state.refType);
-                      if (!params.get("packageDir") && this.state.packageDir)
-                        params.set("packageDir", this.state.packageDir);
-                      window.history.replaceState(
-                        null,
-                        "",
-                        `${window.location.pathname}?${params}`,
-                      );
-                    }}
-                    size="small"
-                  >
-                    <MenuItem value="all">All</MenuItem>
-                    <MenuItem value="err">Errors only</MenuItem>
-                    <MenuItem value="errskip">Errors + Skips</MenuItem>
-                  </Select>
-                </FormControl>
-              </Box>
-            </Stack>
-            <Button
-              onClick={() => this.handleCompute()}
-              variant="contained"
-              size="large"
-              disabled={
-                this.state.progress || !this.state.repo || !this.state.ref
-              }
-              sx={{ alignSelf: "stretch", minWidth: 64 }}
-            >
-              <Icon>start</Icon>
-            </Button>
+                <TextField
+                  id="package-dir-select"
+                  label="Package dir (if not at root)"
+                  value={this.state.packageDir}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    this.setState({ packageDir: e.target.value })
+                  }
+                  sx={{ flexGrow: 1 }}
+                />
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "row",
+                    gap: 1,
+                    alignItems: "center",
+                    justifyContent: "flex-end",
+                    flexGrow: 1,
+                  }}
+                >
+                  <FormControl sx={{ minWidth: 140 }}>
+                    <InputLabel id="show-select-label">Show</InputLabel>
+                    <Select
+                      labelId="show-select-label"
+                      id="show-select"
+                      value={this.state.show}
+                      label="Show"
+                      onChange={(e: SelectChangeEvent<string>) => {
+                        const val = e.target.value as string;
+                        this.setState({ show: val });
+                        // update query string to persist show selection
+                        const params = new URLSearchParams(
+                          window.location.search,
+                        );
+                        if (val && val !== "all") {
+                          params.set("show", val);
+                        } else {
+                          params.delete("show");
+                        }
+                        // preserve repo/ref/refType/packageDir if present
+                        if (!params.get("repo") && this.state.repo)
+                          params.set("repo", this.state.repo);
+                        if (!params.get("ref") && this.state.ref)
+                          params.set("ref", this.state.ref);
+                        if (!params.get("refType") && this.state.refType)
+                          params.set("refType", this.state.refType);
+                        if (!params.get("packageDir") && this.state.packageDir)
+                          params.set("packageDir", this.state.packageDir);
+                        window.history.replaceState(
+                          null,
+                          "",
+                          `${window.location.pathname}?${params}`,
+                        );
+                      }}
+                      size="small"
+                    >
+                      <MenuItem value="all">All</MenuItem>
+                      <MenuItem value="errskip">Errors & Skips</MenuItem>
+                      <MenuItem value="err">Errors only</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Box>
+              </Stack>
+              <Button
+                onClick={() => this.handleCompute()}
+                variant="contained"
+                size="large"
+                disabled={
+                  this.state.progress || !this.state.repo || !this.state.ref
+                }
+                sx={{ alignSelf: "stretch", minWidth: 64 }}
+              >
+                <Icon>start</Icon>
+              </Button>
+            </Box>
           </Stack>
           <Paper elevation={3}>
             <Accordion
