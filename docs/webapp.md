@@ -6,8 +6,9 @@ You can run repo-review in Pyodide as a webapp. An example webapp written in
 JSX using React and MaterialUI is provided in the repository; the live demo is
 available in the docs at the **Live Demo** page or at <https://scientific-python.github.io/repo-review>.
 
-The webapp supports selecting org/repo and branch via URL, for example,
-<a href="https://scientific-python.github.io/repo-review/?repo=scikit-hep/hist&ref=main">https://scientific-python.github.io/repo-review/?repo=scikit-hep/hist&ref=main</a>.
+The webapp supports selecting org/repo, branch, and package directory via URL,
+for example,
+<a href="https://scientific-python.github.io/repo-review/?repo=scikit-hep/hist&ref=main&packageDir=src">https://scientific-python.github.io/repo-review/?repo=scikit-hep/hist&ref=main&packageDir=src</a>.
 
 This webapp can be embedded into an existing webpage by setting
 `header={false}` and you can set your own `deps` when calling `mountApp()`.

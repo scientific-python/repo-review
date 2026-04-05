@@ -41,6 +41,14 @@ import type { SelectChangeEvent } from "@mui/material";
 const DEFAULT_MSG =
   "Enter a GitHub repo and branch/tag to review. Runs Python entirely in your browser using WebAssembly. Built with React, MaterialUI, and Pyodide.";
 
+// Sanitize a package subdirectory path: strip leading slashes, reject any
+// segment that is ".." (path traversal). Returns empty string for invalid input.
+function sanitizePackageDir(raw: string): string {
+  const trimmed = raw.trim().replace(/^\/+/, "");
+  if (trimmed.split("/").some((seg) => seg === "..")) return "";
+  return trimmed;
+}
+
 interface CheckItem {
   name: string;
   description?: string;
@@ -76,6 +84,7 @@ interface AppState {
   snackbarSeverity: "info" | "error" | "warning" | "success";
   repo: string;
   ref: string;
+  packageDir: string;
   refType: "branch" | "tag";
   refs: Refs;
   msg: string;
@@ -118,6 +127,9 @@ class App extends React.Component<AppProps, AppState> {
       snackbarSeverity: "info",
       repo: new URLSearchParams(window.location.search).get("repo") || "",
       ref: new URLSearchParams(window.location.search).get("ref") || "",
+      packageDir: sanitizePackageDir(
+        new URLSearchParams(window.location.search).get("packageDir") || "",
+      ),
       refType: parseRefType(
         new URLSearchParams(window.location.search).get("refType"),
       ),
@@ -210,6 +222,10 @@ class App extends React.Component<AppProps, AppState> {
       refType: this.state.refType,
       show: this.state.show,
     });
+    const packageDir = sanitizePackageDir(this.state.packageDir);
+    if (packageDir) {
+      local_params.set("packageDir", packageDir);
+    }
     window.history.replaceState(
       null,
       "",
@@ -223,9 +239,14 @@ class App extends React.Component<AppProps, AppState> {
     let results_list: any = null;
     try {
       const pyodide = await this.pyodide_promise!;
-      pyPackage = await prefetch(pyodide, state.repo, state.ref);
-      collected = collect_checks(pyodide, pyPackage);
-      results_list = run_process(pyodide, pyPackage, collected) as any;
+      pyPackage = await prefetch(pyodide, state.repo, state.ref, packageDir);
+      collected = collect_checks(pyodide, pyPackage, packageDir);
+      results_list = run_process(
+        pyodide,
+        pyPackage,
+        collected,
+        packageDir,
+      ) as any;
       families_dict = (collected as any).families.copy();
 
       const results: Record<string, CheckItem[]> = {};
@@ -535,14 +556,13 @@ class App extends React.Component<AppProps, AppState> {
           <Stack
             direction={{ xs: "column", sm: "row" }}
             spacing={2}
-            alignItems={{ xs: "stretch", sm: "flex-start" }}
+            alignItems={{ xs: "stretch", sm: "stretch" }}
             sx={{ m: 1, mb: 3 }}
           >
             <TextField
               id="repo-select"
               label="Org/Repo"
               helperText="e.g. scikit-hep/hist"
-              variant="outlined"
               autoFocus={true}
               onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
                 if (e.key === "Enter")
@@ -600,7 +620,6 @@ class App extends React.Component<AppProps, AppState> {
                 <TextField
                   {...params}
                   label="Branch/Tag"
-                  variant="outlined"
                   helperText="e.g. HEAD, main, or v1.0.0"
                   sx={{ flexGrow: 2, minWidth: 200 }}
                   InputProps={{
@@ -617,63 +636,84 @@ class App extends React.Component<AppProps, AppState> {
                 />
               )}
             />
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "row",
-                gap: 1,
-                alignItems: "center",
-              }}
+            <Stack
+              direction={{ xs: "row", sm: "column" }}
+              spacing={1}
+              sx={{ flexGrow: 1, minWidth: { xs: 240, sm: 180 } }}
             >
-              <FormControl sx={{ minWidth: 140 }}>
-                <InputLabel id="show-select-label">Show</InputLabel>
-                <Select
-                  labelId="show-select-label"
-                  id="show-select"
-                  value={this.state.show}
-                  label="Show"
-                  onChange={(e: SelectChangeEvent<string>) => {
-                    const val = e.target.value as string;
-                    this.setState({ show: val });
-                    // update query string to persist show selection
-                    const params = new URLSearchParams(window.location.search);
-                    if (val && val !== "all") {
-                      params.set("show", val);
-                    } else {
-                      params.delete("show");
-                    }
-                    // preserve repo/ref/refType if present
-                    if (!params.get("repo") && this.state.repo)
-                      params.set("repo", this.state.repo);
-                    if (!params.get("ref") && this.state.ref)
-                      params.set("ref", this.state.ref);
-                    if (!params.get("refType") && this.state.refType)
-                      params.set("refType", this.state.refType);
-                    window.history.replaceState(
-                      null,
-                      "",
-                      `${window.location.pathname}?${params}`,
-                    );
-                  }}
-                  size="small"
-                >
-                  <MenuItem value="all">All</MenuItem>
-                  <MenuItem value="err">Errors only</MenuItem>
-                  <MenuItem value="errskip">Errors + Skips</MenuItem>
-                </Select>
-              </FormControl>
-
-              <Button
-                onClick={() => this.handleCompute()}
-                variant="contained"
-                size="large"
-                disabled={
-                  this.state.progress || !this.state.repo || !this.state.ref
+              <TextField
+                id="package-dir-select"
+                label="Package dir (if not at root)"
+                value={this.state.packageDir}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  this.setState({ packageDir: e.target.value })
                 }
+                sx={{ flexGrow: 1 }}
+              />
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "row",
+                  gap: 1,
+                  alignItems: "center",
+                  justifyContent: "flex-end",
+                  flexGrow: 1,
+                }}
               >
-                <Icon>start</Icon>
-              </Button>
-            </Box>
+                <FormControl sx={{ minWidth: 140 }}>
+                  <InputLabel id="show-select-label">Show</InputLabel>
+                  <Select
+                    labelId="show-select-label"
+                    id="show-select"
+                    value={this.state.show}
+                    label="Show"
+                    onChange={(e: SelectChangeEvent<string>) => {
+                      const val = e.target.value as string;
+                      this.setState({ show: val });
+                      // update query string to persist show selection
+                      const params = new URLSearchParams(
+                        window.location.search,
+                      );
+                      if (val && val !== "all") {
+                        params.set("show", val);
+                      } else {
+                        params.delete("show");
+                      }
+                      // preserve repo/ref/refType/packageDir if present
+                      if (!params.get("repo") && this.state.repo)
+                        params.set("repo", this.state.repo);
+                      if (!params.get("ref") && this.state.ref)
+                        params.set("ref", this.state.ref);
+                      if (!params.get("refType") && this.state.refType)
+                        params.set("refType", this.state.refType);
+                      if (!params.get("packageDir") && this.state.packageDir)
+                        params.set("packageDir", this.state.packageDir);
+                      window.history.replaceState(
+                        null,
+                        "",
+                        `${window.location.pathname}?${params}`,
+                      );
+                    }}
+                    size="small"
+                  >
+                    <MenuItem value="all">All</MenuItem>
+                    <MenuItem value="err">Errors only</MenuItem>
+                    <MenuItem value="errskip">Errors + Skips</MenuItem>
+                  </Select>
+                </FormControl>
+              </Box>
+            </Stack>
+            <Button
+              onClick={() => this.handleCompute()}
+              variant="contained"
+              size="large"
+              disabled={
+                this.state.progress || !this.state.repo || !this.state.ref
+              }
+              sx={{ alignSelf: "stretch", minWidth: 64 }}
+            >
+              <Icon>start</Icon>
+            </Button>
           </Stack>
           <Paper elevation={3}>
             <Accordion
@@ -742,7 +782,6 @@ class App extends React.Component<AppProps, AppState> {
                   {hasResults && (
                     <Button
                       onClick={() => this.handleCopyHtml()}
-                      variant="outlined"
                       size="small"
                       disabled={
                         this.state.progress || this.state.pyodideLoading
