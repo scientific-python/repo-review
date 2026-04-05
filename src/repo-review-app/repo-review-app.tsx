@@ -634,7 +634,7 @@ class App extends React.Component<AppProps, AppState> {
             <Box
               sx={{
                 display: "flex",
-                flexDirection: { xs: "row", sm: "row" },
+                flexDirection: "row",
                 gap: 2,
                 alignItems: "center",
                 flexGrow: 1,
