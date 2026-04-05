@@ -41,6 +41,14 @@ import type { SelectChangeEvent } from "@mui/material";
 const DEFAULT_MSG =
   "Enter a GitHub repo and branch/tag to review. Runs Python entirely in your browser using WebAssembly. Built with React, MaterialUI, and Pyodide.";
 
+// Sanitize a package subdirectory path: strip leading slashes, reject any
+// segment that is ".." (path traversal). Returns empty string for invalid input.
+function sanitizePackageDir(raw: string): string {
+  const trimmed = raw.trim().replace(/^\/+/, "");
+  if (trimmed.split("/").some((seg) => seg === "..")) return "";
+  return trimmed;
+}
+
 interface CheckItem {
   name: string;
   description?: string;
@@ -119,8 +127,9 @@ class App extends React.Component<AppProps, AppState> {
       snackbarSeverity: "info",
       repo: new URLSearchParams(window.location.search).get("repo") || "",
       ref: new URLSearchParams(window.location.search).get("ref") || "",
-      packageDir:
+      packageDir: sanitizePackageDir(
         new URLSearchParams(window.location.search).get("packageDir") || "",
+      ),
       refType: parseRefType(
         new URLSearchParams(window.location.search).get("refType"),
       ),
@@ -213,7 +222,7 @@ class App extends React.Component<AppProps, AppState> {
       refType: this.state.refType,
       show: this.state.show,
     });
-    const packageDir = this.state.packageDir.trim();
+    const packageDir = sanitizePackageDir(this.state.packageDir);
     if (packageDir) {
       local_params.set("packageDir", packageDir);
     }
