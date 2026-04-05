@@ -39,16 +39,18 @@ export async function prefetch(
   pyodide: PyodideInterface,
   repo: string,
   branch: string,
+  subdir: string = "",
 ): Promise<PyProxy | null> {
   pyodide.globals.set("repo", repo);
   pyodide.globals.set("branch", branch);
+  pyodide.globals.set("subdir", subdir);
   const packagePy = await pyodide.runPythonAsync(`
     from repo_review.files import collect_prefetch_files, process_prefetch_files
     from repo_review.ghpath import GHPath
 
     package = await GHPath.async_from_repo(repo, branch)
     prefetch_files = collect_prefetch_files()
-    await process_prefetch_files(package, prefetch_files)
+    await process_prefetch_files(package, prefetch_files, subdir=subdir)
     package
   `);
 
@@ -60,12 +62,14 @@ export async function prefetch(
 export function collect_checks(
   pyodide: PyodideInterface,
   pyPackage: PyProxy | null,
+  subdir: string = "",
 ): PyProxy {
   pyodide.globals.set("package", pyPackage);
+  pyodide.globals.set("subdir", subdir);
   const collected = pyodide.runPython(`
     from repo_review.processor import collect_all
 
-    collect_all(package)
+    collect_all(package, subdir=subdir)
   `);
   return collected as PyProxy;
 }
@@ -74,13 +78,15 @@ export function run_process(
   pyodide: PyodideInterface,
   pyPackage: PyProxy | null,
   collected: PyProxy,
+  subdir: string = "",
 ): PyProxy {
   pyodide.globals.set("package", pyPackage);
   pyodide.globals.set("collected", collected);
+  pyodide.globals.set("subdir", subdir);
   const checks = pyodide.runPython(`
     from repo_review.processor import process, md_as_html
 
-    families, checks = process(package, collected=collected)
+    families, checks = process(package, collected=collected, subdir=subdir)
 
     for v in families.values():
         if v.get("description"):
