@@ -30,9 +30,18 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: "3.x"
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
       - uses: pre-commit/action@v3.0.1
       - name: Run PyLint
         run: pipx run --python=python hatch run pylint:lint --output-format=github
+      - name: Install with cache
+        run: bun install --frozen-lockfile
+      - name: Run linter
+        run: bun run lint
+      - name: Run type checker
+        run: bun run type
 
   checks:
     name: Check Python on ${{ matrix.runs-on }}
