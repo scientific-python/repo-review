@@ -103,6 +103,7 @@ function parseRefType(value: string | null): "branch" | "tag" {
 class App extends React.Component<AppProps, AppState> {
   pyodide_promise: Promise<PyodideInterface> | null;
   refInputDebounce: ReturnType<typeof setTimeout> | null;
+  _isMounted = false;
 
   constructor(props: AppProps) {
     super(props);
@@ -142,13 +143,17 @@ class App extends React.Component<AppProps, AppState> {
     this.pyodide_promise = prepare_pyodide(
       props.deps,
       (p: number, m?: string) =>
-        this.setState({
+        this.safeSetState({
           pyodideProgress: p,
           pyodideLoading: p < 100,
           pyodideMessage: m || "",
         }),
     );
     this.refInputDebounce = null;
+  }
+
+  componentDidMount() {
+    this._isMounted = true;
   }
 
   destroyProxy(proxy: PyProxy | null): void {
@@ -162,8 +167,17 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   componentWillUnmount() {
+    this._isMounted = false;
     this.destroyProxy(this.state.pyFamilies);
     this.destroyProxy(this.state.pyChecks);
+  }
+
+  safeSetState(state: Partial<AppState>) {
+    if (this._isMounted) {
+      this.setState(state as any);
+    } else {
+      Object.assign(this.state, state as any);
+    }
   }
 
   async fetchRepoReferences(repo: string) {
