@@ -25,8 +25,8 @@ $ hatch run docs:html        # just build the docs
 $ hatch run docs:man         # build manpage
 $ hatch run docs:linkcheck   # check for broken links
 $ hatch run api-docs:build   # rebuild the API docs
-$ hatch run webapp:serve     # serve the webapp
 $ hatch run example:repo-review <args> # Run an example
+$ bun run serve              # serve the webapp
 ```
 
 Hatch handles everything for you, including setting up an temporary virtual
