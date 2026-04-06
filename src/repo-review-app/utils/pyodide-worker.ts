@@ -115,18 +115,21 @@ async function runReview(
 ): Promise<ReviewRunData> {
   const pyodide = await getPyodide();
   const token = `run-${Date.now()}-${++runCounter}`;
+  const repoLiteral = JSON.stringify(repo);
+  const refLiteral = JSON.stringify(ref);
+  const subdirLiteral = JSON.stringify(subdir);
+  const tokenLiteral = JSON.stringify(token);
 
-  pyodide.globals.set("repo_name", repo);
-  pyodide.globals.set("repo_ref", ref);
-  pyodide.globals.set("repo_subdir", subdir);
-  pyodide.globals.set("run_token", token);
-
-  try {
-    const output = await pyodide.runPythonAsync(`
+  const output = await pyodide.runPythonAsync(`
       import json
       from repo_review.files import collect_prefetch_files, process_prefetch_files
       from repo_review.ghpath import GHPath
       from repo_review.processor import collect_all, process, md_as_html
+
+      repo_name = ${repoLiteral}
+      repo_ref = ${refLiteral}
+      repo_subdir = ${subdirLiteral}
+      run_token = ${tokenLiteral}
 
       package = await GHPath.async_from_repo(repo_name, repo_ref)
       prefetch_files = collect_prefetch_files()
@@ -176,23 +179,19 @@ async function runReview(
       })
     `);
 
-    return JSON.parse(asString(output)) as ReviewRunData;
-  } finally {
-    pyodide.globals.delete("repo_name");
-    pyodide.globals.delete("repo_ref");
-    pyodide.globals.delete("repo_subdir");
-    pyodide.globals.delete("run_token");
-  }
+  return JSON.parse(asString(output)) as ReviewRunData;
 }
 
 async function generateHtml(token: string, show: string): Promise<string> {
   const pyodide = await getPyodide();
-  pyodide.globals.set("html_run_token", token);
-  pyodide.globals.set("show_for_html", show || "all");
+  const tokenLiteral = JSON.stringify(token);
+  const showLiteral = JSON.stringify(show || "all");
 
-  try {
-    const output = await pyodide.runPythonAsync(`
+  const output = await pyodide.runPythonAsync(`
       from repo_review.html import to_html
+
+      html_run_token = ${tokenLiteral}
+      show_for_html = ${showLiteral}
 
       if globals().get("_repo_review_last_token") != html_run_token:
           raise RuntimeError(
@@ -212,11 +211,7 @@ async function generateHtml(token: string, show: string): Promise<string> {
       to_html(_repo_review_last_families, filtered)
     `);
 
-    return asString(output);
-  } finally {
-    pyodide.globals.delete("html_run_token");
-    pyodide.globals.delete("show_for_html");
-  }
+  return asString(output);
 }
 
 async function handleRequest(request: WorkerRequest): Promise<void> {
