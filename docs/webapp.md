@@ -55,16 +55,19 @@ And then after that, call the script with whatever dependencies you want:
 
 ### Bundler notes
 
-The webapp loads Pyodide automatically from the jsDelivr CDN
-(`https://cdn.jsdelivr.net/pyodide/`) at runtime; no extra `<script>` tag is
-required. The version loaded matches the `pyodide` npm package version used at
-build time. Running `bun run build` writes a bundled ESM file to
-`docs/_static/scripts/repo-review-app.min.js`, which the Live Demo imports as a
-module.
+When bundling the app for the web, Pyodide is loaded inside a dedicated web
+worker from the official CDN. The UI thread only talks to that worker via a
+promise-based message API, so React never touches Pyodide objects directly.
+The worker is bootstrapped from an in-memory Blob, so there is no separate
+worker file to host in development or production. Running `bun run build`
+writes a bundled ESM entrypoint to
+`docs/_static/scripts/repo-review-app.min.js`.
 
 ## Custom app
 
-To embed the app, simply import the ESM bundle and call `mountApp()`:
+If you prefer to write a custom integration, import the ESM bundle and mount
+the app. Pyodide will initialize lazily inside the worker when the app starts.
+For example:
 
 ```html
 <script type="module">
@@ -73,4 +76,5 @@ To embed the app, simply import the ESM bundle and call `mountApp()`:
 </script>
 ```
 
-The webapp loads Pyodide and uses `micropip` to install any requested Python packages.
+The worker uses `micropip` to install any requested Python packages and keeps
+the expensive Python state off the main thread.
