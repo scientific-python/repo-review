@@ -9,9 +9,12 @@
     "format": "prettier --write .",
     "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
     "serve": "bun src/repo-review-app/index.html",
-    "type": "tsc --noEmit"
+    "test": "bun test",
+    "type": "tsc --noEmit",
+    "type:test": "tsc --noEmit -p tsconfig.test.json"
   },
   "devDependencies": {
+    "@types/bun": "^1.3.11",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@typescript-eslint/eslint-plugin": "^8.58.0",

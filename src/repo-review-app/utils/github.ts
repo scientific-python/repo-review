@@ -11,8 +11,10 @@ export async function fetchRepoRefs(repo: string) {
       return { branches: [], tags: [] };
     }
 
-    const branches = await branchesResponse.json();
-    const tags = await tagsResponse.json();
+    const branches = (await branchesResponse.json()) as Array<{
+      name: string;
+    }>;
+    const tags = (await tagsResponse.json()) as Array<{ name: string }>;
 
     return {
       branches: branches.map((branch: any) => ({
