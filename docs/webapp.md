@@ -58,10 +58,9 @@ And then after that, call the script with whatever dependencies you want:
 When bundling the app for the web, Pyodide is loaded inside a dedicated web
 worker from the official CDN. The UI thread only talks to that worker via a
 promise-based message API, so React never touches Pyodide objects directly.
-The worker is bootstrapped from an in-memory Blob, so there is no separate
-worker file to host in development or production. Running `bun run build`
-writes a bundled ESM entrypoint to
-`docs/_static/scripts/repo-review-app.min.js`.
+Running `bun run build` writes the bundled ESM entrypoint to
+`docs/_static/scripts/repo-review-app.min.js` and emits the worker module
+alongside it.
 
 ## Custom app
 

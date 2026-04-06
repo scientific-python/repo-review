@@ -4,7 +4,7 @@
   "version": "1.0.3",
   "type": "module",
   "scripts": {
-    "build": "bunx esbuild src/repo-review-app/repo-review-app.tsx --bundle --minify --sourcemap --outfile=docs/_static/scripts/repo-review-app.min.js --platform=browser --format=esm",
+    "build": "bunx esbuild src/repo-review-app/repo-review-app.tsx src/repo-review-app/utils/pyodide-worker.ts --bundle --minify --sourcemap --outdir=docs/_static/scripts --outbase=src/repo-review-app --entry-names=[dir]/[name].min --platform=browser --format=esm",
     "build-html": "bun build src/repo-review-app/index.html --outdir=out --minify",
     "format": "prettier --write .",
     "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
