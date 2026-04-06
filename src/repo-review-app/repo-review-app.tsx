@@ -26,6 +26,7 @@ import Heading from "./components/Heading";
 import Results from "./components/Results";
 import MyThemeProvider from "./components/MyThemeProvider";
 import { fetchRepoRefs } from "./utils/github";
+import { sanitizePackageDir, parseRefType } from "./utils/url";
 import {
   prepare_pyodide,
   run_process,
@@ -40,14 +41,6 @@ import type { SelectChangeEvent } from "@mui/material";
 
 const DEFAULT_MSG =
   "Enter a GitHub repo and branch/tag to review. Runs Python entirely in your browser using WebAssembly. Built with React, MaterialUI, and Pyodide.";
-
-// Sanitize a package subdirectory path: strip leading slashes, reject any
-// segment that is ".." (path traversal). Returns empty string for invalid input.
-function sanitizePackageDir(raw: string): string {
-  const trimmed = raw.trim().replace(/^\/+/, "");
-  if (trimmed.split("/").some((seg) => seg === "..")) return "";
-  return trimmed;
-}
 
 interface CheckItem {
   name: string;
@@ -104,10 +97,6 @@ interface AppState {
   completedRepo: string;
   completedRef: string;
   completedRefType: "branch" | "tag";
-}
-
-function parseRefType(value: string | null): "branch" | "tag" {
-  return value === "tag" ? "tag" : "branch";
 }
 
 class App extends React.Component<AppProps, AppState> {
