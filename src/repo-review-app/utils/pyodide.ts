@@ -1,21 +1,21 @@
 import type { PyodideInterface } from "pyodide";
 import type { PyProxy } from "pyodide/ffi";
+import pyodidePackage from "pyodide/package.json";
 
-declare global {
-  interface Window {
-    loadPyodide?: () => Promise<PyodideInterface>;
-  }
-}
+// Version resolved from the npm package at build time; runtime files loaded from CDN
+const PYODIDE_CDN_URL = `https://cdn.jsdelivr.net/pyodide/v${pyodidePackage.version}/full/pyodide.mjs`;
 
 export async function prepare_pyodide(
   deps: string[],
   onProgress?: (p: number, m?: string) => void,
 ): Promise<PyodideInterface> {
-  const deps_str = deps.map((i) => `\"${i}\"`).join(", ");
+  const deps_str = deps.map((i) => `"${i}"`).join(", ");
   try {
     if (onProgress) onProgress(5, "Initializing Pyodide runtime");
-    // loadPyodide is provided by the Pyodide script at runtime
-    const pyodide: PyodideInterface = await (window as Window).loadPyodide!();
+    const { loadPyodide } = (await import(PYODIDE_CDN_URL)) as {
+      loadPyodide: () => Promise<PyodideInterface>;
+    };
+    const pyodide: PyodideInterface = await loadPyodide();
     if (onProgress) onProgress(50, "Core Pyodide loaded");
 
     if (onProgress) onProgress(65, "Loading micropip");
