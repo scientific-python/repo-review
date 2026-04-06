@@ -141,6 +141,7 @@ node_modules/
 /.vscode
 uv.lock
 /docs/_static/scripts/repo-review-app.*
+/docs/_static/scripts/utils/pyodide-worker.min.js*
 
 # Demo page
 /out

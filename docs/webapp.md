@@ -21,10 +21,6 @@ If you copy the webapp into your page, use this header (with the link to where
 you extract the webapp):
 
 ```html
-<script
-  src="https://cdn.jsdelivr.net/pyodide/v0.29.3/full/pyodide.js"
-  crossorigin
-></script>
 <!-- Fonts to support Material Design -->
 <link
   rel="stylesheet"
@@ -59,28 +55,25 @@ And then after that, call the script with whatever dependencies you want:
 
 ### Bundler notes
 
-When bundling the app for the web, Pyodide is NOT bundled via an npm package.
-The webapp expects `loadPyodide()` to be available at runtime (for example by
-including Pyodide from the official CDN or otherwise providing it on the host
-page). Running `bun run build` writes a bundled ESM file to
-`docs/_static/scripts/repo-review-app.min.js`, which the Live Demo imports as a module.
+When bundling the app for the web, Pyodide is loaded inside a dedicated web
+worker from the official CDN. The UI thread only talks to that worker via a
+promise-based message API, so React never touches Pyodide objects directly.
+Running `bun run build` writes the bundled ESM entrypoint to
+`docs/_static/scripts/repo-review-app.min.js` and emits the worker module
+alongside it.
 
 ## Custom app
 
-If you prefer to write a custom integration, ensure Pyodide is loaded on the
-page and then call `loadPyodide()` as the demo does. For example, load Pyodide
-from the CDN and then mount the app (or import the ESM bundle):
-
-Global (script) example:
+If you prefer to write a custom integration, import the ESM bundle and mount
+the app. Pyodide will initialize lazily inside the worker when the app starts.
+For example:
 
 ```html
-<script src="https://cdn.jsdelivr.net/pyodide/v0.29.3/full/pyodide.js"></script>
 <script type="module">
   import { mountApp } from "./_static/scripts/repo-review-app.min.js";
-  await loadPyodide();
   mountApp({ header: false, deps: ["repo-review"] });
 </script>
 ```
 
-The webapp code expects a callable `loadPyodide()` and will use `micropip` to
-install any requested Python packages.
+The worker uses `micropip` to install any requested Python packages and keeps
+the expensive Python state off the main thread.

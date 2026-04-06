@@ -5,11 +5,6 @@ This demo is using two of the most popular plugins: `sp-repo-review` and
 
 <div id="root">Loading...</div>
 
-<script
-      src="https://cdn.jsdelivr.net/pyodide/v0.29.3/full/pyodide.js"
-      crossorigin
-></script>
-
 <!-- Fonts to support Material Design -->
 <link
   rel="stylesheet"

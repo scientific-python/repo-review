@@ -1,152 +1,139 @@
-import type { PyodideInterface } from "pyodide";
-import type { PyProxy } from "pyodide/ffi";
+import type {
+  KnownChecksData,
+  ReviewRunData,
+  WorkerRequest,
+  WorkerResponse,
+} from "./pyodide-common";
 
-declare global {
-  interface Window {
-    loadPyodide?: () => Promise<PyodideInterface>;
+type ProgressHandler = (progress: number, message?: string) => void;
+
+type WorkerRequestPayload =
+  | { type: "prepare"; deps: string[] }
+  | { type: "loadKnownChecks" }
+  | { type: "runReview"; repo: string; ref: string; subdir: string }
+  | { type: "generateHtml"; token: string; show: string };
+
+interface PendingRequest {
+  resolve: (value: unknown) => void;
+  reject: (reason?: unknown) => void;
+  onProgress?: ProgressHandler;
+}
+
+export interface PyodideClient {
+  prepare(deps: string[], onProgress?: ProgressHandler): Promise<void>;
+  loadKnownChecks(): Promise<KnownChecksData>;
+  runReview(repo: string, ref: string, subdir?: string): Promise<ReviewRunData>;
+  generateHtml(token: string, show?: string): Promise<string>;
+  dispose(): void;
+}
+
+class WorkerPyodideClient implements PyodideClient {
+  private readonly worker: Worker;
+
+  private readonly pending = new Map<number, PendingRequest>();
+
+  private nextRequestId = 1;
+
+  constructor() {
+    this.worker = new Worker(this.getWorkerUrl(), { type: "module" });
+    this.worker.addEventListener("message", this.handleMessage);
+    this.worker.addEventListener("error", this.handleError);
+  }
+
+  private getWorkerUrl(): URL {
+    const currentUrl = new URL(import.meta.url);
+    const isSourceModule = currentUrl.pathname.includes(
+      "/src/repo-review-app/",
+    );
+
+    return isSourceModule
+      ? new URL("./pyodide-worker.ts", import.meta.url)
+      : new URL("./utils/pyodide-worker.min.js", import.meta.url);
+  }
+
+  private handleMessage = (event: MessageEvent<WorkerResponse>): void => {
+    const response = event.data;
+    const pending = this.pending.get(response.id);
+    if (!pending) {
+      return;
+    }
+
+    if (response.type === "progress") {
+      pending.onProgress?.(response.progress, response.message);
+      return;
+    }
+
+    this.pending.delete(response.id);
+
+    if (response.type === "error") {
+      pending.reject(new Error(response.error));
+      return;
+    }
+
+    pending.resolve(response.payload);
+  };
+
+  private handleError = (event: ErrorEvent): void => {
+    const message = event.message || "Pyodide worker failed";
+    for (const [, pending] of this.pending) {
+      pending.reject(new Error(message));
+    }
+    this.pending.clear();
+  };
+
+  private request<T>(
+    request: WorkerRequestPayload,
+    onProgress?: ProgressHandler,
+  ): Promise<T> {
+    const id = this.nextRequestId++;
+
+    return new Promise<T>((resolve, reject) => {
+      this.pending.set(id, {
+        resolve: (value: unknown) => resolve(value as T),
+        reject,
+        onProgress,
+      });
+      const message: WorkerRequest = { id, ...request };
+      this.worker.postMessage(message);
+    });
+  }
+
+  prepare(deps: string[], onProgress?: ProgressHandler): Promise<void> {
+    return this.request<void>({ type: "prepare", deps }, onProgress);
+  }
+
+  loadKnownChecks(): Promise<KnownChecksData> {
+    return this.request<KnownChecksData>({ type: "loadKnownChecks" });
+  }
+
+  runReview(
+    repo: string,
+    ref: string,
+    subdir: string = "",
+  ): Promise<ReviewRunData> {
+    return this.request<ReviewRunData>({
+      type: "runReview",
+      repo,
+      ref,
+      subdir,
+    });
+  }
+
+  generateHtml(token: string, show: string = "all"): Promise<string> {
+    return this.request<string>({ type: "generateHtml", token, show });
+  }
+
+  dispose(): void {
+    this.worker.removeEventListener("message", this.handleMessage);
+    this.worker.removeEventListener("error", this.handleError);
+    for (const [, pending] of this.pending) {
+      pending.reject(new Error("Pyodide worker disposed"));
+    }
+    this.pending.clear();
+    this.worker.terminate();
   }
 }
 
-export async function prepare_pyodide(
-  deps: string[],
-  onProgress?: (p: number, m?: string) => void,
-): Promise<PyodideInterface> {
-  const deps_str = deps.map((i) => `\"${i}\"`).join(", ");
-  try {
-    if (onProgress) onProgress(5, "Initializing Pyodide runtime");
-    // loadPyodide is provided by the Pyodide script at runtime
-    const pyodide: PyodideInterface = await (window as Window).loadPyodide!();
-    if (onProgress) onProgress(50, "Core Pyodide loaded");
-
-    if (onProgress) onProgress(65, "Loading micropip");
-    await pyodide.loadPackage("micropip");
-    if (onProgress) onProgress(80, "Installing Python packages");
-
-    await pyodide.runPythonAsync(`
-      import micropip
-      await micropip.install([${deps_str}])
-    `);
-
-    if (onProgress) onProgress(100, "Ready");
-    return pyodide;
-  } catch (e) {
-    if (onProgress) onProgress(100, "Error during load");
-    throw e;
-  }
-}
-
-export async function prefetch(
-  pyodide: PyodideInterface,
-  repo: string,
-  branch: string,
-  subdir: string = "",
-): Promise<PyProxy | null> {
-  pyodide.globals.set("repo", repo);
-  pyodide.globals.set("branch", branch);
-  pyodide.globals.set("subdir", subdir);
-  const packagePy = await pyodide.runPythonAsync(`
-    from repo_review.files import collect_prefetch_files, process_prefetch_files
-    from repo_review.ghpath import GHPath
-
-    package = await GHPath.async_from_repo(repo, branch)
-    prefetch_files = collect_prefetch_files()
-    await process_prefetch_files(package, prefetch_files, subdir=subdir)
-    package
-  `);
-
-  // package can be None in Python land -> map to null
-  return packagePy === undefined ? null : (packagePy as PyProxy | null);
-}
-
-// Package can be None
-export function collect_checks(
-  pyodide: PyodideInterface,
-  pyPackage: PyProxy | null,
-  subdir: string = "",
-): PyProxy {
-  pyodide.globals.set("package", pyPackage);
-  pyodide.globals.set("subdir", subdir);
-  const collected = pyodide.runPython(`
-    from repo_review.processor import collect_all
-
-    collect_all(package, subdir=subdir)
-  `);
-  return collected as PyProxy;
-}
-
-export function run_process(
-  pyodide: PyodideInterface,
-  pyPackage: PyProxy | null,
-  collected: PyProxy,
-  subdir: string = "",
-): PyProxy {
-  pyodide.globals.set("package", pyPackage);
-  pyodide.globals.set("collected", collected);
-  pyodide.globals.set("subdir", subdir);
-  const checks = pyodide.runPython(`
-    from repo_review.processor import process, md_as_html
-
-    families, checks = process(package, collected=collected, subdir=subdir)
-
-    for v in families.values():
-        if v.get("description"):
-            v["description"] = md_as_html(v["description"])
-    [res.md_as_html() for res in checks]
-    `);
-  return checks;
-}
-
-export function load_known_checks(
-  pyodide: PyodideInterface,
-): Record<string, unknown> {
-  const dataStr = pyodide.runPython(`
-    import json
-    from repo_review.processor import collect_all
-    from repo_review.checks import get_check_url
-
-    collected = collect_all()
-    families_out = {k: {"name": v.get("name", k)} for k, v in collected.families.items()}
-    results_out = []
-    for name, check in collected.checks.items():
-        desc = (check.__doc__ or "").strip()
-        results_out.append({
-            "name": name,
-            "family": check.family,
-            "description": desc,
-            "url": get_check_url(name, check),
-        })
-    json.dumps({"families": families_out, "results": results_out})
-    `);
-
-  // pyodide may return a PyProxy; ensure string
-  return JSON.parse(dataStr.toString ? dataStr.toString() : dataStr);
-}
-
-export async function generate_html(
-  pyodide: PyodideInterface,
-  familiesPy: PyProxy | Record<string, unknown>,
-  checksPy: PyProxy | unknown[],
-  show: string = "all",
-): Promise<string> {
-  pyodide.globals.set("families_for_html", familiesPy);
-  pyodide.globals.set("checks_for_html", checksPy);
-  pyodide.globals.set("show_for_html", show || "all");
-
-  const htmlOut = await pyodide.runPythonAsync(`
-    from repo_review.html import to_html
-
-    match show_for_html:
-        case "all":
-            filtered = checks_for_html
-        case "err":
-            filtered = [c for c in checks_for_html if c.result is False]
-        case "errskip":
-            filtered = [c for c in checks_for_html if c.result is not True]
-        case _:
-            filtered = checks_for_html
-
-    to_html(families_for_html, filtered)
-    `);
-
-  return htmlOut.toString ? htmlOut.toString() : htmlOut;
+export function createPyodideClient(): PyodideClient {
+  return new WorkerPyodideClient();
 }
