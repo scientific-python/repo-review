@@ -3,16 +3,17 @@ import type { PyProxy } from "pyodide/ffi";
 import pyodidePackage from "pyodide/package.json";
 
 // Version resolved from the npm package at build time; runtime files loaded from CDN
-const PYODIDE_CDN_URL = `https://cdn.jsdelivr.net/pyodide/v${pyodidePackage.version}/full/pyodide.mjs`;
+const DEFAULT_PYODIDE_BASE_URL = `https://cdn.jsdelivr.net/pyodide/v${pyodidePackage.version}/full`;
 
 export async function prepare_pyodide(
   deps: string[],
+  pyodideBaseUrl?: string,
   onProgress?: (p: number, m?: string) => void,
 ): Promise<PyodideInterface> {
-  const deps_str = deps.map((i) => `"${i}"`).join(", ");
   try {
     if (onProgress) onProgress(5, "Initializing Pyodide runtime");
-    const { loadPyodide } = (await import(PYODIDE_CDN_URL)) as {
+    const baseUrl = pyodideBaseUrl ?? DEFAULT_PYODIDE_BASE_URL;
+    const { loadPyodide } = (await import(`${baseUrl}/pyodide.mjs`)) as {
       loadPyodide: () => Promise<PyodideInterface>;
     };
     const pyodide: PyodideInterface = await loadPyodide();
@@ -22,10 +23,13 @@ export async function prepare_pyodide(
     await pyodide.loadPackage("micropip");
     if (onProgress) onProgress(80, "Installing Python packages");
 
+    // Pass deps via globals instead of string interpolation for safety
+    pyodide.globals.set("_rr_deps_to_install", deps);
     await pyodide.runPythonAsync(`
       import micropip
-      await micropip.install([${deps_str}])
+      await micropip.install(list(_rr_deps_to_install))
     `);
+    pyodide.globals.delete("_rr_deps_to_install");
 
     if (onProgress) onProgress(100, "Ready");
     return pyodide;
