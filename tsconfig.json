@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES2022",
+    "types": ["bun"],
     "module": "ESNext",
     "jsx": "react-jsx",
     "moduleResolution": "bundler",
@@ -15,6 +16,5 @@
     "resolveJsonModule": true,
     "lib": ["DOM", "DOM.Iterable", "ES2022"]
   },
-  "include": ["src/**/*"],
-  "exclude": ["src/**/*.test.ts", "src/**/*.test.tsx"]
+  "include": ["src/**/*"]
 }

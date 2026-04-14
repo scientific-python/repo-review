@@ -10,8 +10,7 @@
     "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
     "serve": "bun src/repo-review-app/index.html",
     "test": "bun test",
-    "type": "tsc --noEmit",
-    "type:test": "tsc --noEmit -p tsconfig.test.json"
+    "type": "tsc --noEmit"
   },
   "devDependencies": {
     "@types/bun": "^1.3.11",
