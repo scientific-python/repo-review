@@ -17,11 +17,11 @@ export async function fetchRepoRefs(repo: string) {
     const tags = (await tagsResponse.json()) as Array<{ name: string }>;
 
     return {
-      branches: branches.map((branch: any) => ({
+      branches: branches.map((branch) => ({
         name: branch.name,
         type: "branch",
       })),
-      tags: tags.map((tag: any) => ({ name: tag.name, type: "tag" })),
+      tags: tags.map((tag) => ({ name: tag.name, type: "tag" })),
     };
   } catch (error) {
     console.error("Error fetching repo references:", error);
