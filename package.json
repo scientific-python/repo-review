@@ -20,11 +20,11 @@
     "eslint": "^10.1.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-react": "^7.37.5",
-    "pyodide": "^0.29.3",
     "typescript": "^6.0.2",
     "typescript-eslint": "^8.58.0"
   },
   "dependencies": {
+    "pyodide": "^0.29.3",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "@mui/material": "^7.3.9",

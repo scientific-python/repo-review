@@ -21,10 +21,6 @@ If you copy the webapp into your page, use this header (with the link to where
 you extract the webapp):
 
 ```html
-<script
-  src="https://cdn.jsdelivr.net/pyodide/v0.29.3/full/pyodide.js"
-  crossorigin
-></script>
 <!-- Fonts to support Material Design -->
 <link
   rel="stylesheet"
@@ -59,28 +55,22 @@ And then after that, call the script with whatever dependencies you want:
 
 ### Bundler notes
 
-When bundling the app for the web, Pyodide is NOT bundled via an npm package.
-The webapp expects `loadPyodide()` to be available at runtime (for example by
-including Pyodide from the official CDN or otherwise providing it on the host
-page). Running `bun run build` writes a bundled ESM file to
-`docs/_static/scripts/repo-review-app.min.js`, which the Live Demo imports as a module.
+The webapp loads Pyodide automatically from the jsDelivr CDN
+(`https://cdn.jsdelivr.net/pyodide/`) at runtime; no extra `<script>` tag is
+required. The version loaded matches the `pyodide` npm package version used at
+build time. Running `bun run build` writes a bundled ESM file to
+`docs/_static/scripts/repo-review-app.min.js`, which the Live Demo imports as a
+module.
 
 ## Custom app
 
-If you prefer to write a custom integration, ensure Pyodide is loaded on the
-page and then call `loadPyodide()` as the demo does. For example, load Pyodide
-from the CDN and then mount the app (or import the ESM bundle):
-
-Global (script) example:
+To embed the app, simply import the ESM bundle and call `mountApp()`:
 
 ```html
-<script src="https://cdn.jsdelivr.net/pyodide/v0.29.3/full/pyodide.js"></script>
 <script type="module">
   import { mountApp } from "./_static/scripts/repo-review-app.min.js";
-  await loadPyodide();
   mountApp({ header: false, deps: ["repo-review"] });
 </script>
 ```
 
-The webapp code expects a callable `loadPyodide()` and will use `micropip` to
-install any requested Python packages.
+The webapp loads Pyodide and uses `micropip` to install any requested Python packages.

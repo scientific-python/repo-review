@@ -72,6 +72,7 @@ interface Option {
 interface AppProps {
   deps: string[];
   header?: boolean;
+  pyodideBaseUrl?: string;
 }
 
 interface AppState {
@@ -414,6 +415,7 @@ class App extends React.Component<AppProps, AppState> {
   componentDidMount() {
     this.pyodide_promise = prepare_pyodide(
       this.props.deps,
+      this.props.pyodideBaseUrl,
       (p: number, m?: string) =>
         this.setState({
           pyodideProgress: p,

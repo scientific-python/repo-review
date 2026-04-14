@@ -12,6 +12,7 @@
     "forceConsistentCasingInFileNames": true,
     "outDir": "dist",
     "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
     "lib": ["DOM", "DOM.Iterable", "ES2022"]
   },
   "include": ["src/**/*"]
