@@ -42,6 +42,8 @@ jobs:
         run: bun run lint
       - name: Run type checker
         run: bun run type
+      - name: Run tests
+        run: bun run test
 
   checks:
     name: Check Python on ${{ matrix.runs-on }}
