@@ -20,14 +20,17 @@ function makeFetchMock(
 
 describe("fetchRepoRefs", () => {
   let savedFetch: typeof globalThis.fetch;
+  let consoleErrorSpy: ReturnType<typeof spyOn>;
 
   beforeEach(() => {
     savedFetch = globalThis.fetch;
-    spyOn(console, "error").mockImplementation(() => {});
+    consoleErrorSpy = spyOn(console, "error");
+    consoleErrorSpy.mockImplementation(() => {});
   });
 
   afterEach(() => {
     globalThis.fetch = savedFetch;
+    consoleErrorSpy.mockRestore();
   });
 
   it("returns empty arrays immediately for an empty repo string", async () => {
