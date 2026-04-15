@@ -343,7 +343,17 @@ class App extends React.Component<AppProps, AppState> {
     if (params.get("repo") && params.get("ref")) {
       this.handleCompute();
     } else {
-      this.pyodide_promise.then(() => this.loadKnownChecks());
+      this.pyodide_promise
+        .then(() => this.loadKnownChecks())
+        .catch((e: unknown) => {
+          const emsg = e instanceof Error ? e.message : String(e);
+          this.setState({
+            pyodideLoading: false,
+            snackbarOpen: true,
+            snackbarMsg: "Failed to initialize Pyodide: " + emsg,
+            snackbarSeverity: "error",
+          });
+        });
     }
   }
 

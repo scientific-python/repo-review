@@ -35,20 +35,29 @@ class WorkerPyodideClient implements PyodideClient {
   private nextRequestId = 1;
 
   constructor() {
-    this.worker = new Worker(this.getWorkerUrl(), { type: "module" });
+    const workerUrl = this.getWorkerUrl();
+    this.worker = new Worker(workerUrl, { type: "module" });
     this.worker.addEventListener("message", this.handleMessage);
     this.worker.addEventListener("error", this.handleError);
   }
 
   private getWorkerUrl(): URL {
     const currentUrl = new URL(import.meta.url);
-    const isSourceModule = currentUrl.pathname.includes(
-      "/src/repo-review-app/",
-    );
+    const isSourceModule =
+      currentUrl.protocol === "file:" ||
+      currentUrl.pathname.includes("/src/repo-review-app/");
 
-    return isSourceModule
-      ? new URL("./pyodide-worker.ts", import.meta.url)
-      : new URL("./utils/pyodide-worker.min.js", import.meta.url);
+    if (isSourceModule) {
+      if (currentUrl.protocol === "file:") {
+        // Bun's dev server sets import.meta.url to a file:// path even though
+        // it serves files over HTTP with the HTML as the web root.
+        // The worker is at utils/pyodide-worker.ts relative to index.html.
+        return new URL("./utils/pyodide-worker.ts", window.location.href);
+      }
+      return new URL("./pyodide-worker.ts", currentUrl);
+    }
+
+    return new URL("./utils/pyodide-worker.min.js", import.meta.url);
   }
 
   private handleMessage = (event: MessageEvent<WorkerResponse>): void => {
@@ -74,9 +83,14 @@ class WorkerPyodideClient implements PyodideClient {
   };
 
   private handleError = (event: ErrorEvent): void => {
-    const message = event.message || "Pyodide worker failed";
+    const parts: string[] = [];
+    if (event.message) parts.push(event.message);
+    if (event.filename) parts.push(`(${event.filename}:${event.lineno})`);
+    const message =
+      parts.length > 0 ? parts.join(" ") : "Pyodide worker failed to start";
+    const error = new Error(message);
     for (const [, pending] of this.pending) {
-      pending.reject(new Error(message));
+      pending.reject(error);
     }
     this.pending.clear();
   };
