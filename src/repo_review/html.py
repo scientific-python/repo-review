@@ -12,7 +12,7 @@ import builtins
 import functools
 import io
 
-from .families import Family, get_family_description, get_family_name
+from .families import Family, get_family_description, get_family_name, sort_family_keys
 from .processor import Result, md_as_html
 
 TYPE_CHECKING = False
@@ -45,11 +45,7 @@ def to_html(
     out = io.StringIO()
     print = functools.partial(builtins.print, file=out)
 
-    sorted_families = sorted(
-        families.keys(),
-        key=lambda x: (families[x].get("order", 0), x),
-    )
-    for family in sorted_families:
+    for family in sort_family_keys(families):
         family_name = get_family_name(families, family)
         family_description = get_family_description(families, family)
         family_results = [r.md_as_html() for r in processed if r.family == family]
