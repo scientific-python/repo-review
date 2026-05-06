@@ -1,4 +1,7 @@
+import re
+
 from repo_review.families import Family, get_family_description, get_family_name
+from repo_review.html import to_html
 
 
 def test_getters():
@@ -9,3 +12,38 @@ def test_getters():
 
     assert get_family_description(families, "unknown") == ""
     assert get_family_name(families, "unknown") == "unknown"
+
+
+def test_family_sorting_in_html():
+    """Test that families are sorted by order value, then alphabetically."""
+    families = {
+        "validate-pyproject": Family(
+            {
+                "name": "Validate-PyProject",
+                "order": 0,
+                "description": "Validation checks",
+            }
+        ),
+        "general": Family(
+            {"name": "General", "order": -3, "description": "General checks"}
+        ),
+        "pyproject": Family(
+            {"name": "PyProject", "order": -2, "description": "PyProject checks"}
+        ),
+        "github": Family(
+            {
+                "name": "GitHub Actions",
+                "order": 0,
+                "description": "GitHub Actions checks",
+            }
+        ),
+    }
+
+    html = to_html(families, [])
+
+    # Extract family names from h3 tags in the order they appear
+    families_in_order = re.findall(r"<h3>(.*?)</h3>", html)
+
+    # Expected order: by order value first (-3, -2, then 0s), then alphabetically within each order
+    expected = ["General", "PyProject", "GitHub Actions", "Validate-PyProject"]
+    assert families_in_order == expected

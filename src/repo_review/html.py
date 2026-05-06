@@ -45,7 +45,11 @@ def to_html(
     out = io.StringIO()
     print = functools.partial(builtins.print, file=out)
 
-    for family in families:
+    sorted_families = sorted(
+        families.keys(),
+        key=lambda x: (families[x].get("order", 0), x),
+    )
+    for family in sorted_families:
         family_name = get_family_name(families, family)
         family_description = get_family_description(families, family)
         family_results = [r.md_as_html() for r in processed if r.family == family]
