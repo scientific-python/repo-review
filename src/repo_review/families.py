@@ -12,7 +12,12 @@ TYPE_CHECKING = False
 if TYPE_CHECKING:
     from collections.abc import Mapping
 
-__all__ = ["Family", "collect_families", "get_family_name"]
+__all__ = [
+    "Family",
+    "collect_families",
+    "get_family_name",
+    "sort_family_keys",
+]
 
 
 def __dir__() -> list[str]:
@@ -82,3 +87,14 @@ def get_family_description(families: Mapping[str, Family], family: str) -> str:
     .. versionadded:: 0.9
     """
     return families.get(family, {}).get("description", "")
+
+
+def sort_family_keys(families: Mapping[str, Family]) -> list[str]:
+    """
+    Returns family keys sorted by order, then alphabetically by family key.
+
+    :param families: A dict of family short names to :class:`.Family`'s.
+    """
+    return sorted(
+        families, key=lambda family: (families[family].get("order", 0), family)
+    )

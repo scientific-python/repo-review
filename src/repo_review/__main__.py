@@ -56,7 +56,12 @@ from rich.logging import RichHandler
 from repo_review import __version__
 from repo_review._compat.typing import assert_never
 from repo_review.checks import get_check_description, get_check_url
-from repo_review.families import Family, get_family_description, get_family_name
+from repo_review.families import (
+    Family,
+    get_family_description,
+    get_family_name,
+    sort_family_keys,
+)
 from repo_review.files import collect_prefetch_files, process_prefetch_files
 from repo_review.ghpath import GHPath
 from repo_review.html import to_html
@@ -158,7 +163,7 @@ def rich_printer(
     if header:
         console.print(rich.markdown.Markdown(f"# {header}"))
 
-    for family in families:
+    for family in sort_family_keys(families):
         family_name = get_family_name(families, family)
         family_description = get_family_description(families, family)
         family_results = [r for r in processed if r.family == family]
@@ -261,9 +266,10 @@ def display_output(
                 header=header,
             )
         case "json":
+            sorted_families = {k: families[k] for k in sort_family_keys(families)}
             d: dict[str, Any] = {
                 "status": status,
-                "families": families,
+                "families": sorted_families,
                 "checks": as_simple_dict(processed),
             }
             if header:
