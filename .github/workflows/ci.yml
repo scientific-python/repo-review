@@ -89,7 +89,7 @@ jobs:
         with:
           persist-credentials: false
 
-      - uses: hynek/build-and-inspect-python-package@v2
+      - uses: hynek/build-and-inspect-python-package@v2.17.0
 
   docs:
     name: Docs
