@@ -3,6 +3,7 @@ name: Deploy Webapp to GitHub Pages
 on:
   push:
     branches: [main]
+  pull_request:
   workflow_dispatch:
 
 permissions: {}
@@ -42,6 +43,7 @@ jobs:
   deploy:
     name: Deploy
     needs: build
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     permissions:
       pages: write
