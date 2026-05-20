@@ -37,6 +37,7 @@ jobs:
         uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
+          no-cache: true
 
       - name: Install dependencies
         run: bun install --frozen-lockfile
@@ -70,7 +71,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
-          persist-credentials: true # needed for release
+          persist-credentials: false # needed for release
 
       - uses: actions/download-artifact@v8
         with:

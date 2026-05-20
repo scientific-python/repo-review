@@ -33,6 +33,7 @@ jobs:
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
+          no-cache: true
       - uses: pre-commit/action@v3.0.1
       - name: Run PyLint
         run: pipx run --python=python hatch run pylint:lint --output-format=github
@@ -73,6 +74,8 @@ jobs:
 
       - name: Setup uv
         uses: astral-sh/setup-uv@v8.1.0
+        with:
+          enable-cache: false
 
       - name: Install hatch
         run: uv pip install --system hatch
@@ -101,6 +104,8 @@ jobs:
 
       - name: Setup uv
         uses: astral-sh/setup-uv@v8.1.0
+        with:
+          enable-cache: false
 
       - uses: actions/setup-python@v6
         with:
@@ -112,6 +117,7 @@ jobs:
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
+          no-cache: true
 
       - name: Install with cache
         run: bun install --frozen-lockfile
