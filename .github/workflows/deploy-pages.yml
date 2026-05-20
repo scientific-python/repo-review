@@ -46,8 +46,8 @@ jobs:
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
     permissions:
-      pages: write
-      id-token: write
+      pages: write # needed for pages
+      id-token: write # needed for pages
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
