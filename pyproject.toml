@@ -99,6 +99,9 @@ docs = [
 [tool.hatch.envs.default]
 installer = "uv"
 
+[tool.uv]
+exclude-newer = "7 days"
+
 [tool.hatch.envs.hatch-test]
 features = ["cli"]
 dependency-groups = ["test"]
