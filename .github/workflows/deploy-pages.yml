@@ -12,12 +12,10 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build-and-deploy:
-    name: Build and Deploy
+  build:
+    name: Build
     runs-on: ubuntu-latest
     permissions:
-      pages: write # needed for pages
-      id-token: write # needed for pages
       contents: read
     steps:
       - name: Checkout
@@ -36,13 +34,25 @@ jobs:
       - name: Build webapp
         run: bun run build-html
 
-      - name: Configure Pages
-        uses: actions/configure-pages@v6
-
       - name: Upload artifact for Pages
         uses: actions/upload-pages-artifact@v5
         with:
           path: out
 
+  deploy:
+    name: Deploy
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Configure Pages
+        uses: actions/configure-pages@v6
+
       - name: Deploy to GitHub Pages
+        id: deployment
         uses: actions/deploy-pages@v5
