@@ -15,7 +15,35 @@ This webapp can be embedded into an existing webpage by setting
 
 You can see the source at `/src/repo-review-app`, and you can see the file to
 set up the `bun` bundle at `/package.json`. Releases of repo-review have a
-zip attached with the webapp.
+zip attached with the webapp, and the bundle is also published to npm as
+`repo-review-webapp`.
+
+## Using the CDN bundle
+
+The simplest way to embed the webapp is via jsDelivr — no download or hosting
+required:
+
+```html
+<script type="module">
+  import { mountApp } from "https://cdn.jsdelivr.net/npm/repo-review-webapp/dist/repo-review-app.mjs";
+
+  mountApp({
+    header: false,
+    deps: ["repo-review~=1.0.0", "sp-repo-review==2026.04.04"],
+  });
+</script>
+```
+
+Pin to a specific version for stability:
+
+```html
+<script type="module">
+  import { mountApp } from "https://cdn.jsdelivr.net/npm/repo-review-webapp@1.0.3/dist/repo-review-app.mjs";
+  mountApp({ header: false, deps: ["repo-review~=1.0.0"] });
+</script>
+```
+
+## Self-hosting
 
 If you copy the webapp into your page, use this header (with the link to where
 you extract the webapp):
