@@ -47,8 +47,11 @@ bun run lint
 # Format
 bun run format
 
-# Build (outputs to `docs/_static/scripts/`)
+# Build docs bundle (outputs to `docs/_static/scripts/`)
 bun run build
+
+# Build npm dist bundle (outputs to `dist/`, published to npm on release)
+bun run build-lib
 ```
 
 ### Run Tool
@@ -144,3 +147,4 @@ Checks are classes with:
 - Tests are fast (~5–10s)
 - Webapp uses React (class components) + Pyodide; built with `bun`
 - Webapp build output goes to `docs/_static/scripts/`
+- npm dist output goes to `dist/` (gitignored; built and published to npm on release)
