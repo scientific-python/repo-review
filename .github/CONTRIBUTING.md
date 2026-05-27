@@ -81,7 +81,7 @@ hatch run docs:serve
 You can rebuild the API docs with:
 
 ```bash
-$ hatch run api-docs:build
+hatch run api-docs:build
 ```
 
 ## Pre-commit
@@ -100,3 +100,13 @@ to check all files.
 
 You can use DevContainer, such as in GitHub Codespaces or locally. Hatch and a
 local install will be available.
+
+## Making a release
+
+Bump the version, for example to bump the patch:
+
+```bash
+hatch run version:bump bump patch
+```
+
+Push and make the release in GitHub, using the auto changelog.
