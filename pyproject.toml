@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "repo_review"
-version = "1.0.3"
+version = "1.1.0"
 authors = [
   { name = "Henry Schreiner", email = "henryfs@princeton.edu" },
 ]
@@ -267,3 +267,13 @@ filename = "package.json"
 
 [[tool.bumpversion.files]]
 filename = "src/repo_review/__init__.py"
+
+[[tool.bumpversion.files]]
+filename = "docs/webapp.md"
+search = "repo-review-webapp@{current_version}"
+replace = "repo-review-webapp@{new_version}"
+
+[[tool.bumpversion.files]]
+filename = "docs/webapp.md"
+search = "repo-review~={current_version}"
+replace = "repo-review~={new_version}"
