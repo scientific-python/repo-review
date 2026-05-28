@@ -93,11 +93,11 @@ JavaScript setup:
 ```markdown
 :::{anywidget} https://cdn.jsdelivr.net/npm/repo-review-webapp@1.1.2/dist/repo-review-anywidget.mjs
 {
-  "url_sync": true,
-  "deps": [
-    "repo-review~=1.1.2",
-    "sp-repo-review==2026.04.04"
-  ]
+"url_sync": true,
+"deps": [
+"repo-review~=1.1.2",
+"sp-repo-review==2026.04.04"
+]
 }
 :::
 ```
