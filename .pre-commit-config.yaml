@@ -11,7 +11,7 @@ repos:
         additional_dependencies: [black==24.*]
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: "6fec9b7edb08fd9989088709d864a7826dc74e80" # frozen: v0.15.12
+    rev: "0671d8ab202c4ac093b78433ae5baf74f3fc7246" # frozen: v0.15.15
     hooks:
       - id: ruff-check
         args: ["--fix", "--show-fixes"]
@@ -78,7 +78,7 @@ repos:
         exclude: .pre-commit-config.yaml
 
   - repo: https://github.com/henryiii/validate-pyproject-schema-store
-    rev: a18e62629cfba1fb2d16eb417e5442cd7b962a67 # frozen: 2026.05.13
+    rev: a4ec1952e236bbc3b6ec29909724a33ff9d83327 # frozen: 2026.05.28
     hooks:
       - id: validate-pyproject
 
@@ -90,10 +90,10 @@ repos:
       - id: check-readthedocs
 
   - repo: https://github.com/zizmorcore/zizmor-pre-commit
-    rev: a4727cbbcd26d7098e96b9cb738169b59711ae51 # frozen: v1.24.1
+    rev: 9257c6050c0261b8c57e712f632dc4a8010109a9 # frozen: v1.25.2
     hooks:
       - id: zizmor
-        files: "^\\.github"
+        files: '^\.github/(workflow|dependabot\.yml$)'
         args: [--persona=auditor]
 
   - repo: https://github.com/rhysd/actionlint

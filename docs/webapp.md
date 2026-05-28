@@ -14,8 +14,7 @@ This webapp can be embedded into an existing webpage by setting
 `header={false}` and you can set your own `deps` when calling `mountApp()`.
 
 You can see the source at `/src/repo-review-app`, and you can see the file to
-set up the `bun` bundle at `/package.json`. Releases of repo-review have a
-zip attached with the webapp, and the bundle is also published to npm as
+set up the `bun` bundle at `/package.json`. The bundle is published to npm as
 `repo-review-webapp`.
 
 ## Using the CDN bundle

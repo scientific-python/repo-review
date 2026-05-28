@@ -2,6 +2,3 @@ rules:
   concurrency-limits:
     ignore:
       - copilot-setup-steps.yml
-  artipacked:
-    ignore:
-      - cd.yml:72
