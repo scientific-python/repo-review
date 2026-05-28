@@ -49,18 +49,12 @@ If you copy the webapp into your page, use this header (with the link to where
 you extract the webapp):
 
 ```html
-<!-- Fonts to support Material Design -->
-<link
-  rel="stylesheet"
-  href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
-/>
-<!-- Icons to support Material Design -->
-<link
-  rel="stylesheet"
-  href="https://fonts.googleapis.com/icon?family=Material+Icons"
-/>
 <link rel="modulepreload" href="/assets/js/repo-review-app.min.js" />
 ```
+
+The Roboto font and Material Design icons are bundled into the webapp — no
+external `<link>` tags for Google Fonts are required. If Roboto is already
+loaded by the host page, the bundled injection will detect it and skip.
 
 Then to use it:
 
