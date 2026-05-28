@@ -13,7 +13,6 @@ import {
   AccordionSummary,
   AccordionDetails,
   Button,
-  Icon,
   FormControl,
   InputLabel,
   Select,
@@ -22,9 +21,13 @@ import {
   Snackbar,
   Alert,
 } from "@mui/material";
+import PlayArrowIcon from "@mui/icons-material/PlayArrow";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import Heading from "./components/Heading";
 import Results from "./components/Results";
 import MyThemeProvider from "./components/MyThemeProvider";
+import { injectFonts } from "./utils/injectFonts";
 import { fetchRepoRefs } from "./utils/github";
 import { sanitizePackageDir, parseRefType } from "./utils/url";
 import {
@@ -729,7 +732,7 @@ export class App extends React.Component<AppProps, AppState> {
                 }
                 sx={{ alignSelf: "stretch", minWidth: 64 }}
               >
-                <Icon>start</Icon>
+                <PlayArrowIcon />
               </Button>
             </Box>
           </Stack>
@@ -745,7 +748,7 @@ export class App extends React.Component<AppProps, AppState> {
               sx={{ borderBottom: 1, borderColor: "divider" }}
             >
               <AccordionSummary
-                expandIcon={<Icon>expand_more</Icon>}
+                expandIcon={<ExpandMoreIcon />}
                 sx={{ bgcolor: "primary.main", color: "primary.contrastText" }}
               >
                 <Typography fontWeight="medium">About</Typography>
@@ -805,7 +808,7 @@ export class App extends React.Component<AppProps, AppState> {
                         this.state.progress || this.state.pyodideLoading
                       }
                     >
-                      <Icon>content_copy</Icon>
+                      <ContentCopyIcon />
                     </Button>
                   )}
                 </Box>
@@ -837,6 +840,7 @@ export class App extends React.Component<AppProps, AppState> {
 }
 
 export function mountApp(opts: Partial<AppProps> & { el?: HTMLElement } = {}) {
+  injectFonts();
   const { el, ...appOpts } = opts;
   const target = el ?? document.getElementById("root");
   const root = ReactDOM.createRoot(target!);

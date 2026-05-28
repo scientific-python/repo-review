@@ -22,12 +22,14 @@ import createCache from "@emotion/cache";
 import { CacheProvider } from "@emotion/react";
 import { App } from "./repo-review-app";
 import type { AppProps } from "./repo-review-app";
+import { injectFonts } from "./utils/injectFonts";
 
 interface AnyWidgetModel {
   get(key: string): unknown;
 }
 
 function render({ model, el }: { model: AnyWidgetModel; el: HTMLElement }) {
+  injectFonts();
   const deps = (model.get("deps") as string[] | null) ?? [];
   const disableUrlSync = !model.get("url_sync");
   const pyodideBaseUrl =

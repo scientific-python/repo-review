@@ -5,10 +5,12 @@ import {
   ListItemIcon,
   ListItemText,
   ListSubheader,
-  Icon,
   Typography,
   Box,
 } from "@mui/material";
+import ReportIcon from "@mui/icons-material/Report";
+import CheckBoxIcon from "@mui/icons-material/CheckBox";
+import InfoIcon from "@mui/icons-material/Info";
 import IfUrlLink from "./IfUrlLink";
 
 export default function Results(props: any) {
@@ -26,21 +28,14 @@ export default function Results(props: any) {
         result.state === false ? (
           <span dangerouslySetInnerHTML={{ __html: result.err_msg }} />
         ) : null;
-      const color =
-        result.state === false
-          ? "error"
-          : result.state === true
-            ? "success"
-            : "info";
-      const icon = (
-        <Icon color={color}>
-          {result.state === false
-            ? "report"
-            : result.state === true
-              ? "check_box"
-              : "info"}
-        </Icon>
-      );
+      const icon =
+        result.state === false ? (
+          <ReportIcon color="error" />
+        ) : result.state === true ? (
+          <CheckBoxIcon color="success" />
+        ) : (
+          <InfoIcon color="info" />
+        );
 
       const skipped = (
         <Typography
