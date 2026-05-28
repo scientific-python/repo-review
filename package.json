@@ -1,6 +1,23 @@
 {
   "name": "repo-review-webapp",
   "version": "1.1.1",
+  "description": "Framework that can run checks on repos",
+  "license": "BSD-3-Clause",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/scientific-python/repo-review.git"
+  },
+  "homepage": "https://repo-review.readthedocs.io",
+  "bugs": {
+    "url": "https://github.com/scientific-python/repo-review/issues"
+  },
+  "author": "Henry Schreiner <henryfs@princeton.edu>",
+  "keywords": [
+    "repo-review",
+    "scientific-python",
+    "linting",
+    "repository"
+  ],
   "type": "module",
   "exports": {
     ".": "./dist/repo-review-app.mjs",
@@ -39,11 +56,12 @@
     "typescript-eslint": "^8.58.0"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@mui/icons-material": "^9.0.1",
+    "@mui/material": "^7.3.9",
     "pyodide": "^0.29.3",
     "react": "^19.2.4",
-    "react-dom": "^19.2.4",
-    "@mui/material": "^7.3.9",
-    "@emotion/react": "^11.14.0",
-    "@emotion/styled": "^11.14.1"
+    "react-dom": "^19.2.4"
   }
 }
