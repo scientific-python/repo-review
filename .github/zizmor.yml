@@ -5,6 +5,3 @@ rules:
   artipacked:
     ignore:
       - cd.yml:72
-  use-trusted-publishing:
-    ignore:
-      - cd.yml:144

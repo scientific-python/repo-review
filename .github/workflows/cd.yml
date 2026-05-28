@@ -123,6 +123,9 @@ jobs:
     needs: [webapp-npm-make]
     if: github.event_name == 'release' && github.event.action == 'published'
     environment: npm
+    permissions:
+      contents: read # needed for checkout
+      id-token: write # needed for npm trusted publishing
 
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -134,16 +137,8 @@ jobs:
           name: repo-review-npm
           path: dist/
 
-      - name: Setup bun
-        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
-        with:
-          bun-version: latest
-          no-cache: true
-
       - name: Publish to npm
-        run: bun publish --access public
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --provenance --access public
 
   publish:
     name: Publish
