@@ -825,4 +825,3 @@ export function mountApp(opts: Partial<AppProps> & { el?: HTMLElement } = {}) {
 }
 
 export default { mountApp };
-export App;
