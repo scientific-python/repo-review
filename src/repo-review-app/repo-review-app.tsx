@@ -823,5 +823,3 @@ export function mountApp(opts: Partial<AppProps> & { el?: HTMLElement } = {}) {
   root.render(<App {...props} />);
   return () => root.unmount();
 }
-
-export default { mountApp };
