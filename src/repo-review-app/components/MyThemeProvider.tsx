@@ -21,10 +21,15 @@ function usePageTheme(): PageTheme {
     return null;
   };
 
-  const [pageClass, setPageClass] = React.useState<boolean | null>(getPageClass);
+  const [pageClass, setPageClass] = React.useState<boolean | null>(
+    getPageClass,
+  );
 
   React.useEffect(() => {
-    if (typeof document === "undefined" || typeof MutationObserver === "undefined")
+    if (
+      typeof document === "undefined" ||
+      typeof MutationObserver === "undefined"
+    )
       return;
     const observer = new MutationObserver(() => setPageClass(getPageClass()));
     observer.observe(document.documentElement, {
