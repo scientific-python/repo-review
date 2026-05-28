@@ -3,7 +3,8 @@
   "version": "1.1.0",
   "type": "module",
   "exports": {
-    ".": "./dist/repo-review-app.mjs"
+    ".": "./dist/repo-review-app.mjs",
+    "./anywidget": "./dist/repo-review-anywidget.mjs"
   },
   "files": [
     "dist"
@@ -13,7 +14,9 @@
   },
   "scripts": {
     "build": "bunx esbuild src/repo-review-app/repo-review-app.tsx --bundle --minify --sourcemap --outfile=docs/_static/scripts/repo-review-app.min.js --platform=browser --format=esm",
-    "build-lib": "bunx esbuild src/repo-review-app/repo-review-app.tsx --bundle --minify --sourcemap --outfile=dist/repo-review-app.mjs --platform=browser --format=esm",
+    "build-lib": "bun run build-lib-main && bun run build-anywidget",
+    "build-lib-main": "bunx esbuild src/repo-review-app/repo-review-app.tsx --bundle --minify --sourcemap --outfile=dist/repo-review-app.mjs --platform=browser --format=esm",
+    "build-anywidget": "bunx esbuild src/repo-review-app/anywidget.tsx --bundle --minify --sourcemap --outfile=dist/repo-review-anywidget.mjs --platform=browser --format=esm",
     "build-html": "bun build src/repo-review-app/index.html --outdir=out --minify",
     "format": "prettier --write .",
     "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
