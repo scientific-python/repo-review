@@ -84,6 +84,27 @@ build time. Running `bun run build` writes a bundled ESM file to
 `docs/_static/scripts/repo-review-app.min.js`, which the Live Demo imports as a
 module.
 
+## MyST AnyWidget
+
+For [mystmd](https://mystmd.org) (e.g. Jupyter Book), we provide an integration
+that you can embed using the `anywidget` directive, which requires no
+JavaScript setup:
+
+```markdown
+:::{anywidget} https://cdn.jsdelivr.net/npm/repo-review-webapp@1.1.2/dist/repo-review-anywidget.mjs
+{
+"url_sync": true,
+"deps": [
+"repo-review~=1.1.2",
+"sp-repo-review==2026.04.04"
+]
+}
+:::
+```
+
+Set `url_sync: true` if you want the selected repo/branch is reflected in (and
+restored from) the page URL. Add any extra Python packages you need to `deps`.
+
 ## Custom app
 
 To embed the app, simply import the ESM bundle and call `mountApp()`:
