@@ -62,10 +62,12 @@ interface Option {
   type: "branch" | "tag";
 }
 
-interface AppProps {
+export interface AppProps {
   deps: string[];
   header?: boolean;
   pyodideBaseUrl?: string;
+  /** Disable reading/writing window.location (e.g. when embedded as a widget) */
+  disableUrlSync?: boolean;
 }
 
 interface AppState {
@@ -100,14 +102,16 @@ interface AppState {
   completedRefType: "branch" | "tag";
 }
 
-class App extends React.Component<AppProps, AppState> {
+export class App extends React.Component<AppProps, AppState> {
   pyodide_promise: Promise<PyodideInterface> | null;
 
   constructor(props: AppProps) {
     super(props);
     const inner_deps_str = props.deps.join("\n");
     const deps_str = `<pre><code>${inner_deps_str}</code></pre>`;
-    const params = new URLSearchParams(window.location.search);
+    const params = props.disableUrlSync
+      ? new URLSearchParams()
+      : new URLSearchParams(window.location.search);
     const initialRef = params.get("ref") || "HEAD";
     const initialRefInput = params.get("ref") || "";
     this.state = {
@@ -187,7 +191,9 @@ class App extends React.Component<AppProps, AppState> {
   async handleCompute() {
     if (!this.state.repo || !this.state.ref) {
       this.setState({ results: [], msg: DEFAULT_MSG });
-      window.history.replaceState(null, "", window.location.pathname);
+      if (!this.props.disableUrlSync) {
+        window.history.replaceState(null, "", window.location.pathname);
+      }
       this.setState({
         snackbarOpen: true,
         snackbarMsg: `Please enter a repo and branch/tag`,
@@ -195,22 +201,25 @@ class App extends React.Component<AppProps, AppState> {
       });
       return;
     }
-    const local_params = new URLSearchParams({
-      repo: this.state.repo,
-      ref: this.state.ref,
-      refType: this.state.refType,
-      show: this.state.show,
-    });
-    const packageDir = sanitizePackageDir(this.state.packageDir);
-    if (packageDir) {
-      local_params.set("packageDir", packageDir);
+    if (!this.props.disableUrlSync) {
+      const local_params = new URLSearchParams({
+        repo: this.state.repo,
+        ref: this.state.ref,
+        refType: this.state.refType,
+        show: this.state.show,
+      });
+      const packageDir = sanitizePackageDir(this.state.packageDir);
+      if (packageDir) {
+        local_params.set("packageDir", packageDir);
+      }
+      window.history.replaceState(
+        null,
+        "",
+        `${window.location.pathname}?${local_params}`,
+      );
     }
-    window.history.replaceState(
-      null,
-      "",
-      `${window.location.pathname}?${local_params}`,
-    );
     this.setState({ results: [], progress: true, infoOpen: false });
+    const packageDir = sanitizePackageDir(this.state.packageDir);
     const state = this.state;
     let pyPackage: PyProxy | null = null;
     let collected: PyProxy | null = null;
@@ -412,15 +421,17 @@ class App extends React.Component<AppProps, AppState> {
           pyodideMessage: m || "",
         }),
     );
-    const params = new URLSearchParams(window.location.search);
-    if (params.get("repo")) {
-      this.fetchRepoReferences(params.get("repo")!);
+    if (!this.props.disableUrlSync) {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("repo")) {
+        this.fetchRepoReferences(params.get("repo")!);
+      }
+      if (params.get("repo") && params.get("ref")) {
+        this.handleCompute();
+        return;
+      }
     }
-    if (params.get("repo") && params.get("ref")) {
-      this.handleCompute();
-    } else {
-      this.pyodide_promise.then(() => this.loadKnownChecks());
-    }
+    this.pyodide_promise.then(() => this.loadKnownChecks());
   }
 
   render() {
@@ -663,32 +674,42 @@ class App extends React.Component<AppProps, AppState> {
                       id="show-select"
                       value={this.state.show}
                       label="Show"
+                      MenuProps={
+                        this.props.disableUrlSync
+                          ? { disablePortal: true }
+                          : undefined
+                      }
                       onChange={(e: SelectChangeEvent<string>) => {
                         const val = e.target.value as string;
                         this.setState({ show: val });
-                        // update query string to persist show selection
-                        const params = new URLSearchParams(
-                          window.location.search,
-                        );
-                        if (val && val !== "all") {
-                          params.set("show", val);
-                        } else {
-                          params.delete("show");
+                        if (!this.props.disableUrlSync) {
+                          // update query string to persist show selection
+                          const params = new URLSearchParams(
+                            window.location.search,
+                          );
+                          if (val && val !== "all") {
+                            params.set("show", val);
+                          } else {
+                            params.delete("show");
+                          }
+                          // preserve repo/ref/refType/packageDir if present
+                          if (!params.get("repo") && this.state.repo)
+                            params.set("repo", this.state.repo);
+                          if (!params.get("ref") && this.state.ref)
+                            params.set("ref", this.state.ref);
+                          if (!params.get("refType") && this.state.refType)
+                            params.set("refType", this.state.refType);
+                          if (
+                            !params.get("packageDir") &&
+                            this.state.packageDir
+                          )
+                            params.set("packageDir", this.state.packageDir);
+                          window.history.replaceState(
+                            null,
+                            "",
+                            `${window.location.pathname}?${params}`,
+                          );
                         }
-                        // preserve repo/ref/refType/packageDir if present
-                        if (!params.get("repo") && this.state.repo)
-                          params.set("repo", this.state.repo);
-                        if (!params.get("ref") && this.state.ref)
-                          params.set("ref", this.state.ref);
-                        if (!params.get("refType") && this.state.refType)
-                          params.set("refType", this.state.refType);
-                        if (!params.get("packageDir") && this.state.packageDir)
-                          params.set("packageDir", this.state.packageDir);
-                        window.history.replaceState(
-                          null,
-                          "",
-                          `${window.location.pathname}?${params}`,
-                        );
                       }}
                       size="small"
                     >
