@@ -13,6 +13,8 @@
  * Model attributes:
  *   - deps (string[]): Python packages to install via micropip.
  *   - pyodide_base_url (string, optional): Override the Pyodide CDN base URL.
+ *   - url_sync (boolean, optional): Enable URL syncing. Disabled by default
+ *     when embedded as a widget.
  */
 import React from "react";
 import ReactDOM from "react-dom/client";
@@ -27,7 +29,7 @@ interface AnyWidgetModel {
 
 function render({ model, el }: { model: AnyWidgetModel; el: HTMLElement }) {
   const deps = (model.get("deps") as string[] | null) ?? [];
-  const disableUrlSync = !((model.get("url_sync") as boolean | false) || false);
+  const disableUrlSync = !model.get("url_sync");
   const pyodideBaseUrl =
     (model.get("pyodide_base_url") as string | null) || undefined;
 

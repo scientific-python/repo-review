@@ -218,6 +218,7 @@ export class App extends React.Component<AppProps, AppState> {
         `${window.location.pathname}?${local_params}`,
       );
     }
+    this.setState({ results: [], progress: true, infoOpen: false });
     const packageDir = sanitizePackageDir(this.state.packageDir);
     const state = this.state;
     let pyPackage: PyProxy | null = null;
