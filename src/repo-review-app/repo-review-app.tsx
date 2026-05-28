@@ -815,10 +815,14 @@ class App extends React.Component<AppProps, AppState> {
   }
 }
 
-export function mountApp(opts: Partial<AppProps> = {}) {
-  const root = ReactDOM.createRoot(document.getElementById("root")!);
-  const props: AppProps = { deps: [], ...opts };
+export function mountApp(opts: Partial<AppProps> & { el?: HTMLElement } = {}) {
+  const { el, ...appOpts } = opts;
+  const target = el ?? document.getElementById("root");
+  const root = ReactDOM.createRoot(target!);
+  const props: AppProps = { deps: [], ...appOpts };
   root.render(<App {...props} />);
+  return () => root.unmount();
 }
 
-export default App;
+export default mountApp;
+export App;
