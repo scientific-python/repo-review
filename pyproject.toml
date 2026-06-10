@@ -101,6 +101,10 @@ installer = "uv"
 
 [tool.uv]
 exclude-newer = "7 days"
+# erbsland-sphinx-ansi 1.2.4 fixes a crash with Sphinx 9.1 / docutils 0.22; the
+# broken 1.2.2 is inside the 7-day window while the fix is not. Remove this once
+# 1.2.4 ages past the window (after 2026-06-17).
+exclude-newer-package = { "erbsland-sphinx-ansi" = "2026-06-11" }
 
 [tool.hatch.envs.hatch-test]
 features = ["cli"]
