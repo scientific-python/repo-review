@@ -40,8 +40,8 @@ def __dir__() -> list[str]:
 
 def pyproject(package: Traversable) -> dict[str, Any]:
     """
-    Fixture: The ``pyproject.toml`` structure from the package. Returned an
-    empty dict if no pyproject.toml found.
+    Fixture: The ``pyproject.toml`` structure from the package. Returns an
+    empty dict if no pyproject.toml is found.
 
     :param package: The package fixture.
 
@@ -84,19 +84,25 @@ def compute_fixtures(
     :return: The fully evaluated dict of fixtures.
     """
     fixtures: dict[str, Any] = {"root": root, "package": package}
+    signatures = {
+        name: inspect.signature(fix) for name, fix in unevaluated_fixtures.items()
+    }
     graph: dict[str, AbstractSet[str]] = {"root": set(), "package": set()}
     graph |= {
-        name: inspect.signature(fix).parameters.keys()
-        for name, fix in unevaluated_fixtures.items()
+        name: signature.parameters.keys() for name, signature in signatures.items()
     }
+    for fixture_name, signature in signatures.items():
+        for name in signature.parameters:
+            if name not in graph:
+                msg = f"unknown fixture {name!r} requested by fixture {fixture_name!r}"
+                raise KeyError(msg)
     ts = graphlib.TopologicalSorter(graph)
     for fixture_name in ts.static_order():
         if fixture_name in {"package", "root"}:
             continue
         func = unevaluated_fixtures[fixture_name]
-        signature = inspect.signature(func)
-        kwargs = {name: fixtures[name] for name in signature.parameters}
-        fixtures[fixture_name] = unevaluated_fixtures[fixture_name](**kwargs)
+        kwargs = {name: fixtures[name] for name in signatures[fixture_name].parameters}
+        fixtures[fixture_name] = func(**kwargs)
     return fixtures
 
 

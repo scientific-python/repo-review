@@ -476,10 +476,10 @@ def on_each(
 ) -> int:
     base_package: Traversable
 
-    ignore_list = {x.strip() for x in ignore.split(",") if x}
-    select_list = {x.strip() for x in select.split(",") if x}
-    extend_ignore_list = {x.strip() for x in extend_ignore.split(",") if x}
-    extend_select_list = {x.strip() for x in extend_select.split(",") if x}
+    ignore_list = {x.strip() for x in ignore.split(",") if x.strip()}
+    select_list = {x.strip() for x in select.split(",") if x.strip()}
+    extend_ignore_list = {x.strip() for x in extend_ignore.split(",") if x.strip()}
+    extend_select_list = {x.strip() for x in extend_select.split(",") if x.strip()}
 
     # Local paths support pointing at pyproject.toml as a special case
     match package:

@@ -15,6 +15,7 @@ if TYPE_CHECKING:
 __all__ = [
     "Family",
     "collect_families",
+    "get_family_description",
     "get_family_name",
     "sort_family_keys",
 ]
@@ -82,7 +83,7 @@ def get_family_description(families: Mapping[str, Family], family: str) -> str:
 
     :param families: A dict of family short names to :class:`.Family`'s.
     :param family: The short name of a family.
-    :return: The de-intended description if there is one, otherwise an empty string.
+    :return: The description if there is one, otherwise an empty string.
 
     .. versionadded:: 0.9
     """

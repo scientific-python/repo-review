@@ -35,6 +35,21 @@ class E200:
         return True
 
 
+class E300:
+    "Depends on a check that doesn't exist"
+
+    family = "example"
+    requires = frozenset(["E999"])
+
+    @staticmethod
+    def check() -> bool:
+        """
+        Can't be false.
+        """
+
+        return True
+
+
 def test_ignore_filter_single(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(
         repo_review.processor,
@@ -59,3 +74,19 @@ def test_select_filter_single(monkeypatch: pytest.MonkeyPatch) -> None:
     assert len(results) == 1
     assert results[0].name == "E200"
     assert results[0].result
+
+
+def test_requires_missing_check(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(
+        repo_review.processor,
+        "collect_checks",
+        lambda _: {"E100": E100, "E300": E300},
+    )
+    _, results = repo_review.processor.process(Path())
+
+    assert len(results) == 2
+    assert results[0].name == "E100"
+    assert results[0].result
+    # The missing dependency is treated as passed, so the check still runs.
+    assert results[1].name == "E300"
+    assert results[1].result

@@ -109,10 +109,10 @@ def to_html(
         if status == "empty":
             print('<span style="color: red;">No checks ran.</span>')
         elif status == "passed":
-            print('<span style="color: red;">All checks passed.</span>')
+            print('<span style="color: green;">All checks passed.</span>')
         elif status == "skips":
             print(
-                '<span style="color: red;">All checks passed.</span> <span style="color: yellow;">(some checks skipped)</span>'
+                '<span style="color: green;">All checks passed.</span> <span style="color: yellow;">(some checks skipped)</span>'
             )
 
     return out.getvalue()

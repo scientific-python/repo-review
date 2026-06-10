@@ -72,7 +72,7 @@ md = markdown_it.MarkdownIt()
 
 def md_as_html(md_text: str) -> str:
     """
-    Heler function that converts markdown text to HTML. Strips paragraph tags from the result.
+    Helper function that converts markdown text to HTML. Strips paragraph tags from the result.
 
     :param md_text: The markdown text to convert.
     """
@@ -274,6 +274,12 @@ def process(
     # Run all the checks in topological order based on their dependencies
     ts = graphlib.TopologicalSorter(graph)
     for name in ts.static_order():
+        if name not in tasks:
+            # A check listed a dependency in `requires` that was not
+            # collected; it shows up in the topological order but has no
+            # task to run. Treat it as passed (matching `completed.get`
+            # below).
+            continue
         if all(completed.get(n, "") == "" for n in graph[name]):
             result = apply_fixtures({"name": name, **fixtures_copy}, tasks[name].check)
             completed[name] = process_result_bool(result, tasks[name], name)
