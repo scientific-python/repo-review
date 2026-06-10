@@ -8,7 +8,7 @@ repos:
     rev: dda8db18cfc68df532abf33b185ecd12d5b7b326 # frozen: 1.20.0
     hooks:
       - id: blacken-docs
-        additional_dependencies: [black==24.*]
+        additional_dependencies: [black==25.*]
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: "0671d8ab202c4ac093b78433ae5baf74f3fc7246" # frozen: v0.15.15
@@ -33,7 +33,6 @@ repos:
       - id: debug-statements
       - id: end-of-file-fixer
       - id: mixed-line-ending
-      - id: requirements-txt-fixer
       - id: trailing-whitespace
 
   - repo: https://github.com/pre-commit/pygrep-hooks
@@ -47,12 +46,11 @@ repos:
     rev: d2823d321df3af8f878f7ee3414dc94d037145b9 # frozen: v2.1.0
     hooks:
       - id: mypy
-        files: (src|web|tests)
+        files: (src|tests)
         args: []
         additional_dependencies:
           - httpx
           - markdown-it-py
-          - orjson
           - pytest
           - rich
           - tomli
@@ -93,7 +91,7 @@ repos:
     rev: 9257c6050c0261b8c57e712f632dc4a8010109a9 # frozen: v1.25.2
     hooks:
       - id: zizmor
-        files: '^\.github/(workflow|dependabot\.yml$)'
+        files: '^(\.github/(workflows/.*|dependabot\.yml)|action\.yml)$'
         args: [--persona=auditor]
 
   - repo: https://github.com/rhysd/actionlint

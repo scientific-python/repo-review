@@ -148,3 +148,6 @@ uv.lock
 # Symlink to AGENTS.md
 CLAUDE.md
 .claude/
+
+# Profiling
+*.prof

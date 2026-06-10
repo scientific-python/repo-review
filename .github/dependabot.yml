@@ -11,3 +11,27 @@ updates:
           - "*"
     cooldown:
       default-days: 7
+
+  # Maintain Python dependencies
+  - package-ecosystem: "uv"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    groups:
+      uv:
+        patterns:
+          - "*"
+    cooldown:
+      default-days: 7
+
+  # Maintain JavaScript dependencies (bun.lock)
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    groups:
+      npm:
+        patterns:
+          - "*"
+    cooldown:
+      default-days: 7
