@@ -69,6 +69,19 @@ describe("fetchRepoRefs", () => {
     expect(result.tags).toHaveLength(2);
   });
 
+  it("requests 100 results per page to avoid truncation", async () => {
+    const urls: string[] = [];
+    globalThis.fetch = (async (input: string | URL | Request) => {
+      urls.push(input.toString());
+      return new Response("[]", { status: 200 });
+    }) as unknown as typeof globalThis.fetch;
+    await fetchRepoRefs("owner/repo");
+    expect(urls).toHaveLength(2);
+    for (const url of urls) {
+      expect(url).toContain("per_page=100");
+    }
+  });
+
   it("returns empty arrays when the API responds with a non-OK status", async () => {
     globalThis.fetch = makeFetchMock(null, null, 404);
     const result = await fetchRepoRefs("owner/repo");

@@ -38,14 +38,22 @@ import {
   prefetch,
   collect_checks,
 } from "./utils/pyodide";
+import type { KnownChecksData } from "./utils/pyodide";
 import type { PyodideInterface } from "pyodide";
-import type { PyProxy } from "pyodide/ffi";
+import type { PyDict, PyIterable, PyProxy } from "pyodide/ffi";
 import type { SelectChangeEvent } from "@mui/material";
 
 const DEFAULT_MSG =
   "Enter a GitHub repo and branch/tag to review. Runs Python entirely in your browser using WebAssembly. Built with React, MaterialUI, and Pyodide.";
 
-interface CheckItem {
+// Build the "About" HTML message. `deps` is app-configured (not user input),
+// so interpolating it into HTML is safe.
+function buildAboutMsg(deps: string[]): string {
+  const deps_str = `<pre><code>${deps.join("\n")}</code></pre>`;
+  return `<p>${DEFAULT_MSG}</p><h4>Packages:</h4> ${deps_str}`;
+}
+
+export interface CheckItem {
   name: string;
   description?: string;
   state?: boolean | null | undefined;
@@ -75,7 +83,7 @@ export interface AppProps {
 
 interface AppState {
   show: string;
-  results: Record<string, CheckItem[]> | CheckItem[];
+  results: Record<string, CheckItem[]> | null;
   pyFamilies: PyProxy | null;
   pyChecks: PyProxy | null;
   snackbarOpen: boolean;
@@ -90,7 +98,10 @@ interface AppState {
   msg: string;
   progress: boolean;
   loadingRefs: boolean;
+  /** App-level error banner text (always plain text, rendered as text content) */
   err_msg: string;
+  /** Render err_msg in a monospace <pre><code> block (e.g. exception text) */
+  err_is_code: boolean;
   skip_reason: string;
   url: string;
   knownChecks: Record<string, CheckItem[]> | null;
@@ -110,8 +121,6 @@ export class App extends React.Component<AppProps, AppState> {
 
   constructor(props: AppProps) {
     super(props);
-    const inner_deps_str = props.deps.join("\n");
-    const deps_str = `<pre><code>${inner_deps_str}</code></pre>`;
     const params = props.disableUrlSync
       ? new URLSearchParams()
       : new URLSearchParams(window.location.search);
@@ -119,7 +128,7 @@ export class App extends React.Component<AppProps, AppState> {
     const initialRefInput = params.get("ref") || "";
     this.state = {
       show: params.get("show") || "all",
-      results: [],
+      results: null,
       pyFamilies: null,
       pyChecks: null,
       snackbarOpen: false,
@@ -131,10 +140,11 @@ export class App extends React.Component<AppProps, AppState> {
       packageDir: sanitizePackageDir(params.get("packageDir") || ""),
       refType: parseRefType(params.get("refType")),
       refs: { branches: [], tags: [] },
-      msg: `<p>${DEFAULT_MSG}</p><h4>Packages:</h4> ${deps_str}`,
+      msg: buildAboutMsg(props.deps),
       progress: false,
       loadingRefs: false,
       err_msg: "",
+      err_is_code: false,
       skip_reason: "",
       url: "",
       knownChecks: null,
@@ -155,7 +165,7 @@ export class App extends React.Component<AppProps, AppState> {
     if (proxy) {
       try {
         proxy.destroy();
-      } catch (e) {
+      } catch {
         // ignore destroy errors
       }
     }
@@ -168,9 +178,23 @@ export class App extends React.Component<AppProps, AppState> {
 
   async fetchRepoReferences(repo: string) {
     if (!repo) return;
+    // Refs are reset whenever the repo changes, so non-empty refs means we
+    // already fetched them for this repo; don't waste the GitHub rate limit.
+    if (
+      this.state.loadingRefs ||
+      this.state.refs.branches.length > 0 ||
+      this.state.refs.tags.length > 0
+    ) {
+      return;
+    }
 
     this.setState({ loadingRefs: true });
     const refs = await fetchRepoRefs(repo);
+    // Drop stale responses if the user switched repos while we were fetching.
+    if (this.state.repo !== repo) {
+      this.setState({ loadingRefs: false });
+      return;
+    }
     this.setState({ refs: refs, loadingRefs: false });
   }
 
@@ -192,8 +216,9 @@ export class App extends React.Component<AppProps, AppState> {
   }
 
   async handleCompute() {
+    if (this.state.progress) return;
     if (!this.state.repo || !this.state.ref) {
-      this.setState({ results: [], msg: DEFAULT_MSG });
+      this.setState({ results: null, msg: buildAboutMsg(this.props.deps) });
       if (!this.props.disableUrlSync) {
         window.history.replaceState(null, "", window.location.pathname);
       }
@@ -221,13 +246,13 @@ export class App extends React.Component<AppProps, AppState> {
         `${window.location.pathname}?${local_params}`,
       );
     }
-    this.setState({ results: [], progress: true, infoOpen: false });
+    this.setState({ results: null, progress: true, infoOpen: false });
     const packageDir = sanitizePackageDir(this.state.packageDir);
     const state = this.state;
     let pyPackage: PyProxy | null = null;
     let collected: PyProxy | null = null;
-    let families_dict: any = null;
-    let results_list: any = null;
+    let families_dict: PyDict | null = null;
+    let results_list: PyIterable | null = null;
     try {
       const pyodide = await this.pyodide_promise!;
       pyPackage = await prefetch(pyodide, state.repo, state.ref, packageDir);
@@ -237,8 +262,12 @@ export class App extends React.Component<AppProps, AppState> {
         pyPackage,
         collected,
         packageDir,
-      ) as any;
-      families_dict = (collected as any).families.copy();
+      ) as PyIterable;
+      // PyProxy.copy() is typed as returning PyProxy; the copy of a dict
+      // proxy is still a dict proxy.
+      families_dict = (
+        collected as PyProxy & { families: PyDict }
+      ).families.copy() as PyDict;
 
       const results: Record<string, CheckItem[]> = {};
       const families: Record<string, { name: string; description?: string }> =
@@ -275,6 +304,7 @@ export class App extends React.Component<AppProps, AppState> {
         families: families,
         progress: false,
         err_msg: "",
+        err_is_code: false,
         url: "",
         infoOpen: false,
         pyFamilies: families_dict,
@@ -295,11 +325,15 @@ export class App extends React.Component<AppProps, AppState> {
         this.setState({
           progress: false,
           err_msg: "Invalid repository or branch/tag. Please try again.",
+          err_is_code: false,
         });
       } else {
+        // Stored as plain text and rendered as React text content (never as
+        // raw HTML) — exception messages can echo unsanitized URL input.
         this.setState({
           progress: false,
-          err_msg: `<pre><code>${emsg}</code></pre>`,
+          err_msg: emsg,
+          err_is_code: true,
         });
       }
     } finally {
@@ -347,9 +381,8 @@ export class App extends React.Component<AppProps, AppState> {
         return;
       }
 
-      const htmlStr = htmlOut.toString ? htmlOut.toString() : htmlOut;
       if (navigator.clipboard && navigator.clipboard.writeText) {
-        await navigator.clipboard.writeText(htmlStr);
+        await navigator.clipboard.writeText(htmlOut);
         this.setState({
           snackbarOpen: true,
           snackbarMsg: "HTML output copied to clipboard",
@@ -359,7 +392,7 @@ export class App extends React.Component<AppProps, AppState> {
         // Fallback: open in new window for manual copy
         const w = window.open("", "repo-review-html");
         if (w) {
-          w.document.write(htmlStr);
+          w.document.write(htmlOut);
           w.document.close();
         }
       }
@@ -376,8 +409,7 @@ export class App extends React.Component<AppProps, AppState> {
 
   async loadKnownChecks() {
     const pyodide = await this.pyodide_promise!;
-    let data: { families?: Record<string, { name: string }>; results?: any[] } =
-      {};
+    let data: KnownChecksData = {};
     try {
       data = load_known_checks(pyodide);
     } catch (e) {
@@ -424,6 +456,16 @@ export class App extends React.Component<AppProps, AppState> {
           pyodideMessage: m || "",
         }),
     );
+    // Surface load failures in the error banner instead of failing silently.
+    this.pyodide_promise.catch((e: unknown) => {
+      const emsg = (e as Error)?.message || String(e);
+      this.setState({
+        pyodideLoading: false,
+        progress: false,
+        err_msg: `Failed to load Pyodide: ${emsg}`,
+        err_is_code: true,
+      });
+    });
     if (!this.props.disableUrlSync) {
       const params = new URLSearchParams(window.location.search);
       if (params.get("repo")) {
@@ -431,10 +473,14 @@ export class App extends React.Component<AppProps, AppState> {
       }
       if (params.get("repo") && params.get("ref")) {
         this.handleCompute();
-        return;
       }
     }
-    this.pyodide_promise.then(() => this.loadKnownChecks());
+    // Always load the list of available checks, even if an auto-run from the
+    // URL parameters is in flight (or fails). Errors are reported above.
+    this.pyodide_promise.then(
+      () => this.loadKnownChecks(),
+      () => {},
+    );
   }
 
   render() {
@@ -497,12 +543,10 @@ export class App extends React.Component<AppProps, AppState> {
       ];
     }
 
-    const hasResults = !Array.isArray(this.state.results);
-    const displayResults = hasResults
-      ? this.state.results
-      : !this.state.progress && this.state.knownChecks
-        ? this.state.knownChecks
-        : null;
+    const hasResults = this.state.results !== null;
+    const displayResults =
+      this.state.results ??
+      (!this.state.progress ? this.state.knownChecks : null);
     const displayFamilies = hasResults
       ? this.state.families
       : this.state.knownFamilies;
@@ -514,14 +558,9 @@ export class App extends React.Component<AppProps, AppState> {
     let filteredResults = displayResults;
     let filteredFamilies = displayFamilies;
     if (displayResults && this.state.show && this.state.show !== "all") {
-      const groupedResults = displayResults as Record<string, CheckItem[]>;
-      const groupedFamilies = displayFamilies as Record<
-        string,
-        { name: string; description?: string }
-      >;
       const newResults: Record<string, CheckItem[]> = {};
-      for (const fam of Object.keys(groupedResults)) {
-        const items = groupedResults[fam];
+      for (const fam of Object.keys(displayResults)) {
+        const items = displayResults[fam];
         // first keep items that are not passing (i.e., state !== true)
         let kept = items.filter((it: CheckItem) => it.state !== true);
         // if 'err', then keep only failing checks
@@ -538,12 +577,12 @@ export class App extends React.Component<AppProps, AppState> {
         string,
         { name: string; description?: string }
       > = {};
-      for (const k of Object.keys(groupedFamilies)) {
+      for (const k of Object.keys(displayFamilies)) {
         if (
           knownFamilies.has(k) ||
-          (groupedFamilies[k] && groupedFamilies[k].description)
+          (displayFamilies[k] && displayFamilies[k].description)
         ) {
-          newFamilies[k] = groupedFamilies[k];
+          newFamilies[k] = displayFamilies[k];
         }
       }
 
@@ -622,16 +661,18 @@ export class App extends React.Component<AppProps, AppState> {
                   helperText="e.g. HEAD, main, or v1.0.0"
                   onFocus={() => this.fetchRepoReferences(this.state.repo)}
                   sx={{ flexGrow: 2, minWidth: 170 }}
-                  InputProps={{
-                    ...params.InputProps,
-                    endAdornment: (
-                      <>
-                        {this.state.loadingRefs ? (
-                          <CircularProgress color="inherit" size={20} />
-                        ) : null}
-                        {params.InputProps.endAdornment}
-                      </>
-                    ),
+                  slotProps={{
+                    input: {
+                      ...params.InputProps,
+                      endAdornment: (
+                        <>
+                          {this.state.loadingRefs ? (
+                            <CircularProgress color="inherit" size={20} />
+                          ) : null}
+                          {params.InputProps.endAdornment}
+                        </>
+                      ),
+                    },
                   }}
                 />
               )}
@@ -727,6 +768,7 @@ export class App extends React.Component<AppProps, AppState> {
                 onClick={() => this.handleCompute()}
                 variant="contained"
                 size="large"
+                aria-label="Run checks"
                 disabled={
                   this.state.progress || !this.state.repo || !this.state.ref
                 }
@@ -787,12 +829,19 @@ export class App extends React.Component<AppProps, AppState> {
                 color="error"
                 sx={{ p: 2 }}
               >
-                <span
-                  dangerouslySetInnerHTML={{ __html: this.state.err_msg }}
-                />
+                {this.state.err_is_code ? (
+                  <Box
+                    component="pre"
+                    sx={{ m: 0, whiteSpace: "pre-wrap", overflowX: "auto" }}
+                  >
+                    <code>{this.state.err_msg}</code>
+                  </Box>
+                ) : (
+                  this.state.err_msg
+                )}
               </Typography>
             )}
-            {displayResults && (
+            {filteredResults && (
               <>
                 <Box
                   sx={{ display: "flex", alignItems: "center", px: 2, pt: 1 }}
@@ -804,6 +853,7 @@ export class App extends React.Component<AppProps, AppState> {
                     <Button
                       onClick={() => this.handleCopyHtml()}
                       size="small"
+                      aria-label="Copy HTML results"
                       disabled={
                         this.state.progress || this.state.pyodideLoading
                       }
@@ -828,7 +878,7 @@ export class App extends React.Component<AppProps, AppState> {
         >
           <Alert
             onClose={() => this.setState({ snackbarOpen: false })}
-            severity={this.state.snackbarSeverity as any}
+            severity={this.state.snackbarSeverity}
             sx={{ width: "100%" }}
           >
             {this.state.snackbarMsg}

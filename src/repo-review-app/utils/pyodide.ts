@@ -10,33 +10,30 @@ export async function prepare_pyodide(
   pyodideBaseUrl?: string,
   onProgress?: (p: number, m?: string) => void,
 ): Promise<PyodideInterface> {
-  try {
-    if (onProgress) onProgress(5, "Initializing Pyodide runtime");
-    const baseUrl = pyodideBaseUrl ?? DEFAULT_PYODIDE_BASE_URL;
-    const { loadPyodide } = (await import(`${baseUrl}/pyodide.mjs`)) as {
-      loadPyodide: () => Promise<PyodideInterface>;
-    };
-    const pyodide: PyodideInterface = await loadPyodide();
-    if (onProgress) onProgress(50, "Core Pyodide loaded");
+  // On failure the promise rejects; callers are responsible for surfacing
+  // the error (the app shows it in the error banner).
+  if (onProgress) onProgress(5, "Initializing Pyodide runtime");
+  const baseUrl = pyodideBaseUrl ?? DEFAULT_PYODIDE_BASE_URL;
+  const { loadPyodide } = (await import(`${baseUrl}/pyodide.mjs`)) as {
+    loadPyodide: () => Promise<PyodideInterface>;
+  };
+  const pyodide: PyodideInterface = await loadPyodide();
+  if (onProgress) onProgress(50, "Core Pyodide loaded");
 
-    if (onProgress) onProgress(65, "Loading micropip");
-    await pyodide.loadPackage("micropip");
-    if (onProgress) onProgress(80, "Installing Python packages");
+  if (onProgress) onProgress(65, "Loading micropip");
+  await pyodide.loadPackage("micropip");
+  if (onProgress) onProgress(80, "Installing Python packages");
 
-    // Pass deps via globals instead of string interpolation for safety
-    pyodide.globals.set("_rr_deps_to_install", deps);
-    await pyodide.runPythonAsync(`
-      import micropip
-      await micropip.install(list(_rr_deps_to_install))
-    `);
-    pyodide.globals.delete("_rr_deps_to_install");
+  // Pass deps via globals instead of string interpolation for safety
+  pyodide.globals.set("_rr_deps_to_install", deps);
+  await pyodide.runPythonAsync(`
+    import micropip
+    await micropip.install(list(_rr_deps_to_install))
+  `);
+  pyodide.globals.delete("_rr_deps_to_install");
 
-    if (onProgress) onProgress(100, "Ready");
-    return pyodide;
-  } catch (e) {
-    if (onProgress) onProgress(100, "Error during load");
-    throw e;
-  }
+  if (onProgress) onProgress(100, "Ready");
+  return pyodide;
 }
 
 export async function prefetch(
@@ -100,10 +97,18 @@ export function run_process(
   return checks;
 }
 
-export function load_known_checks(
-  pyodide: PyodideInterface,
-): Record<string, unknown> {
-  const dataStr = pyodide.runPython(`
+export interface KnownChecksData {
+  families?: Record<string, { name: string }>;
+  results?: {
+    name: string;
+    family: string;
+    description: string;
+    url: string;
+  }[];
+}
+
+export function load_known_checks(pyodide: PyodideInterface): KnownChecksData {
+  const dataStr: string = pyodide.runPython(`
     import json
     from repo_review.processor import collect_all
     from repo_review.checks import get_check_url
@@ -122,8 +127,8 @@ export function load_known_checks(
     json.dumps({"families": families_out, "results": results_out})
     `);
 
-  // pyodide may return a PyProxy; ensure string
-  return JSON.parse(dataStr.toString ? dataStr.toString() : dataStr);
+  // Python `str` converts directly to a JS string
+  return JSON.parse(dataStr) as KnownChecksData;
 }
 
 export async function generate_html(
@@ -136,7 +141,7 @@ export async function generate_html(
   pyodide.globals.set("checks_for_html", checksPy);
   pyodide.globals.set("show_for_html", show || "all");
 
-  const htmlOut = await pyodide.runPythonAsync(`
+  const htmlOut: string = await pyodide.runPythonAsync(`
     from repo_review.html import to_html
 
     match show_for_html:
@@ -152,5 +157,6 @@ export async function generate_html(
     to_html(families_for_html, filtered)
     `);
 
-  return htmlOut.toString ? htmlOut.toString() : htmlOut;
+  // Python `str` converts directly to a JS string
+  return htmlOut;
 }

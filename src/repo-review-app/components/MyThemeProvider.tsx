@@ -42,7 +42,7 @@ function usePageTheme(): PageTheme {
   return { darkMode: pageClass ?? false, hostControlled: pageClass !== null };
 }
 
-export default function MyThemeProvider(props: any) {
+export default function MyThemeProvider(props: { children: React.ReactNode }) {
   const { darkMode: pageDark, hostControlled } = usePageTheme();
   const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
 

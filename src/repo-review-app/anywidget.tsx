@@ -16,7 +16,6 @@
  *   - url_sync (boolean, optional): Enable URL syncing. Disabled by default
  *     when embedded as a widget.
  */
-import React from "react";
 import ReactDOM from "react-dom/client";
 import createCache from "@emotion/cache";
 import { CacheProvider } from "@emotion/react";
