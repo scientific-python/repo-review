@@ -20,7 +20,9 @@ def __dir__() -> list[str]:
 
 def get_schema(tool_name: str = "repo-review") -> dict[str, Any]:
     """Get the stored complete schema for repo-review settings."""
-    assert tool_name == "repo-review", "Only repo-review is supported."
+    if tool_name != "repo-review":
+        msg = f"Only 'repo-review' is supported, got {tool_name!r}"
+        raise ValueError(msg)
 
     with resources.joinpath("repo-review.schema.json").open(encoding="utf-8") as f:
         return json.load(f)  # type: ignore[no-any-return]

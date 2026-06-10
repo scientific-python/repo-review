@@ -78,12 +78,12 @@ def collect_checks(fixtures: Mapping[str, Any]) -> dict[str, Check]:
 
 def name_matches(name: str, selectors: AbstractSet[str]) -> str:
     """
-    Checks if the name is contained in the matchers. The selectors can be the
+    Checks if the name is contained in the selectors. The selectors can be the
     exact name or just the non-number prefix. Returns the selector that matched,
     or an empty string if no match.
 
     :param name: The name to check.
-    :param expr: The expression to check against.
+    :param selectors: The selectors to check against.
 
     :return: The matched selector if the name matches a selector, or an empty string if no match.
     """

@@ -5,7 +5,7 @@ import pytest
 
 @pytest.fixture(autouse=True)
 def nocolor(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.delenv("NOCOLOR", raising=False)
+    monkeypatch.delenv("NO_COLOR", raising=False)
     monkeypatch.delenv("FORCE_COLOR", raising=False)
 
 

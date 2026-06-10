@@ -83,6 +83,14 @@ def test_process_fixtures_with_package() -> None:
     assert apply_fixtures(fixtures, not_simple) == ". ."
 
 
+def test_unknown_fixture_error() -> None:
+    def bad_fixture(does_not_exist: str) -> str:
+        return does_not_exist
+
+    with pytest.raises(KeyError, match="unknown fixture 'does_not_exist'"):
+        compute_fixtures(Path(), Path(), {"bad_fixture": bad_fixture})
+
+
 @pytest.mark.parametrize("some_bool", [True, False])
 def test_process_checks(monkeypatch: pytest.MonkeyPatch, some_bool: bool) -> None:
     ep = importlib.metadata.EntryPoint(name="x", group="y", value="test_module:f")
