@@ -144,3 +144,7 @@ uv.lock
 
 # Demo page
 /out
+
+# Symlink to AGENTS.md
+CLAUDE.md
+.claude/
