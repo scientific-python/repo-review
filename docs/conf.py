@@ -11,7 +11,7 @@ import repo_review
 DIR = Path(__file__).parent.resolve()
 
 project = "repo-review"
-copyright = "2022-2026, Henry Schreiner"
+copyright = "2022, Henry Schreiner"
 author = "Henry Schreiner"
 version = repo_review.__version__
 release = version
