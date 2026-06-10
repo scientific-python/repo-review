@@ -4,15 +4,22 @@
 
 from __future__ import annotations
 
-__lazy_modules__ = [f"{__spec__.parent}._timer", "io", "json", "sys", "typing"]
+__lazy_modules__ = [
+    f"{__spec__.parent}._timer",
+    "fnmatch",
+    "io",
+    "json",
+    "sys",
+    "typing",
+]
 
 import dataclasses
+import fnmatch
 import io
 import json
 import logging
 import sys
 import typing
-from pathlib import PurePosixPath
 from typing import Literal
 
 from ._compat.importlib.resources.abc import Traversable
@@ -34,13 +41,33 @@ def __dir__() -> list[str]:
 logger = logging.getLogger(__name__)
 
 
+def _glob_match(pattern_parts: list[str], path_parts: list[str]) -> bool:
+    """
+    Match path components against glob pattern components, like
+    ``pathlib.Path.glob``. A ``**`` component matches zero or more path
+    components; other components are matched with ``fnmatch.fnmatchcase``.
+    """
+    if not pattern_parts:
+        return not path_parts
+    head, *rest = pattern_parts
+    if head == "**":
+        return any(
+            _glob_match(rest, path_parts[i:]) for i in range(len(path_parts) + 1)
+        )
+    return bool(
+        path_parts
+        and fnmatch.fnmatchcase(path_parts[0], head)
+        and _glob_match(rest, path_parts[1:])
+    )
+
+
 @dataclasses.dataclass(frozen=True, kw_only=True)
 class GHPath(Traversable):
     """
     This is a Traversable that can be used to navigate a GitHub repo without
     downloading it.
 
-    Will throw an KeyError if the response is not valid.
+    Will throw a KeyError if the response is not valid.
 
     :param repo: The repo name, in "org/repo" style.
     :param branch: The branch name. "HEAD" works too.
@@ -191,10 +218,11 @@ class GHPath(Traversable):
 
     def iterdir(self) -> Iterator[GHPath]:
         if self.path:
+            prefix = f"{self.path}/"
             yield from (
                 self._with_path(d["path"])
                 for d in self._info
-                if d["path"].startswith(self.path)
+                if d["path"].startswith(prefix) and "/" not in d["path"][len(prefix) :]
             )
         else:
             yield from (
@@ -203,8 +231,13 @@ class GHPath(Traversable):
 
     def glob(self, pattern: str) -> Iterator[GHPath]:
         """
-        Yield paths matching the given glob-style `pattern` relative to this
-        `GHPath`. Patterns support `**` recursion via PurePosixPath.match.
+        Yield paths matching the given glob-style ``pattern``, anchored at
+        this `GHPath` and matched against the full relative path, like
+        :meth:`pathlib.Path.glob`. Each ``/``-separated pattern component is
+        matched with :func:`fnmatch.fnmatchcase`, and a ``**`` component
+        matches zero or more path components. So ``"**/*.py"`` includes
+        top-level ``.py`` files, and ``"pyproject.toml"`` only matches the
+        direct child, not files nested in subdirectories.
 
         :param pattern: A glob pattern (e.g. ``"**/*.py"`` or ``"subdir/*.md"``).
 
@@ -212,24 +245,20 @@ class GHPath(Traversable):
         """
 
         base = self.path.rstrip("/")
-        base_path = PurePosixPath(base) if base else None
+        prefix = f"{base}/" if base else ""
+        pattern_parts = pattern.split("/")
 
         for entry in self._info:
-            entry_path = entry.get("path", "")
-            entry_pure_path = PurePosixPath(entry_path)
-
-            if base_path is not None:
-                try:
-                    relative_path = entry_pure_path.relative_to(base_path)
-                except ValueError:
-                    continue
-            else:
-                relative_path = entry_pure_path
-
-            if relative_path.match(pattern):
+            entry_path = entry["path"]
+            if prefix and not entry_path.startswith(prefix):
+                continue
+            relative_path = entry_path[len(prefix) :]
+            if _glob_match(pattern_parts, relative_path.split("/")):
                 yield self._with_path(entry_path)
 
     def is_dir(self) -> bool:
+        if not self.path:
+            return True
         return self.path in {d["path"] for d in self._info if d["type"] == "tree"}
 
     def is_file(self) -> bool:
