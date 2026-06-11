@@ -1,5 +1,5 @@
 [build-system]
-requires = ["hatchling"]
+requires = ["hatchling>=1.27"]
 build-backend = "hatchling.build"
 
 
@@ -11,12 +11,13 @@ authors = [
 ]
 description = "Framework that can run checks on repos"
 readme = "README.md"
+license = "BSD-3-Clause"
+license-files = ["LICENSE"]
 requires-python = ">=3.10"
 classifiers = [
   "Development Status :: 5 - Production/Stable",
   "Intended Audience :: Developers",
   "Intended Audience :: Science/Research",
-  "License :: OSI Approved :: BSD License",
   "Operating System :: OS Independent",
   "Environment :: Console",
   "Environment :: WebAssembly :: Emscripten",
@@ -164,7 +165,7 @@ pythonpath = ["tests/test_utilities"]
 
 [tool.mypy]
 mypy_path = ["src"]
-files = ["src", "web", "tests"]
+files = ["src", "tests"]
 python_version = "3.10"
 warn_unused_configs = true
 strict = true

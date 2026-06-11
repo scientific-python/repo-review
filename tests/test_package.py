@@ -22,7 +22,7 @@ def test_local():
     package = DIR.parent
     results = process(package)
     assert "hatchling.build" in results.families["general"]["description"]
-    assert "BSD License" in results.families["general"]["description"]
+    assert "BSD-3-Clause" in results.families["general"]["description"]
     assert "[tool.repo-review]" in results.families["validate-pyproject"]["description"]
     for result in results.results:
         if result.result is not None:

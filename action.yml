@@ -26,22 +26,33 @@ runs:
     - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
       id: python
       with:
-        python-version: "3.13"
+        python-version: "3.14"
         update-environment: false
 
     - name: Install repo-review and plugins
       shell: bash
+      env:
+        PYTHON_PATH: ${{ steps.python.outputs.python-path }}
+        ACTION_PATH: ${{ github.action_path }}
+        PLUGINS: ${{ inputs.plugins }}
       run: |
-        pipx install --python '${{ steps.python.outputs.python-path }}' '${{ github.action_path }}[cli]'
-        pipx inject repo-review ${{ inputs.plugins }}
+        pipx install --python "$PYTHON_PATH" "${ACTION_PATH}[cli]"
+        # PLUGINS is a space-separated list of requirements, so word splitting
+        # is intentional here.
+        # shellcheck disable=SC2086
+        pipx inject repo-review $PLUGINS
 
     - name: Run repo-review
       shell: bash
+      env:
+        SELECT: ${{ inputs.select }}
+        IGNORE: ${{ inputs.ignore }}
+        PACKAGE_DIR: ${{ inputs.package-dir }}
       run: >
         repo-review .
         --format html
         --stderr rich
-        --select "${{ inputs.select }}"
-        --ignore "${{ inputs.ignore }}"
-        --package-dir "${{ inputs.package-dir }}"
-        >> $GITHUB_STEP_SUMMARY
+        --select "$SELECT"
+        --ignore "$IGNORE"
+        --package-dir "$PACKAGE_DIR"
+        >> "$GITHUB_STEP_SUMMARY"

@@ -34,7 +34,10 @@ jobs:
         with:
           bun-version: latest
           no-cache: true
-      - uses: pre-commit/action@2c7b3805fd2a0fd8c1884dcaebf91fc102a13ecd # v3.0.1
+      - name: Run prek
+        uses: j178/prek-action@bdca6f102f98e2b4c7029491a53dfd366469e33d # v2.0.4
+        with:
+          cache: false
       - name: Run PyLint
         run: pipx run --python=python hatch run pylint:lint --output-format=github
       - name: Install with cache
@@ -60,7 +63,6 @@ jobs:
           persist-credentials: false
 
       # Last one is activated
-      # yaml circular import issue on 3.14t on ubuntu
       - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
         with:
           python-version: |
