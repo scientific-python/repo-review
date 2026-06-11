@@ -1,9 +1,10 @@
 export async function fetchRepoRefs(repo: string) {
   if (!repo) return { branches: [], tags: [] };
   try {
+    // Default page size is 30; request the maximum to avoid truncating refs.
     const [branchesResponse, tagsResponse] = await Promise.all([
-      fetch(`https://api.github.com/repos/${repo}/branches`),
-      fetch(`https://api.github.com/repos/${repo}/tags`),
+      fetch(`https://api.github.com/repos/${repo}/branches?per_page=100`),
+      fetch(`https://api.github.com/repos/${repo}/tags?per_page=100`),
     ]);
 
     if (!branchesResponse.ok || !tagsResponse.ok) {

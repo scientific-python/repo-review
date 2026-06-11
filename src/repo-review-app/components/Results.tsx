@@ -1,4 +1,3 @@
-import React from "react";
 import {
   List,
   ListItem,
@@ -12,12 +11,19 @@ import ReportIcon from "@mui/icons-material/Report";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import InfoIcon from "@mui/icons-material/Info";
 import IfUrlLink from "./IfUrlLink";
+import type { ReactNode } from "react";
+import type { CheckItem } from "../repo-review-app";
 
-export default function Results(props: any) {
-  const output: any[] = [];
+interface ResultsProps {
+  results: Record<string, CheckItem[]>;
+  families: Record<string, { name: string; description?: string }>;
+}
+
+export default function Results(props: ResultsProps) {
+  const output: ReactNode[] = [];
   for (const key in props.results) {
     const inner_results = props.results[key];
-    const results_components = inner_results.map((result: any) => {
+    const results_components = inner_results.map((result: CheckItem) => {
       const text_color =
         result.state === false
           ? "error.main"
@@ -26,7 +32,7 @@ export default function Results(props: any) {
             : "info.main";
       const details =
         result.state === false ? (
-          <span dangerouslySetInnerHTML={{ __html: result.err_msg }} />
+          <span dangerouslySetInnerHTML={{ __html: result.err_msg ?? "" }} />
         ) : null;
       const icon =
         result.state === false ? (
@@ -50,16 +56,14 @@ export default function Results(props: any) {
       const msg = (
         <>
           <IfUrlLink name={result.name} url={result.url} color={text_color} />
-          <IfUrlLink name={": "} url={""} color={text_color} />
-          <>
-            <Typography
-              sx={{ display: "inline" }}
-              component="span"
-              color={text_color}
-            >
-              {result.description}
-            </Typography>
-          </>
+          <Typography
+            sx={{ display: "inline" }}
+            component="span"
+            color={text_color}
+          >
+            {": "}
+            {result.description}
+          </Typography>
           {result.state === undefined && skipped}
         </>
       );

@@ -2,7 +2,6 @@
 // extra dependencies required. Assertions are over the rendered HTML string.
 import { describe, it, expect } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
-import React from "react";
 import IfUrlLink from "./IfUrlLink";
 
 describe("IfUrlLink", () => {

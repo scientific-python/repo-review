@@ -1,7 +1,6 @@
-import React from "react";
 import { Box, AppBar, Toolbar, Typography, Button } from "@mui/material";
 
-export default function Heading(props: any) {
+export default function Heading() {
   return (
     <Box sx={{ flexGrow: 1, mb: 2 }}>
       <AppBar position="static">
