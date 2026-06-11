@@ -30,17 +30,8 @@ import MyThemeProvider from "./components/MyThemeProvider";
 import { injectFonts } from "./utils/injectFonts";
 import { fetchRepoRefs } from "./utils/github";
 import { sanitizePackageDir, parseRefType } from "./utils/url";
-import {
-  prepare_pyodide,
-  run_process,
-  load_known_checks,
-  generate_html,
-  prefetch,
-  collect_checks,
-} from "./utils/pyodide";
-import type { KnownChecksData } from "./utils/pyodide";
-import type { PyodideInterface } from "pyodide";
-import type { PyDict, PyIterable, PyProxy } from "pyodide/ffi";
+import { PyodideClient } from "./utils/pyodideClient";
+import type { KnownChecksData } from "./utils/pyodideClient";
 import type { SelectChangeEvent } from "@mui/material";
 
 const DEFAULT_MSG =
@@ -84,8 +75,6 @@ export interface AppProps {
 interface AppState {
   show: string;
   results: Record<string, CheckItem[]> | null;
-  pyFamilies: PyProxy | null;
-  pyChecks: PyProxy | null;
   snackbarOpen: boolean;
   snackbarMsg: string;
   snackbarSeverity: "info" | "error" | "warning" | "success";
@@ -117,7 +106,8 @@ interface AppState {
 }
 
 export class App extends React.Component<AppProps, AppState> {
-  pyodide_promise: Promise<PyodideInterface> | null;
+  client: PyodideClient | null;
+  readyPromise: Promise<void> | null;
 
   constructor(props: AppProps) {
     super(props);
@@ -129,8 +119,6 @@ export class App extends React.Component<AppProps, AppState> {
     this.state = {
       show: params.get("show") || "all",
       results: null,
-      pyFamilies: null,
-      pyChecks: null,
       snackbarOpen: false,
       snackbarMsg: "",
       snackbarSeverity: "info",
@@ -158,22 +146,13 @@ export class App extends React.Component<AppProps, AppState> {
       completedRef: "",
       completedRefType: "branch",
     };
-    this.pyodide_promise = null;
-  }
-
-  destroyProxy(proxy: PyProxy | null): void {
-    if (proxy) {
-      try {
-        proxy.destroy();
-      } catch {
-        // ignore destroy errors
-      }
-    }
+    this.client = null;
+    this.readyPromise = null;
   }
 
   componentWillUnmount() {
-    this.destroyProxy(this.state.pyFamilies);
-    this.destroyProxy(this.state.pyChecks);
+    this.client?.terminate();
+    this.client = null;
   }
 
   async fetchRepoReferences(repo: string) {
@@ -199,20 +178,11 @@ export class App extends React.Component<AppProps, AppState> {
   }
 
   handleRepoChange(repo: string) {
-    this.destroyProxy(this.state.pyFamilies);
-    this.destroyProxy(this.state.pyChecks);
-    this.setState({
-      repo,
-      refs: { branches: [], tags: [] },
-      pyFamilies: null,
-      pyChecks: null,
-    });
+    this.setState({ repo, refs: { branches: [], tags: [] } });
   }
 
   handleRefChange(ref: string, refType: "branch" | "tag") {
-    this.destroyProxy(this.state.pyFamilies);
-    this.destroyProxy(this.state.pyChecks);
-    this.setState({ ref, refType, pyFamilies: null, pyChecks: null });
+    this.setState({ ref, refType });
   }
 
   async handleCompute() {
@@ -248,55 +218,32 @@ export class App extends React.Component<AppProps, AppState> {
     }
     this.setState({ results: null, progress: true, infoOpen: false });
     const packageDir = sanitizePackageDir(this.state.packageDir);
-    const state = this.state;
-    let pyPackage: PyProxy | null = null;
-    let collected: PyProxy | null = null;
-    let families_dict: PyDict | null = null;
-    let results_list: PyIterable | null = null;
+    const { repo, ref, refType } = this.state;
     try {
-      const pyodide = await this.pyodide_promise!;
-      pyPackage = await prefetch(pyodide, state.repo, state.ref, packageDir);
-      collected = collect_checks(pyodide, pyPackage, packageDir);
-      results_list = run_process(
-        pyodide,
-        pyPackage,
-        collected,
-        packageDir,
-      ) as PyIterable;
-      // PyProxy.copy() is typed as returning PyProxy; the copy of a dict
-      // proxy is still a dict proxy.
-      families_dict = (
-        collected as PyProxy & { families: PyDict }
-      ).families.copy() as PyDict;
+      // Surfaces init failures with their original message; the actual run
+      // happens entirely inside the worker, returning plain data.
+      await this.readyPromise!;
+      const data = await this.client!.runChecks(repo, ref, packageDir);
 
       const results: Record<string, CheckItem[]> = {};
       const families: Record<string, { name: string; description?: string }> =
         {};
-      for (const val of families_dict) {
-        const descr = families_dict.get(val).get("description");
-        results[val] = [];
-        families[val] = {
-          name: families_dict.get(val).get("name").toString(),
-          description: descr && descr.toString(),
+      for (const [key, family] of Object.entries(data.families)) {
+        results[key] = [];
+        families[key] = {
+          name: family.name,
+          description: family.description ?? undefined,
         };
       }
-      for (const val of results_list) {
-        results[val.family].push({
-          name: val.name.toString(),
-          description: val.description.toString(),
-          state: val.result,
-          err_msg: val.err_msg.toString(),
-          url: val.url.toString(),
-          skip_reason: val.skip_reason.toString(),
+      for (const res of data.results) {
+        results[res.family].push({
+          name: res.name,
+          description: res.description,
+          state: res.result,
+          err_msg: res.err_msg,
+          url: res.url,
+          skip_reason: res.skip_reason,
         });
-      }
-
-      // Destroy any previously stored PyProxies for a different run
-      if (this.state.pyFamilies && this.state.pyFamilies !== families_dict) {
-        this.destroyProxy(this.state.pyFamilies);
-      }
-      if (this.state.pyChecks && this.state.pyChecks !== results_list) {
-        this.destroyProxy(this.state.pyChecks);
       }
 
       this.setState({
@@ -307,19 +254,11 @@ export class App extends React.Component<AppProps, AppState> {
         err_is_code: false,
         url: "",
         infoOpen: false,
-        pyFamilies: families_dict,
-        pyChecks: results_list,
-        completedRepo: state.repo,
-        completedRef: state.ref,
-        completedRefType: state.refType,
+        completedRepo: repo,
+        completedRef: ref,
+        completedRefType: refType,
       });
-      // Proxies are now owned by state; clear locals to avoid destroying them in catch
-      families_dict = null;
-      results_list = null;
     } catch (e: unknown) {
-      // Destroy any proxies from this run that were not saved to state
-      this.destroyProxy(families_dict);
-      this.destroyProxy(results_list);
       const emsg = (e as Error)?.message || String(e);
       if (emsg.includes("KeyError: 'tree'")) {
         this.setState({
@@ -336,51 +275,36 @@ export class App extends React.Component<AppProps, AppState> {
           err_is_code: true,
         });
       }
-    } finally {
-      // prefetch and collected are run-scoped only; release them after processing
-      this.destroyProxy(collected);
-      this.destroyProxy(pyPackage);
     }
   }
 
   async handleCopyHtml() {
-    if (!this.state.repo || !this.state.ref) {
+    if (!this.state.results) {
       this.setState({
         snackbarOpen: true,
-        snackbarMsg: `Please enter a repo and branch/tag`,
+        snackbarMsg: "No results to copy — please run the checks first",
         snackbarSeverity: "warning",
       });
       return;
     }
 
+    let htmlOut: string;
     try {
-      const pyodide = await this.pyodide_promise!;
+      // The worker stores the most recent run, which is always the run the
+      // displayed results came from; regenerating HTML from it is cheap.
+      htmlOut = await this.client!.generateHtml(this.state.show || "all");
+    } catch (e: unknown) {
+      console.error("Error generating HTML:", e);
+      const emsg = (e as Error)?.message || String(e);
+      this.setState({
+        snackbarOpen: true,
+        snackbarMsg: "Error generating HTML: " + emsg,
+        snackbarSeverity: "error",
+      });
+      return;
+    }
 
-      let htmlOut: string;
-
-      // Reuse previously stored PyProxy results if they correspond to the
-      // same repo/ref to avoid rerunning the expensive `process(package)`.
-      if (this.state.pyFamilies && this.state.pyChecks) {
-        // Use stored pyFamilies/pyChecks; they are cleared when repo/ref change
-        htmlOut = await generate_html(
-          pyodide,
-          this.state.pyFamilies,
-          this.state.pyChecks,
-          this.state.show || "all",
-        );
-      } else {
-        // Shouldn't be possible: if we have a copy button, we should have
-        // a stored run result for that repo/ref. Show an error instead of
-        // rerunning the expensive process.
-        this.setState({
-          snackbarOpen: true,
-          snackbarMsg:
-            "Stored results do not match current repo/ref — please run the checks first",
-          snackbarSeverity: "error",
-        });
-        return;
-      }
-
+    try {
       if (navigator.clipboard && navigator.clipboard.writeText) {
         await navigator.clipboard.writeText(htmlOut);
         this.setState({
@@ -397,21 +321,20 @@ export class App extends React.Component<AppProps, AppState> {
         }
       }
     } catch (e: unknown) {
-      console.error("Error generating HTML:", e);
+      console.error("Error copying HTML:", e);
       const emsg = (e as Error)?.message || String(e);
       this.setState({
         snackbarOpen: true,
-        snackbarMsg: "Error generating HTML: " + emsg,
+        snackbarMsg: "Could not copy to clipboard: " + emsg,
         snackbarSeverity: "error",
       });
     }
   }
 
   async loadKnownChecks() {
-    const pyodide = await this.pyodide_promise!;
     let data: KnownChecksData = {};
     try {
-      data = load_known_checks(pyodide);
+      data = await this.client!.knownChecks();
     } catch (e) {
       console.error("Error loading known checks:", e);
       return;
@@ -446,18 +369,19 @@ export class App extends React.Component<AppProps, AppState> {
   }
 
   componentDidMount() {
-    this.pyodide_promise = prepare_pyodide(
+    this.client = new PyodideClient((p: number, m?: string) =>
+      this.setState({
+        pyodideProgress: p,
+        pyodideLoading: p < 100,
+        pyodideMessage: m || "",
+      }),
+    );
+    this.readyPromise = this.client.init(
       this.props.deps,
       this.props.pyodideBaseUrl,
-      (p: number, m?: string) =>
-        this.setState({
-          pyodideProgress: p,
-          pyodideLoading: p < 100,
-          pyodideMessage: m || "",
-        }),
     );
     // Surface load failures in the error banner instead of failing silently.
-    this.pyodide_promise.catch((e: unknown) => {
+    this.readyPromise.catch((e: unknown) => {
       const emsg = (e as Error)?.message || String(e);
       this.setState({
         pyodideLoading: false,
@@ -477,7 +401,7 @@ export class App extends React.Component<AppProps, AppState> {
     }
     // Always load the list of available checks, even if an auto-run from the
     // URL parameters is in flight (or fails). Errors are reported above.
-    this.pyodide_promise.then(
+    this.readyPromise.then(
       () => this.loadKnownChecks(),
       () => {},
     );

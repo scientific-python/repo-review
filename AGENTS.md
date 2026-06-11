@@ -79,7 +79,8 @@ uvx hatch run api-docs:build
 - `src/repo_review/fixtures.py` → dependency injection system
 - `src/repo_review/__main__.py` → CLI interface
 - `src/repo-review-app/repo-review-app.tsx` → main React app (class component)
-- `src/repo-review-app/utils/pyodide.ts` → Pyodide loading and Python interop
+- `src/repo-review-app/utils/pyodideWorker.ts` → self-contained web worker (all Python interop; stringified into a Blob URL, so nothing inside `workerMain` may reference module scope)
+- `src/repo-review-app/utils/pyodideClient.ts` → main-thread RPC client for the Pyodide worker
 - `src/repo-review-app/utils/github.ts` → GitHub API helpers
 
 ### Plugin System

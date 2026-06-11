@@ -115,4 +115,7 @@ To embed the app, simply import the ESM bundle and call `mountApp()`:
 </script>
 ```
 
-The webapp loads Pyodide and uses `micropip` to install any requested Python packages.
+The webapp loads Pyodide and uses `micropip` to install any requested Python
+packages. Pyodide runs in a web worker (created internally from a Blob URL, so
+the bundle stays a single file), keeping the page responsive while packages
+install and checks run.
