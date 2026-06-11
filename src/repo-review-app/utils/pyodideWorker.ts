@@ -72,9 +72,7 @@ export interface KnownChecksData {
   }[];
 }
 
-export function workerMain(
-  dynImport: (url: string) => Promise<unknown>,
-): void {
+export function workerMain(dynImport: (url: string) => Promise<unknown>): void {
   // `self` is typed as Window in this project's tsconfig; narrow it to the
   // worker-shaped subset we use.
   const ctx = self as unknown as {
