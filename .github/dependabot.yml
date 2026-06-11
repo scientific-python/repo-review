@@ -30,7 +30,7 @@ updates:
     schedule:
       interval: "monthly"
     groups:
-      npm:
+      bun:
         patterns:
           - "*"
     cooldown:
