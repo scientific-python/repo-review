@@ -6,7 +6,7 @@
  * ```{anywidget} repo-review-anywidget.mjs
  * {
  *   "deps": ["repo-review", "sp-repo-review"],
- *   "pyodide_base_url": "https://cdn.jsdelivr.net/pyodide/v0.29.3/full"
+ *   "pyodide_base_url": "https://cdn.jsdelivr.net/pyodide/v314.0.0/full"
  * }
  * ```
  *
