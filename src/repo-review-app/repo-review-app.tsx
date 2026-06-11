@@ -598,8 +598,7 @@ export class App extends React.Component<AppProps, AppState> {
           <Stack
             direction={{ xs: "column", sm: "row" }}
             spacing={2}
-            alignItems={{ xs: "stretch", sm: "stretch" }}
-            sx={{ m: 1, mb: 3 }}
+            sx={{ alignItems: { xs: "stretch", sm: "stretch" }, m: 1, mb: 3 }}
           >
             <TextField
               id="repo-select"
@@ -663,13 +662,13 @@ export class App extends React.Component<AppProps, AppState> {
                   sx={{ flexGrow: 2, minWidth: 170 }}
                   slotProps={{
                     input: {
-                      ...params.InputProps,
+                      ...params.slotProps.input,
                       endAdornment: (
                         <>
                           {this.state.loadingRefs ? (
                             <CircularProgress color="inherit" size={20} />
                           ) : null}
-                          {params.InputProps.endAdornment}
+                          {params.slotProps.input.endAdornment}
                         </>
                       ),
                     },
@@ -793,7 +792,7 @@ export class App extends React.Component<AppProps, AppState> {
                 expandIcon={<ExpandMoreIcon />}
                 sx={{ bgcolor: "primary.main", color: "primary.contrastText" }}
               >
-                <Typography fontWeight="medium">About</Typography>
+                <Typography sx={{ fontWeight: "medium" }}>About</Typography>
               </AccordionSummary>
               <AccordionDetails sx={{ bgcolor: "transparent" }}>
                 <Typography variant="body1" component="div">
