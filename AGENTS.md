@@ -149,3 +149,4 @@ Checks are classes with:
 - Webapp uses React (class components) + Pyodide; built with `bun`
 - Webapp build output goes to `docs/_static/scripts/`
 - npm dist output goes to `dist/` (gitignored; built and published to npm on release)
+- Changelog lives in `docs/changelog.md` (static, in-repo — not pulled from GitHub releases); add a new section per release

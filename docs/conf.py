@@ -24,7 +24,6 @@ extensions = [
     "sphinx_autodoc_typehints",
     "sphinx_copybutton",
     "sphinxcontrib.programoutput",
-    "sphinx_github_changelog",
     "sphinxext.opengraph",
     "sphinx.ext.linkcode",
 ]
@@ -83,8 +82,6 @@ nitpick_ignore = [
 ]
 
 always_document_param_types = True
-
-sphinx_github_changelog_token = os.environ.get("GITHUB_API_TOKEN")
 
 commit = os.environ.get("READTHEDOCS_GIT_COMMIT_HASH", "main")
 code_url = "https://github.com/scientific-python/repo-review/blob"

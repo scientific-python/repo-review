@@ -110,3 +110,8 @@ hatch run version:bump bump patch
 ```
 
 Push and make the release in GitHub, using the auto changelog.
+
+The changelog also lives in the repo at `docs/changelog.md` (it is no longer
+pulled live from GitHub releases). After publishing the GitHub release, copy its
+notes into a new top-of-file `## Version X.Y.Z` section, following the existing
+format (date, tag link, then the release notes).
