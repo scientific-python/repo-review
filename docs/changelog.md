@@ -2,8 +2,6 @@
 
 ## Version 1.2.0
 
-_2026-06-15_ · [`v1.2.0`](https://github.com/scientific-python/repo-review/releases/tag/v1.2.0)
-
 Features for the webapp:
 
 - Run Pyodide in a web worker by @henryiii in https://github.com/scientific-python/repo-review/pull/404
@@ -37,11 +35,7 @@ Dependencies:
 - Bump the github-actions group with 2 updates by @dependabot in https://github.com/scientific-python/repo-review/pull/401
 - Update pre-commit hooks by @pre-commit-ci in https://github.com/scientific-python/repo-review/pull/393
 
-**Full Changelog**: https://github.com/scientific-python/repo-review/compare/v1.1.3...v1.2.0
-
 ## Version 1.1.3
-
-_2026-05-28_ · [`v1.1.3`](https://github.com/scientific-python/repo-review/releases/tag/v1.1.3)
 
 Fixes for the webapp:
 
@@ -52,11 +46,7 @@ Docs and internal:
 - Add anywidget to documentation by @henryiii in https://github.com/scientific-python/repo-review/pull/391
 - Remove webapp GitHub release artifact by @henryiii in https://github.com/scientific-python/repo-review/pull/392
 
-**Full Changelog**: https://github.com/scientific-python/repo-review/compare/v1.1.2...v1.1.3
-
 ## Version 1.1.2
-
-_2026-05-28_ · [`v1.1.2`](https://github.com/scientific-python/repo-review/releases/tag/v1.1.2)
 
 ### What's Changed
 
@@ -68,11 +58,7 @@ CI:
 
 - Fix publish webapp by @henryiii in https://github.com/scientific-python/repo-review/pull/386
 
-**Full Changelog**: https://github.com/scientific-python/repo-review/compare/v1.1.1...v1.1.2
-
 ## Version 1.1.1
-
-_2026-05-28_ · [`v1.1.1`](https://github.com/scientific-python/repo-review/releases/tag/v1.1.1)
 
 Features for the webapp:
 
@@ -83,11 +69,7 @@ CI for the webapp:
 
 - Use npm trusted publishing for npm publish job by @henryiii in https://github.com/scientific-python/repo-review/pull/383
 
-**Full Changelog**: https://github.com/scientific-python/repo-review/compare/v1.1.0...v1.1.1
-
 ## Version 1.1.0
-
-_2026-05-27_ · [`v1.1.0`](https://github.com/scientific-python/repo-review/releases/tag/v1.1.0)
 
 Fixes:
 
@@ -106,11 +88,7 @@ CI and internal:
 - Secure CI configuration and update dependencies by @henryiii in https://github.com/scientific-python/repo-review/pull/379
 - Bump version to 1.1.0 by @henryiii in https://github.com/scientific-python/repo-review/pull/382
 
-**Full Changelog**: https://github.com/scientific-python/repo-review/compare/v1.0.3...v1.1.0
-
 ## Version 1.0.3
-
-_2026-04-05_ · [`v1.0.3`](https://github.com/scientific-python/repo-review/releases/tag/v1.0.3)
 
 Features for the WebApp:
 
@@ -132,32 +110,20 @@ CI:
 
 - Lint webapp in CI by @henryiii in https://github.com/scientific-python/repo-review/pull/364
 
-**Full Changelog**: https://github.com/scientific-python/repo-review/compare/v1.0.2...v1.0.3
-
 ## Version 1.0.2
-
-_2026-04-04_ · [`v1.0.2`](https://github.com/scientific-python/repo-review/releases/tag/v1.0.2)
 
 Fixes for the WebApp:
 
 - Fix webapp copy HTML crash due to destroyed borrowed PyProxy by @Copilot in https://github.com/scientific-python/repo-review/pull/358
 
-**Full Changelog**: https://github.com/scientific-python/repo-review/compare/v1.0.1...v1.0.2
-
 ## Version 1.0.1
-
-_2026-04-04_ · [`v1.0.1`](https://github.com/scientific-python/repo-review/releases/tag/v1.0.1)
 
 Fixes for the WebApp:
 
 - Make webapp input row responsive on mobile by @Copilot in https://github.com/scientific-python/repo-review/pull/355
 - Keep Show dropdown and Run button always on the same line by @Copilot in https://github.com/scientific-python/repo-review/pull/356
 
-**Full Changelog**: https://github.com/scientific-python/repo-review/compare/v1.0.0...v1.0.1
-
 ## Version 1.0.0
-
-_2026-04-03_ · [`v1.0.0`](https://github.com/scientific-python/repo-review/releases/tag/v1.0.0)
 
 Features:
 
@@ -233,35 +199,19 @@ New Contributors
 
 - @Copilot made their first contribution in https://github.com/scientific-python/repo-review/pull/298
 
-**Full Changelog**: https://github.com/scientific-python/repo-review/compare/v0.12.3...v1.0.0
-
 ## v1.0.0rc3
-
-_2026-04-03_ · [`v1.0.0rc3`](https://github.com/scientific-python/repo-review/releases/tag/v1.0.0rc3)
 
 Fixing CI upload, and rename the webapp to repo-review-app.
 
-**Full Changelog**: https://github.com/scientific-python/repo-review/compare/v1.0.0rc2...v1.0.0rc3
-
 ## v1.0.0rc2
-
-_2026-04-03_ · [`v1.0.0rc2`](https://github.com/scientific-python/repo-review/releases/tag/v1.0.0rc2)
 
 Update to use async in web app and fix for web app binaries on releases.
 
-**Full Changelog**: https://github.com/scientific-python/repo-review/compare/v1.0.0rc1...v1.0.0rc2
-
 ## v1.0.0rc1
-
-_2026-04-03_ · [`v1.0.0rc1`](https://github.com/scientific-python/repo-review/releases/tag/v1.0.0rc1)
 
 First RC.
 
-**Full Changelog**: https://github.com/scientific-python/repo-review/compare/v0.12.3...v1.0.0rc1
-
 ## Version 0.12.3
-
-_2025-09-27_ · [`v0.12.3`](https://github.com/scientific-python/repo-review/releases/tag/v0.12.3)
 
 This is a quick release to handle changes in rich-click 1.9 that break `--help` on Windows if not using unicode by default on your terminal.
 
@@ -274,11 +224,7 @@ WebApp:
 - Bump webapp to 0.12.2 by @henryiii in https://github.com/scientific-python/repo-review/pull/276
 - Bump to Pyodide 0.28 by @agriyakhetarpal in https://github.com/scientific-python/repo-review/pull/282
 
-**Full Changelog**: https://github.com/scientific-python/repo-review/compare/v0.12.2...v0.12.3
-
 ## Version 0.12.2
-
-_2025-05-21_ · [`v0.12.2`](https://github.com/scientific-python/repo-review/releases/tag/v0.12.2)
 
 This release provides a much nicer error message if a invalid repository is given, and adds the Python 3.14 (Python π) trove classifier.
 
@@ -304,11 +250,7 @@ New Contributors:
 
 - @agriyakhetarpal made their first contribution in https://github.com/scientific-python/repo-review/pull/261
 
-**Full Changelog**: https://github.com/scientific-python/repo-review/compare/v0.12.1...v0.12.2
-
 ## Version 0.12.1
-
-_2025-02-05_ · [`v0.12.1`](https://github.com/scientific-python/repo-review/releases/tag/v0.12.1)
 
 This is a quick release improving the webapp for the new skip reasons.
 
@@ -320,11 +262,7 @@ Fixes:
 
 - webapp support 0.12's skip reasons by @henryiii in https://github.com/scientific-python/repo-review/pull/259
 
-**Full Changelog**: https://github.com/scientific-python/repo-review/compare/v0.12.0...v0.12.1
-
 ## Version 0.12.0
-
-_2025-02-04_ · [`v0.12.0`](https://github.com/scientific-python/repo-review/releases/tag/v0.12.0)
 
 This release adds support for supplying reasons for ignored checks by using a table in pyproject.toml. It also adds new `--extend-ignore`/ `--extend-select` options to the CLI, to avoid overriding the existing `pyproject.toml` ignores.
 
@@ -338,11 +276,7 @@ CI and internal:
 - chore: support running coverage by @henryiii in https://github.com/scientific-python/repo-review/pull/256
 - ci: tighten up permissions a bit by @henryiii in https://github.com/scientific-python/repo-review/pull/257
 
-**Full Changelog**: https://github.com/scientific-python/repo-review/compare/v0.11.3...v0.12.0
-
 ## Version 0.11.3
-
-_2024-12-13_ · [`v0.11.3`](https://github.com/scientific-python/repo-review/releases/tag/v0.11.3)
 
 This release integrates the code blocks into the current theme instead of always being on a light background.
 
@@ -356,11 +290,7 @@ New contributors:
 
 - @kurtmckee made their first contribution in https://github.com/scientific-python/repo-review/pull/247
 
-**Full Changelog**: https://github.com/scientific-python/repo-review/compare/v0.11.2...v0.11.3
-
 ## Version 0.11.2
-
-_2024-08-24_ · [`v0.11.2`](https://github.com/scientific-python/repo-review/releases/tag/v0.11.2)
 
 This release fixes a long standing issue if a check modifies the cached fixtures. Checks weren't supposed to do this, but `validate-pyproject` did this. Now a spare deep copy of the fixtures are kept, and restored with a warning if a check modifies them. There's also a new CLI flag to show all the installed plugin's versions.
 
@@ -372,11 +302,7 @@ Fixes:
 
 - Warn and correct if a check modifies a cached fixture by @henryiii in https://github.com/scientific-python/repo-review/pull/243
 
-**Full Changelog**: https://github.com/scientific-python/repo-review/compare/v0.11.1...v0.11.2
-
 ## Version 0.11.1
-
-_2024-08-20_ · [`v0.11.1`](https://github.com/scientific-python/repo-review/releases/tag/v0.11.1)
 
 This release fixes an issue with (Windows) systems not set to unicode; it's no longer required to set `PYTHONUTF8` to 1 to run on these systems. We also now support a key-value structure in the Schema for ignores, which in the future may allow us to print out reasons for suppression (older versions still read this correctly). We also updated the docs, including links back to the source. We are ready and testing on Python 3.13, and 3.12 is now the default for things like the GitHub Action.
 
@@ -402,11 +328,7 @@ Internal and tests:
 - Use the new github actions reporter for pylint by @henryiii in https://github.com/scientific-python/repo-review/pull/222
 - Changelog generation by @henryiii in https://github.com/scientific-python/repo-review/pull/219
 
-**Full Changelog**: https://github.com/scientific-python/repo-review/compare/v0.11.0...v0.11.1
-
 ## Version 0.11.0
-
-_2024-05-04_ · [`v0.11.0`](https://github.com/scientific-python/repo-review/releases/tag/v0.11.0)
 
 Repo-review now supports pyodide directly, so you no longer need to inject a new `open_url` function, making the webapp slightly simpler.
 
@@ -421,11 +343,7 @@ Internal and tests:
 - Use hatch instead of nox by @henryiii in https://github.com/scientific-python/repo-review/pull/212
 - New issue template by @henryiii in https://github.com/scientific-python/repo-review/pull/213
 
-**Full Changelog**: https://github.com/scientific-python/repo-review/compare/v0.10.6...v0.11.0
-
 ## Version 0.10.6
-
-_2024-04-22_ · [`v0.10.6`](https://github.com/scientific-python/repo-review/releases/tag/v0.10.6)
 
 This version adds one more small helper for unit tests.
 
@@ -434,11 +352,7 @@ Tests and testing:
 - Extra testing helper by @henryiii in https://github.com/scientific-python/repo-review/pull/203
 - Add an extra test file by @henryiii in https://github.com/scientific-python/repo-review/pull/204
 
-**Full Changelog**: https://github.com/scientific-python/repo-review/compare/v0.10.5...v0.10.6
-
 ## Version 0.10.5
-
-_2024-04-21_ · [`v0.10.5`](https://github.com/scientific-python/repo-review/releases/tag/v0.10.5)
 
 Features:
 
@@ -459,11 +373,7 @@ Internal:
 
 - Use uv in CI by @henryiii in https://github.com/scientific-python/repo-review/pull/189
 
-**Full Changelog**: https://github.com/scientific-python/repo-review/compare/v0.10.4...v0.10.5
-
 ## Version 0.10.4
-
-_2024-01-24_ · [`v0.10.4`](https://github.com/scientific-python/repo-review/releases/tag/v0.10.4)
 
 This is a small release mostly fixing the code display on the terminal with some themes. The demo now uses `validate-pyproject-schema-store` for `validate-pyproject`.
 
@@ -472,11 +382,7 @@ Fixes:
 - Use default (light) theme for code by @henryiii in https://github.com/scientific-python/repo-review/pull/176
 - Use validate-pyproject-schema-store by @henryiii in https://github.com/scientific-python/repo-review/pull/179
 
-**Full Changelog**: https://github.com/scientific-python/repo-review/compare/v0.10.3...v0.10.4
-
 ## Version 0.10.3
-
-_2023-12-22_ · [`v0.10.3`](https://github.com/scientific-python/repo-review/releases/tag/v0.10.3)
 
 This is a small release to fix wrapping in the HTML output, making it nicer when used in GitHub issues and GHA output.
 
@@ -490,11 +396,7 @@ Docs:
 - Make TOML valid by @henryiii in https://github.com/scientific-python/repo-review/pull/162
 - Fix pipx link by @henryiii in https://github.com/scientific-python/repo-review/pull/168
 
-**Full Changelog**: https://github.com/scientific-python/repo-review/compare/v0.10.2...v0.10.3
-
 ## Version 0.10.2
-
-_2023-11-17_ · [`v0.10.2`](https://github.com/scientific-python/repo-review/releases/tag/v0.10.2)
 
 This is quick patch release fixing a regression in GitHub path handling in 0.10.1.
 
@@ -502,11 +404,7 @@ Fixes:
 
 - GitHub path bug (regression in 0.10.1) by @henryiii in https://github.com/scientific-python/repo-review/pull/160
 
-**Full Changelog**: https://github.com/scientific-python/repo-review/compare/v0.10.1...v0.10.2
-
 ## Version 0.10.1
-
-_2023-11-17_ · [`v0.10.1`](https://github.com/scientific-python/repo-review/releases/tag/v0.10.1)
 
 This release primary improves the error message when a branch is missing in the CLI.
 
@@ -523,11 +421,7 @@ Other:
 - Move to ruff-format by @henryiii in https://github.com/scientific-python/repo-review/pull/155
 - Use sp-repo-review 2023.11.17 for webapp by @henryiii in https://github.com/scientific-python/repo-review/pull/159
 
-**Full Changelog**: https://github.com/scientific-python/repo-review/compare/v0.10.0...v0.10.1
-
 ## Version 0.10.0
-
-_2023-08-25_ · [`v0.10.0`](https://github.com/scientific-python/repo-review/releases/tag/v0.10.0)
 
 This release adds support for running on multiple repositories at once. You can list as many as you need, and the output formats will be modified to better support multiple repos. You can also now filter out passing or passing + skipped checks, which is especially useful in long multi-repo reports. You can also pass the path to `pyproject.toml` instead of just the repo if it's at top-level.
 
@@ -549,11 +443,7 @@ Docs:
 - Add mention of recent features by @henryiii in https://github.com/scientific-python/repo-review/pull/137
 - Add mention of pre-commit issues by @henryiii in https://github.com/scientific-python/repo-review/pull/139
 
-**Full Changelog**: https://github.com/scientific-python/repo-review/compare/v0.9.3...v0.10.0
-
 ## Version 0.9.3
-
-_2023-08-23_ · [`v0.9.3`](https://github.com/scientific-python/repo-review/releases/tag/v0.9.3)
 
 This release adds support for `[tool.repo-review]` to validate-pyproject.
 
@@ -572,11 +462,7 @@ Docs:
 - Fix links in README by @henryiii in https://github.com/scientific-python/repo-review/pull/126
 - Ddd validate-pyproject by @henryiii in https://github.com/scientific-python/repo-review/pull/129
 
-**Full Changelog**: https://github.com/scientific-python/repo-review/compare/v0.9.2...v0.9.3
-
 ## Version 0.9.2
-
-_2023-08-03_ · [`v0.9.2`](https://github.com/scientific-python/repo-review/releases/tag/v0.9.2)
 
 A few fixes, one for a regression and one for the WebApp.
 
@@ -585,11 +471,7 @@ Fixes:
 - Span wasn't set properly in the WebApp by @henryiii in https://github.com/scientific-python/repo-review/pull/119
 - Pass correct self object by @henryiii in https://github.com/scientific-python/repo-review/pull/118
 
-**Full Changelog**: https://github.com/scientific-python/repo-review/compare/v0.9.1...v0.9.2
-
 ## Version 0.9.1
-
-_2023-08-03_ · [`v0.9.1`](https://github.com/scientific-python/repo-review/releases/tag/v0.9.1)
 
 Quick WebApp fix for Pyodide having pyyaml 6.0.0.
 
@@ -597,11 +479,7 @@ Fixes:
 
 - Pyodide has pyyaml 6.0.0 by @henryiii in https://github.com/scientific-python/repo-review/pull/117
 
-**Full Changelog**: https://github.com/scientific-python/repo-review/compare/v0.9.0...v0.9.1
-
 ## Version 0.9
-
-_2023-08-03_ · [`v0.9.0`](https://github.com/scientific-python/repo-review/releases/tag/v0.9.0)
 
 This release adds a new `description` slot that is shown below the family name if present. You can request fixtures in the family collection function now, which allows the descriptions to be dynamic, based on the repo being evaluated. A minor breaking change is also present - the text return from checks is no longer run through `.format`, removing the need for escaping. A new checks-only fixture `name` is provided in case you did need the current check name.
 
@@ -620,11 +498,7 @@ Docs and other:
 - Use sphinx-autobuild by @henryiii in https://github.com/scientific-python/repo-review/pull/109
 - Drop pytest Python 3.12 workaround by @henryiii in https://github.com/scientific-python/repo-review/pull/110
 
-**Full Changelog**: https://github.com/scientific-python/repo-review/compare/v0.8.1...v0.9.0
-
 ## Version 0.8.1
-
-_2023-07-13_ · [`v0.8.1`](https://github.com/scientific-python/repo-review/releases/tag/v0.8.1)
 
 This release fixes a couple of issues with the webapp; it now supports pressing "enter" to move, and error messages (which hopefully you never see!) will get formatted nicely.
 
@@ -633,11 +507,7 @@ Fixes:
 - Support enter in form by @henryiii in https://github.com/scientific-python/repo-review/pull/104
 - Format error messages properly by @henryiii in https://github.com/scientific-python/repo-review/pull/105
 
-**Full Changelog**: https://github.com/scientific-python/repo-review/compare/v0.8.0...v0.8.1
-
 ## Version 0.8.0
-
-_2023-06-29_ · [`v0.8.0`](https://github.com/scientific-python/repo-review/releases/tag/v0.8.0)
 
 This release adds a new fixture (`list_all`, a bool), several new helper functions (`get_check_url`, `get_check_description`, `get_family_name`), and makes `collect_all` part of the public API, with a structured return. This enables easier programmatic usage, especially when listing all (unevaluated) checks. This is use for a new new cog example in a new documentation page on programmatic usage.
 
@@ -645,11 +515,7 @@ Features:
 
 - feat: better list-all support by @henryiii in https://github.com/scientific-python/repo-review/pull/101
 
-**Full Changelog**: https://github.com/scientific-python/repo-review/compare/v0.7.0...v0.8.0
-
 ## Version 0.7.0
-
-_2023-06-17_ · [`v0.7.0`](https://github.com/scientific-python/repo-review/releases/tag/v0.7.0)
 
 This is the first stand-alone release after being split out from `sp-repo-review` and moved to scientific Python.
 
@@ -695,41 +561,25 @@ Other things:
 - docs: minor fixes by @henryiii in https://github.com/scientific-python/repo-review/pull/91
 - docs: some getting started info by @henryiii in https://github.com/scientific-python/repo-review/pull/86
 
-**Full Changelog**: https://github.com/scientific-python/repo-review/compare/v0.6.1...v0.7.0
-
 ## Version 0.7.0 beta 10
-
-_2023-06-14_ · [`v0.7.0b10`](https://github.com/scientific-python/repo-review/releases/tag/v0.7.0b10)
 
 Renaming a confusing method before release.
 
 - refactor: rename `err_markdown` to `err_as_html` by @henryiii in https://github.com/scientific-python/repo-review/pull/99
 
-**Full Changelog**: https://github.com/scientific-python/repo-review/compare/v0.7.0b9...v0.7.0b10
-
 ## Version 0.7.0 beta 9
-
-_2023-06-13_ · [`v0.7.0b9`](https://github.com/scientific-python/repo-review/releases/tag/v0.7.0b9)
 
 - chore: bump sp-repo-review version by @henryiii in https://github.com/scientific-python/repo-review/pull/97
 - docs: Fill out some API docs by @henryiii in https://github.com/scientific-python/repo-review/pull/98
 
-**Full Changelog**: https://github.com/scientific-python/repo-review/compare/v0.7.0b8...v0.7.0b9
-
 ## Version 0.7.0 beta 8
-
-_2023-06-07_ · [`v0.7.0b8`](https://github.com/scientific-python/repo-review/releases/tag/v0.7.0b8)
 
 Features:
 
 - stderr/stdout refactor by @henryiii in https://github.com/scientific-python/repo-review/pull/95
 - `--list-all` rename and improvements, --version addition by @henryiii in https://github.com/scientific-python/repo-review/pull/96
 
-**Full Changelog**: https://github.com/scientific-python/repo-review/compare/v0.7.0b7...v0.7.0b8
-
 ## Version 0.7.0 beta 7
-
-_2023-06-07_ · [`v0.7.0b7`](https://github.com/scientific-python/repo-review/releases/tag/v0.7.0b7)
 
 This release improves the PyPI landing page a little, and touches up the docs with better versioning.
 
@@ -742,11 +592,7 @@ Documentation:
 
 (GitHub was having an outage)
 
-**Full Changelog**: https://github.com/scientific-python/repo-review/compare/v0.7.0b6...v0.7.0b7
-
 ## Version 0.7.0 beta 6
-
-_2023-06-07_ · [`v0.7.0b6`](https://github.com/scientific-python/repo-review/releases/tag/v0.7.0b6)
 
 Features:
 
@@ -759,11 +605,7 @@ Other:
 - Some getting started info in the docs by @henryiii in https://github.com/scientific-python/repo-review/pull/86
 - Auto-versioning by @henryiii in https://github.com/scientific-python/repo-review/pull/89
 
-**Full Changelog**: https://github.com/scientific-python/repo-review/compare/v0.7.0b5...v0.7.0b6
-
 ## Version 0.7.0 beta 5
-
-_2023-06-07_ · [`v0.7.0b5`](https://github.com/scientific-python/repo-review/releases/tag/v0.7.0b5)
 
 Features:
 
@@ -776,21 +618,13 @@ Other:
 - Link to live preview in docs by @henryiii in https://github.com/scientific-python/repo-review/pull/84
 - Touch up some webapp details by @henryiii in https://github.com/scientific-python/repo-review/pull/85
 
-**Full Changelog**: https://github.com/scientific-python/repo-review/compare/v0.7.0b4...v0.7.0b5
-
 ## Version 0.7.0 beta 4
-
-_2023-06-05_ · [`v0.7.0b4`](https://github.com/scientific-python/repo-review/releases/tag/v0.7.0b4)
 
 Features:
 
 - Allow name sub in URL by @henryiii in https://github.com/scientific-python/repo-review/pull/80
 
-**Full Changelog**: https://github.com/scientific-python/repo-review/compare/v0.7.0b3...v0.7.0b4
-
 ## Version 0.7.0 beta 3
-
-_2023-06-05_ · [`v0.7.0b3`](https://github.com/scientific-python/repo-review/releases/tag/v0.7.0b3)
 
 Features:
 
@@ -807,11 +641,7 @@ Docs:
 - Add docs by @henryiii in https://github.com/scientific-python/repo-review/pull/74
 - Filling out a bit more by @henryiii in https://github.com/scientific-python/repo-review/pull/79
 
-**Full Changelog**: https://github.com/scientific-python/repo-review/compare/v0.7.0b2...v0.7.0b3
-
 ## Version 0.7.2 beta 2
-
-_2023-06-04_ · [`v0.7.0b2`](https://github.com/scientific-python/repo-review/releases/tag/v0.7.0b2)
 
 Adding a few more features before release of scientific-python version. Split root/package, add URL support, and support dynamic error messages.
 
@@ -825,19 +655,11 @@ Other:
 
 - ci: prepare dist by @henryiii in https://github.com/scientific-python/repo-review/pull/73
 
-**Full Changelog**: https://github.com/scientific-python/repo-review/compare/v0.7.0b1...v0.7.0b2
-
 ## Version 0.7.0b1
-
-_2023-06-04_ · [`v0.7.0b1`](https://github.com/scientific-python/repo-review/releases/tag/v0.7.0b1)
 
 - refactor: rename and split by @henryiii in https://github.com/scientific-python/repo-review/pull/68
 
-**Full Changelog**: https://github.com/scientific-python/repo-review/compare/v0.6.1...v0.7.0b1
-
 ## Version 0.6.1
-
-_2023-06-01_ · [`v0.6.1`](https://github.com/scientific-python/repo-review/releases/tag/v0.6.1)
 
 Fix a regression in 0.6.0 with error messages not showing up, and also improve the output formatting a bit by removing the extra paragraph tag.
 
@@ -848,11 +670,7 @@ Fixes:
 - Produce the correct error message by @henryiii in https://github.com/scikit-hep/repo-review/pull/66
 - Strip paragraph tags when converting to markdown by @henryiii in https://github.com/scikit-hep/repo-review/pull/67
 
-**Full Changelog**: https://github.com/scikit-hep/repo-review/compare/v0.6.0...v0.6.1
-
 ## Version 0.6.0
-
-_2023-06-01_ · [`v0.6.0`](https://github.com/scientific-python/repo-review/releases/tag/v0.6.0)
 
 This version has a lot of internal rewrites, preparing it for splitting up into a general runner and a specific tool, as discussed at the Scientific-Python Developer Summit. This is likely the last release before the split.
 
@@ -889,11 +707,7 @@ Other:
 - @crazy4pi314 made their first contribution in https://github.com/scikit-hep/repo-review/pull/44
 - @pllim made their first contribution in https://github.com/scikit-hep/repo-review/pull/46
 
-**Full Changelog**: https://github.com/scikit-hep/repo-review/compare/v0.5.1...v0.6.0
-
 ## Version 0.5.1
-
-_2023-05-16_ · [`v0.5.1`](https://github.com/scientific-python/repo-review/releases/tag/v0.5.1)
 
 Small release fixing a check that was reporting fail instead of skip if Ruff config was not present.
 
@@ -903,11 +717,7 @@ Now using trusted publisher PyPI deployment, too.
 
 - fix: ruff requirement missing by @henryiii in https://github.com/scikit-hep/repo-review/pull/38
 
-**Full Changelog**: https://github.com/scikit-hep/repo-review/compare/v0.5.0...v0.5.1
-
 ## Version 0.5.0
-
-_2023-02-22_ · [`v0.5.0`](https://github.com/scientific-python/repo-review/releases/tag/v0.5.0)
 
 Moved from various other style checkers to Ruff, following the Scikit-HEP developer guidelines and scikit-hep/cookie.
 
@@ -915,11 +725,7 @@ Moved from various other style checkers to Ruff, following the Scikit-HEP develo
 
 - feat: move to checking for Ruff by @henryiii in https://github.com/scikit-hep/repo-review/pull/23
 
-**Full Changelog**: https://github.com/scikit-hep/repo-review/compare/v0.4.2...v0.5.0
-
 ## Version 0.4.2
-
-_2023-02-22_ · [`v0.4.2`](https://github.com/scientific-python/repo-review/releases/tag/v0.4.2)
 
 Small release moving to using Ruff internally (next release will move to using Ruff). Also fixed a potential issue with Python 3.11 requiring tomli.
 
@@ -934,11 +740,7 @@ Small release moving to using Ruff internally (next release will move to using R
 
 - @pre-commit-ci made their first contribution in https://github.com/scikit-hep/repo-review/pull/16
 
-**Full Changelog**: https://github.com/scikit-hep/repo-review/compare/v0.4.1...v0.4.2
-
 ## Version 0.4.1
-
-_2022-09-30_ · [`v0.4.1`](https://github.com/scientific-python/repo-review/releases/tag/v0.4.1)
 
 Small update that mostly adds Python 3.11 testing & a pyodide update for the docs. For development, pytest is now expected to be 7+, since we aren't testing with <7.
 
@@ -946,11 +748,7 @@ Small update that mostly adds Python 3.11 testing & a pyodide update for the doc
 
 - chore: update & include py311 by @henryiii in https://github.com/scikit-hep/repo-review/pull/15
 
-**Full Changelog**: https://github.com/scikit-hep/repo-review/compare/v0.4.0...v0.4.1
-
 ## Version 0.4.0
-
-_2022-08-19_ · [`v0.4.0`](https://github.com/scientific-python/repo-review/releases/tag/v0.4.0)
 
 This release changes to the new dependabot best practice of not limiting official versions, since it now handles v1->v2 instead of v1->v2.0.0. It also adds a check for test naming.
 
@@ -971,11 +769,7 @@ This release changes to the new dependabot best practice of not limiting officia
 
 - @matthewfeickert made their first contribution in https://github.com/scikit-hep/repo-review/pull/9
 
-**Full Changelog**: https://github.com/scikit-hep/repo-review/compare/v0.3.0...v0.4.0
-
 ## Version 0.3.0
-
-_2022-05-13_ · [`v0.3.0`](https://github.com/scientific-python/repo-review/releases/tag/v0.3.0)
 
 First version under the scikit-hep org. Added two new checks (prettier, blacken-docs), which also are applied to this codebase (repo-review self-checks fully passing). Fixed several bugs - filter warnings was misreporting, and bugbear didn't work if you pinned bugbear.
 
@@ -984,34 +778,19 @@ First version under the scikit-hep org. Added two new checks (prettier, blacken-
 - feat: prettier/blacken-docs by @henryiii in https://github.com/scikit-hep/repo-review/pull/4
 - fix: a couple of mistakes by @henryiii in https://github.com/scikit-hep/repo-review/pull/5
 
-**Full Changelog**: https://github.com/scikit-hep/repo-review/compare/v0.2.4...v0.3.0
-
 ## Version 0.2.4
-
-_2022-04-29_ · [`v0.2.4`](https://github.com/scientific-python/repo-review/releases/tag/v0.2.4)
 
 Updates to the web app, like the ability to pre-fill the fields with `?repo=...&branch=...`. The web app now prints `[skipped]` as well. The app now passes its own tests. Lots of documentation updates to the checks, and several fixes for the checks.
 
-**Full Changelog**: https://github.com/henryiii/scikit-hep-repo-review/compare/v0.2.3...v0.2.4
-
 ## Version 0.2.3
-
-_2022-04-19_ · [`v0.2.3`](https://github.com/scientific-python/repo-review/releases/tag/v0.2.3)
 
 Minor updates to error messages, also correcting a skip issue with GHA.
 
 ## Version 0.2.2
 
-_2022-04-15_ · [`v0.2.2`](https://github.com/scientific-python/repo-review/releases/tag/v0.2.2)
-
 Integrating webapp Python code for simpler usage.
-
-**Full Changelog**: https://github.com/henryiii/scikit-hep-repo-review/compare/v0.2.1...v0.2.2
 
 ## Version 0.2.1
 
-_2022-04-14_ · [`v0.2.1`](https://github.com/scientific-python/repo-review/releases/tag/v0.2.1)
-
 Fix for skipping checks.
 
-**Full Changelog**: https://github.com/henryiii/scikit-hep-repo-review/compare/v0.2.0...v0.2.1
