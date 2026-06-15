@@ -1,5 +1,44 @@
 # Changelog
 
+## Version 1.2.0
+
+_2026-06-15_ · [`v1.2.0`](https://github.com/scientific-python/repo-review/releases/tag/v1.2.0)
+
+Features for the webapp:
+
+- Run Pyodide in a web worker by @henryiii in https://github.com/scientific-python/repo-review/pull/404
+
+Fixes:
+
+- Core correctness fixes and polish by @henryiii in https://github.com/scientific-python/repo-review/pull/395
+- Correct `GHPath` iterdir/glob/is_dir traversal semantics by @henryiii in https://github.com/scientific-python/repo-review/pull/394
+
+Fixes for the webapp:
+
+- Webapp security, races, and lint enforcement by @henryiii in https://github.com/scientific-python/repo-review/pull/397
+
+Internal:
+
+- Update Pyodide to 314.0.0 (Python 3.14) by @henryiii in https://github.com/scientific-python/repo-review/pull/402
+- Repo config fixes (mypy files, action injection, PEP 639, dependabot) by @henryiii in https://github.com/scientific-python/repo-review/pull/396
+
+CI:
+
+- Unblock docs build broken by erbsland-sphinx-ansi 1.2.2 by @henryiii in https://github.com/scientific-python/repo-review/pull/399
+
+Docs:
+
+- Move changelog into the repo by @henryiii in https://github.com/scientific-python/repo-review/pull/406
+
+Dependencies:
+
+- Bump the npm group with 7 updates by @dependabot in https://github.com/scientific-python/repo-review/pull/403
+- Bump the npm group across 1 directory with 3 updates by @dependabot in https://github.com/scientific-python/repo-review/pull/400
+- Bump the github-actions group with 2 updates by @dependabot in https://github.com/scientific-python/repo-review/pull/401
+- Update pre-commit hooks by @pre-commit-ci in https://github.com/scientific-python/repo-review/pull/393
+
+**Full Changelog**: https://github.com/scientific-python/repo-review/compare/v1.1.3...v1.2.0
+
 ## Version 1.1.3
 
 _2026-05-28_ · [`v1.1.3`](https://github.com/scientific-python/repo-review/releases/tag/v1.1.3)
