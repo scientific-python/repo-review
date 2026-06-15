@@ -94,7 +94,6 @@ docs = [
   "sphinx-copybutton",
   "sphinxcontrib-programoutput",
   "sphinxext-opengraph",
-  "sphinx-github-changelog",
 ]
 
 [tool.hatch.envs.default]
