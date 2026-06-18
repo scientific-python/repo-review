@@ -585,6 +585,7 @@ export class App extends React.Component<AppProps, AppState> {
                   onFocus={() => this.fetchRepoReferences(this.state.repo)}
                   sx={{ flexGrow: 2, minWidth: 170 }}
                   slotProps={{
+                    ...params.slotProps,
                     input: {
                       ...params.slotProps.input,
                       endAdornment: (
