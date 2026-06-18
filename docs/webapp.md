@@ -50,7 +50,7 @@ the Docs Addons injects global keyboard hotkeys (such as `/` to focus search)
 that capture keystrokes before they reach the webapp's input fields without
 correctly detecting the input fields. For now, disable the Addons hotkeys to
 type in the webapp — see
-[readthedocs/addons#639](https://github.com/readthedocs/addons/issues/639#issuecomment-4744025028).
+[readthedocs/addons#639](https://github.com/readthedocs/addons/issues/639).
 :::
 
 If you copy the webapp into your page, use this header (with the link to where
