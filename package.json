@@ -1,6 +1,6 @@
 {
   "name": "repo-review-webapp",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Framework that can run checks on repos",
   "license": "BSD-3-Clause",
   "repository": {
