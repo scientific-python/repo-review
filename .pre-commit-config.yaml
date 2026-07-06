@@ -11,14 +11,14 @@ repos:
         additional_dependencies: [black==26.*]
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: "c59bba8fb259db0fec2bbb77ad8ba51ea7341b56"  # frozen: v0.15.20
+    rev: "c59bba8fb259db0fec2bbb77ad8ba51ea7341b56" # frozen: v0.15.20
     hooks:
       - id: ruff-check
         args: ["--fix", "--show-fixes"]
       - id: ruff-format
 
   - repo: https://github.com/rbubley/mirrors-prettier
-    rev: "39e2973981e6d2f9b6c543b0086a2d2393abdc89"  # frozen: v3.9.4
+    rev: "39e2973981e6d2f9b6c543b0086a2d2393abdc89" # frozen: v3.9.4
     hooks:
       - id: prettier
 
@@ -76,19 +76,19 @@ repos:
         exclude: .pre-commit-config.yaml
 
   - repo: https://github.com/henryiii/validate-pyproject-schema-store
-    rev: a8ee8203d36b01b59af504dac4ae7f96174b60a4  # frozen: 2026.07.06
+    rev: a8ee8203d36b01b59af504dac4ae7f96174b60a4 # frozen: 2026.07.06
     hooks:
       - id: validate-pyproject
 
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 1a4bb160cab6417b3045e1b37b6b72449243e658  # frozen: 0.37.4
+    rev: 1a4bb160cab6417b3045e1b37b6b72449243e658 # frozen: 0.37.4
     hooks:
       - id: check-dependabot
       - id: check-github-workflows
       - id: check-readthedocs
 
   - repo: https://github.com/zizmorcore/zizmor-pre-commit
-    rev: e3eebf65325ccc992422292cb7a4baee967cf815  # frozen: v1.26.1
+    rev: e3eebf65325ccc992422292cb7a4baee967cf815 # frozen: v1.26.1
     hooks:
       - id: zizmor
         files: '^(\.github/(workflows/.*|dependabot\.yml)|action\.yml)$'
