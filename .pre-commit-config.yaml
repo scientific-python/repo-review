@@ -11,14 +11,14 @@ repos:
         additional_dependencies: [black==26.*]
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: "39d9ac5938dadb73df0564a45f163e25ff9fa6e2"  # frozen: v0.16.1
+    rev: "39d9ac5938dadb73df0564a45f163e25ff9fa6e2" # frozen: v0.16.1
     hooks:
       - id: ruff-check
         args: ["--fix", "--show-fixes"]
       - id: ruff-format
 
   - repo: https://github.com/rbubley/mirrors-prettier
-    rev: "0ee178619d696787ca73d210cc191d720868c631"  # frozen: v3.9.6
+    rev: "0ee178619d696787ca73d210cc191d720868c631" # frozen: v3.9.6
     hooks:
       - id: prettier
 
@@ -43,7 +43,7 @@ repos:
       - id: rst-inline-touching-normal
 
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: 41e691678310dfd3833f7ab4e180ddb014310356  # frozen: v2.3.0
+    rev: 41e691678310dfd3833f7ab4e180ddb014310356 # frozen: v2.3.0
     hooks:
       - id: mypy
         files: (src|tests)
@@ -57,7 +57,7 @@ repos:
           - types-PyYAML
 
   - repo: https://github.com/codespell-project/codespell
-    rev: 57b21406f092110c18776e39b0bda50d37c945c8  # frozen: v2.4.3
+    rev: 57b21406f092110c18776e39b0bda50d37c945c8 # frozen: v2.4.3
     hooks:
       - id: codespell
         args: ["-Lhist,absense", "-w"]
@@ -76,7 +76,7 @@ repos:
         exclude: .pre-commit-config.yaml
 
   - repo: https://github.com/henryiii/validate-pyproject-schema-store
-    rev: 9efb3138f1d55c197b17348a8dd5b732d384603f  # frozen: 2026.08.01
+    rev: 9efb3138f1d55c197b17348a8dd5b732d384603f # frozen: 2026.08.01
     hooks:
       - id: validate-pyproject
 
@@ -88,7 +88,7 @@ repos:
       - id: check-readthedocs
 
   - repo: https://github.com/zizmorcore/zizmor-pre-commit
-    rev: 451b56af716f9f0d0c2b816503a3fd0cf8b036fa  # frozen: v1.29.0
+    rev: 451b56af716f9f0d0c2b816503a3fd0cf8b036fa # frozen: v1.29.0
     hooks:
       - id: zizmor
         files: '^(\.github/(workflows/.*|dependabot\.yml)|action\.yml)$'
