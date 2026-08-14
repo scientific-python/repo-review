@@ -35,3 +35,7 @@ updates:
           - "*"
     cooldown:
       default-days: 7
+    ignore:
+      # typescript-eslint does not support the TypeScript 7 API yet
+      - dependency-name: "typescript"
+        versions: [">=7"]
