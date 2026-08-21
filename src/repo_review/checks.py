@@ -47,7 +47,7 @@ class Check(Protocol):
         identical to omitting this member.
         """
 
-    def check(self) -> bool | None | str:
+    def check(self) -> bool | str | None:
         """
         This is a check. The docstring is used as the failure message if
         `False` is returned. Returning None is a skip. Returning `True` (or an
