@@ -216,6 +216,7 @@ ignore = [
   "C9",      # Complexity
   "S",       # TODO
   "ANN401",  # TODO (Any)
+  "CPY001",  # Copyright notice at top of file
 ]
 typing-modules = ["repo_review._compat.typing"]
 pydocstyle.convention = "pep257"
