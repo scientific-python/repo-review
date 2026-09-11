@@ -2,3 +2,7 @@ rules:
   concurrency-limits:
     ignore:
       - copilot-setup-steps.yml
+  self-repository:
+    # actionlint does not support the `$/` syntax yet
+    ignore:
+      - ci.yml
