@@ -36,10 +36,12 @@ jobs:
           no-cache: true
       - name: Run prek
         uses: j178/prek-action@4e14d07f9231acabce116ccfca13b13dd9755ece # v3.0.0
+        background: true
         with:
           cache: false
       - name: Run PyLint
         run: pipx run --python=python hatch run pylint:lint --output-format=github
+        background: true
       - name: Install with cache
         run: bun install --frozen-lockfile
       - name: Run linter
@@ -48,6 +50,8 @@ jobs:
         run: bun run type
       - name: Run tests
         run: bun run test
+      - name: Wait for prek and PyLint
+        wait-all:
 
   checks:
     name: Check Python on ${{ matrix.runs-on }}
@@ -64,26 +68,47 @@ jobs:
 
       # Last one is activated
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        background: true
         with:
           python-version: |
-            3.10
             3.11
             3.12
             3.14
-            3.15
             3.13
-          allow-prereleases: true
 
       - name: Setup uv
         uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
         with:
           enable-cache: false
 
-      - name: Install hatch
-        run: uv pip install --system hatch
+      # Faster than setup-python for these versions
+      - name: Install Python 3.10 and 3.15
+        shell: bash
+        run: |
+          uv python install 3.10 3.15
+          uv python dir --bin >> "$GITHUB_PATH"
 
-      - name: Test package (all Pythons)
-        run: hatch test -a
+      - wait-all:
+
+      # Creating the config in parallel races on Windows
+      - name: Install hatch
+        run: |
+          uv pip install --system hatch
+          hatch config restore
+
+      - parallel:
+          - name: Test Python 3.10
+            run: hatch test -py 3.10
+          - name: Test Python 3.11
+            run: hatch test -py 3.11
+          - name: Test Python 3.12
+            run: hatch test -py 3.12
+          - name: Test Python 3.13
+            run: hatch test -py 3.13
+          - name: Test Python 3.14
+            run: hatch test -py 3.14
+          - name: Test Python 3.15
+            run: hatch test -py 3.15
 
   dist:
     name: Distribution build
@@ -147,6 +172,6 @@ jobs:
           persist-credentials: false
 
       - name: Run repo-review action
-        uses: ./
+        uses: $/
         with:
           plugins: sp-repo-review==2026.08.14
