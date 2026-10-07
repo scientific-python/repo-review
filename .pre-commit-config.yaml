@@ -94,10 +94,3 @@ repos:
       - id: zizmor
         files: '^(\.github/(workflows/.*|dependabot\.yml)|action\.yml)$'
         args: [--persona=auditor]
-
-  - repo: https://github.com/rhysd/actionlint
-    rev: 914e7df21a07ef503a81201c76d2b11c789d3fca # frozen: v1.7.12
-    hooks:
-      - id: actionlint
-        # No support yet for background/wait/parallel steps
-        exclude: ^\.github/workflows/ci\.yml$

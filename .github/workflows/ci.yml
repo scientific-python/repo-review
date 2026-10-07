@@ -165,6 +165,6 @@ jobs:
           persist-credentials: false
 
       - name: Run repo-review action
-        uses: ./
+        uses: $/
         with:
           plugins: sp-repo-review==2026.08.14
