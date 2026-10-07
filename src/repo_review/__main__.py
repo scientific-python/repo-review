@@ -390,7 +390,7 @@ def main(args: list[str] | None = None) -> None:
     lvl = parsed.log_level or os.getenv("REPO_REVIEW_LOG_LEVEL")
     if lvl:
         level = getattr(logging, lvl.upper(), logging.INFO)
-        handler = RichHandler()
+        handler = RichHandler(console=rich.console.Console(stderr=True))
         # Configure only the `repo_review` logger to avoid enabling global logging
         repo_logger = logging.getLogger("repo_review")
         repo_logger.setLevel(level)
