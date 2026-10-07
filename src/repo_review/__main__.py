@@ -287,11 +287,12 @@ def display_output(
             assert_never(format_opt)
 
 
-def _remote_path_processor(package: Path) -> Path | GHPath:
-    if not str(package).startswith("gh:"):
-        return package
+def _remote_path_processor(package: str) -> Path | GHPath:
+    # Parse the raw string; pathlib would rewrite "/" on Windows.
+    if not package.startswith("gh:"):
+        return Path(package)
 
-    _, org_repo_branch, *p = str(package).split(":", maxsplit=2)
+    _, org_repo_branch, *p = package.split(":", maxsplit=2)
     if "@" in org_repo_branch:
         org_repo, branch = org_repo_branch.split("@", maxsplit=1)
     else:
@@ -334,7 +335,6 @@ def main(args: list[str] | None = None) -> None:
     )
     parser.add_argument(
         "packages",
-        type=Path,
         nargs="*",
         help="Local path or gh:org/repo[@branch][:path]",
     )
