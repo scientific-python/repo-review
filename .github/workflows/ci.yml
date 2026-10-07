@@ -36,10 +36,12 @@ jobs:
           no-cache: true
       - name: Run prek
         uses: j178/prek-action@4e14d07f9231acabce116ccfca13b13dd9755ece # v3.0.0
+        background: true
         with:
           cache: false
       - name: Run PyLint
         run: pipx run --python=python hatch run pylint:lint --output-format=github
+        background: true
       - name: Install with cache
         run: bun install --frozen-lockfile
       - name: Run linter
@@ -48,6 +50,8 @@ jobs:
         run: bun run type
       - name: Run tests
         run: bun run test
+      - name: Wait for prek and PyLint
+        wait-all:
 
   checks:
     name: Check Python on ${{ matrix.runs-on }}
@@ -83,7 +87,19 @@ jobs:
         run: uv pip install --system hatch
 
       - name: Test package (all Pythons)
-        run: hatch test -a
+        parallel:
+          - name: Test Python 3.10
+            run: hatch test -py 3.10
+          - name: Test Python 3.11
+            run: hatch test -py 3.11
+          - name: Test Python 3.12
+            run: hatch test -py 3.12
+          - name: Test Python 3.13
+            run: hatch test -py 3.13
+          - name: Test Python 3.14
+            run: hatch test -py 3.14
+          - name: Test Python 3.15
+            run: hatch test -py 3.15
 
   dist:
     name: Distribution build
