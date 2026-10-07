@@ -27,6 +27,7 @@ classifiers = [
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
   "Programming Language :: Python :: 3.14",
+  "Programming Language :: Python :: 3.15",
   "Programming Language :: Python",
   "Topic :: Software Development :: Quality Assurance",
   "Topic :: Software Development :: Libraries :: Python Modules",
@@ -40,7 +41,7 @@ dependencies = [
 ]
 
 [project.urls]
-Changelog = "https://github.com/scientific-python/repo-review/releases"
+Changelog = "https://repo-review.readthedocs.io/en/latest/changelog.html"
 Demo = "https://scientific-python.github.io/repo-review"
 Documentation = "https://repo-review.readthedocs.io"
 Homepage = "https://repo-review.readthedocs.io"
@@ -101,10 +102,6 @@ installer = "uv"
 
 [tool.uv]
 exclude-newer = "7 days"
-# erbsland-sphinx-ansi 1.2.4 fixes a crash with Sphinx 9.1 / docutils 0.22; the
-# broken 1.2.2 is inside the 7-day window while the fix is not. Remove this once
-# 1.2.4 ages past the window (after 2026-06-17).
-exclude-newer-package = { "erbsland-sphinx-ansi" = "2026-06-11" }
 
 [tool.hatch.envs.hatch-test]
 features = ["cli"]
@@ -280,5 +277,15 @@ replace = "repo-review-webapp@{new_version}"
 
 [[tool.bumpversion.files]]
 filename = "docs/webapp.md"
+search = "repo-review~={current_version}"
+replace = "repo-review~={new_version}"
+
+[[tool.bumpversion.files]]
+filename = "docs/live-demo.md"
+search = "repo-review~={current_version}"
+replace = "repo-review~={new_version}"
+
+[[tool.bumpversion.files]]
+filename = "src/repo-review-app/main.tsx"
 search = "repo-review~={current_version}"
 replace = "repo-review~={new_version}"
