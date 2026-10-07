@@ -21,6 +21,7 @@ repos:
     rev: "0ee178619d696787ca73d210cc191d720868c631" # frozen: v3.9.6
     hooks:
       - id: prettier
+        exclude: "^docs/_templates/"
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: 3e8a8703264a2f4a69428a0aa4dcb512790b2c8c # frozen: v6.0.0
