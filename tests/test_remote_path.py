@@ -5,8 +5,8 @@ import pytest
 
 pytest.importorskip("rich")
 
-from repo_review.__main__ import _remote_path_processor, main  # noqa: E402
-from repo_review.ghpath import GHPath  # noqa: E402
+from repo_review.__main__ import _remote_path_processor, main
+from repo_review.ghpath import GHPath
 
 
 @pytest.fixture
