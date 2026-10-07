@@ -6,7 +6,7 @@ import pytest
 pytest.importorskip("rich")
 pytest.importorskip("sp_repo_review")
 
-from repo_review.__main__ import main  # noqa: E402
+from repo_review.__main__ import main
 
 
 def test_log_output_does_not_corrupt_stdout(
