@@ -28,7 +28,7 @@ required:
 
   mountApp({
     header: false,
-    deps: ["repo-review~=1.2.1", "sp-repo-review==2026.04.04"],
+    deps: ["repo-review~=1.2.1", "sp-repo-review==2026.08.14"],
   });
 </script>
 ```
@@ -78,7 +78,7 @@ And then after that, call the script with whatever dependencies you want:
 
   mountApp({
     header: false,
-    deps: ["repo-review~=1.2.1", "sp-repo-review==2026.04.04"],
+    deps: ["repo-review~=1.2.1", "sp-repo-review==2026.08.14"],
   });
 </script>
 ```
@@ -104,7 +104,7 @@ JavaScript setup:
 "url_sync": true,
 "deps": [
 "repo-review~=1.2.1",
-"sp-repo-review==2026.04.04"
+"sp-repo-review==2026.08.14"
 ]
 }
 :::

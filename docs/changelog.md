@@ -1,5 +1,16 @@
 # Changelog
 
+## Version 1.2.1
+
+Fixes for the webapp:
+
+- Restore Autocomplete input ref under MUI v9 by @henryiii in https://github.com/scientific-python/repo-review/pull/407
+
+Docs and internal:
+
+- Add DOM-based test lane for ref/effect regressions by @henryiii in https://github.com/scientific-python/repo-review/pull/409
+- Note Read the Docs hotkey conflict when self-hosting by @henryiii in https://github.com/scientific-python/repo-review/pull/410
+
 ## Version 1.2.0
 
 Features for the webapp:
