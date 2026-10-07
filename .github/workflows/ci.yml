@@ -86,20 +86,26 @@ jobs:
       - name: Install hatch
         run: uv pip install --system hatch
 
-      - name: Test package (all Pythons)
-        parallel:
-          - name: Test Python 3.10
-            run: hatch test -py 3.10
-          - name: Test Python 3.11
-            run: hatch test -py 3.11
-          - name: Test Python 3.12
-            run: hatch test -py 3.12
-          - name: Test Python 3.13
-            run: hatch test -py 3.13
-          - name: Test Python 3.14
-            run: hatch test -py 3.14
-          - name: Test Python 3.15
-            run: hatch test -py 3.15
+      - name: Test Python 3.10
+        run: hatch test -py 3.10
+        background: true
+      - name: Test Python 3.11
+        run: hatch test -py 3.11
+        background: true
+      - name: Test Python 3.12
+        run: hatch test -py 3.12
+        background: true
+      - name: Test Python 3.13
+        run: hatch test -py 3.13
+        background: true
+      - name: Test Python 3.14
+        run: hatch test -py 3.14
+        background: true
+      - name: Test Python 3.15
+        run: hatch test -py 3.15
+        background: true
+      - name: Wait for tests
+        wait-all:
 
   dist:
     name: Distribution build
