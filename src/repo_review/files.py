@@ -41,10 +41,10 @@ def collect_prefetch_files() -> dict[str, set[str]]:
     Produces a mapping with keys ``"root"`` and/or ``"package"`` to sets of
     files that should be prefetched.
 
-    Entry-points whose name is ``"package"`` are collected under the
-    ``"package"`` key (resolved relative to the package directory). All other
-    entry-points (name ``"root"`` or empty) are collected under ``"root"``
-    (resolved relative to the repository root).
+    Entry-points named ``"package"`` are collected under the ``"package"``
+    key (resolved relative to the package directory). Entry-points named
+    ``"root"`` are collected under ``"root"`` (resolved relative to the
+    repository root). Any other name is ignored with a warning.
 
     :return: A mapping with keys ``"root"`` and/or ``"package"``.
     """
