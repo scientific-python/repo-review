@@ -68,20 +68,27 @@ jobs:
 
       # Last one is activated
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        background: true
         with:
           python-version: |
-            3.10
             3.11
             3.12
             3.14
-            3.15
             3.13
-          allow-prereleases: true
 
       - name: Setup uv
         uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
         with:
           enable-cache: false
+
+      # Faster than setup-python for these versions
+      - name: Install Python 3.10 and 3.15
+        shell: bash
+        run: |
+          uv python install 3.10 3.15
+          uv python dir --bin >> "$GITHUB_PATH"
+
+      - wait-all:
 
       # Creating the config in parallel races on Windows
       - name: Install hatch
