@@ -1,4 +1,5 @@
 import json
+import urllib.error
 from pathlib import Path
 
 import pytest
@@ -55,3 +56,18 @@ def test_main_passes_raw_string(monkeypatch: pytest.MonkeyPatch) -> None:
 
     assert seen == ["gh:org/repo@main:src/pkg"]
     assert isinstance(seen[0], str)
+
+
+def test_remote_path_offline(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    def fake_open(url: str) -> str:  # noqa: ARG001
+        msg = "Name or service not known"
+        raise urllib.error.URLError(msg)
+
+    monkeypatch.setattr(GHPath, "open_url", staticmethod(fake_open))
+    with pytest.raises(SystemExit) as excinfo:
+        _remote_path_processor("gh:org/repo")
+
+    assert excinfo.value.code == 1
+    assert "Name or service not known" in capsys.readouterr().err

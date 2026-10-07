@@ -304,6 +304,10 @@ def _remote_path_processor(package: str) -> Path | GHPath:
         rich.print(f"[red][bold]Error[/bold] accessing {e.url}", file=sys.stderr)
         rich.print(f"[red]{e}", file=sys.stderr)
         raise SystemExit(1) from None
+    except urllib.error.URLError as e:
+        rich.print(f"[red][bold]Error[/bold] accessing {package}", file=sys.stderr)
+        rich.print(f"[red]{e.reason}", file=sys.stderr)
+        raise SystemExit(1) from None
 
 
 def main(args: list[str] | None = None) -> None:
