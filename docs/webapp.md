@@ -28,7 +28,7 @@ required:
 
   mountApp({
     header: false,
-    deps: ["repo-review~=1.2.1", "sp-repo-review==2026.08.14"],
+    deps: ["repo-review~=1.2.2", "sp-repo-review==2026.08.14"],
   });
 </script>
 ```
@@ -37,8 +37,8 @@ Pin to a specific version for stability:
 
 ```html
 <script type="module">
-  import { mountApp } from "https://cdn.jsdelivr.net/npm/repo-review-webapp@1.2.1/dist/repo-review-app.mjs";
-  mountApp({ header: false, deps: ["repo-review~=1.2.1"] });
+  import { mountApp } from "https://cdn.jsdelivr.net/npm/repo-review-webapp@1.2.2/dist/repo-review-app.mjs";
+  mountApp({ header: false, deps: ["repo-review~=1.2.2"] });
 </script>
 ```
 
@@ -78,7 +78,7 @@ And then after that, call the script with whatever dependencies you want:
 
   mountApp({
     header: false,
-    deps: ["repo-review~=1.2.1", "sp-repo-review==2026.08.14"],
+    deps: ["repo-review~=1.2.2", "sp-repo-review==2026.08.14"],
   });
 </script>
 ```
@@ -99,11 +99,11 @@ that you can embed using the `anywidget` directive, which requires no
 JavaScript setup:
 
 ```markdown
-:::{anywidget} https://cdn.jsdelivr.net/npm/repo-review-webapp@1.2.1/dist/repo-review-anywidget.mjs
+:::{anywidget} https://cdn.jsdelivr.net/npm/repo-review-webapp@1.2.2/dist/repo-review-anywidget.mjs
 {
 "url_sync": true,
 "deps": [
-"repo-review~=1.2.1",
+"repo-review~=1.2.2",
 "sp-repo-review==2026.08.14"
 ]
 }

@@ -1,5 +1,20 @@
 # Changelog
 
+## Version 1.2.2
+
+Fixes:
+
+- Keep `gh:` specs as strings so Windows paths are not rewritten by @henryiii in https://github.com/scientific-python/repo-review/pull/429
+- Send `--log-level` output to stderr by @henryiii in https://github.com/scientific-python/repo-review/pull/431
+- Report network errors for `gh:` specs instead of a traceback by @henryiii in https://github.com/scientific-python/repo-review/pull/430
+
+Docs and internal:
+
+- Add GitHub link at top of pages by @henryiii in https://github.com/scientific-python/repo-review/pull/427
+- Match `collect_prefetch_files` docstring to behavior by @henryiii in https://github.com/scientific-python/repo-review/pull/432
+- Clean up stale config and pins by @henryiii in https://github.com/scientific-python/repo-review/pull/426
+- Run independent CI steps in parallel by @henryiii in https://github.com/scientific-python/repo-review/pull/428
+
 ## Version 1.2.1
 
 Fixes for the webapp:

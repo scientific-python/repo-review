@@ -23,7 +23,7 @@ This demo is using two of the most popular plugins: `sp-repo-review` and
   mountApp({
     header: false,
     deps: [
-      "repo-review~=1.2.1",
+      "repo-review~=1.2.2",
       "sp-repo-review==2026.08.14",
       "validate-pyproject[all]~=0.26.0",
       "validate-pyproject-schema-store==2026.10.06",
