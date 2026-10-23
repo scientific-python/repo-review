@@ -2,7 +2,7 @@
 
 ## Overview
 
-**repo-review**: Python 3.10+ framework for validating repository configuration (not source code).
+**repo-review**: Python 3.11+ framework for validating repository configuration (not source code).
 Supports CLI, plugins, GitHub API, pre-commit, CI, and web (via Pyodide).
 
 - Core: run checks over repo structure/config
@@ -143,7 +143,7 @@ Checks are classes with:
 
 ## Key Notes
 
-- Python ≥3.10 (uses modern syntax)
+- Python ≥3.11 (uses modern syntax)
 - Pre-commit handles formatting, linting, typing
 - Tests are fast (~5–10s)
 - Webapp uses React (class components) + Pyodide; built with `bun`

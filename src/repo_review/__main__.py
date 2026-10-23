@@ -10,8 +10,6 @@ __lazy_modules__ = [
     "logging",
     "os",
     "pathlib",
-    "repo_review._compat",
-    "repo_review._compat.typing",
     "repo_review.checks",
     "repo_review.families",
     "repo_review.ghpath",
@@ -42,7 +40,7 @@ import os
 import sys
 import urllib.error
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any, Literal, assert_never
 
 import rich
 import rich.console
@@ -54,7 +52,6 @@ import rich.tree
 from rich.logging import RichHandler
 
 from repo_review import __version__
-from repo_review._compat.typing import assert_never
 from repo_review.checks import get_check_description, get_check_url
 from repo_review.families import (
     Family,
@@ -75,8 +72,7 @@ from repo_review.processor import (
 TYPE_CHECKING = False
 if TYPE_CHECKING:
     from collections.abc import Mapping
-
-    from ._compat.importlib.resources.abc import Traversable
+    from importlib.resources.abc import Traversable
 
 __all__ = ["Formats", "Show", "Status", "main"]
 
@@ -423,9 +419,7 @@ def main(args: list[str] | None = None) -> None:
         if stderr_fmt == "json":
             print("{", file=sys.stderr)
 
-    supports_async = (
-        sys.version_info >= (3, 11) and importlib.util.find_spec("httpx") is not None
-    )
+    supports_async = importlib.util.find_spec("httpx") is not None
     result = 0
     for n, package in enumerate(packages):
         if supports_async and isinstance(package, GHPath):

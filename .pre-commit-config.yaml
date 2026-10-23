@@ -54,7 +54,6 @@ repos:
           - markdown-it-py
           - pytest
           - rich
-          - tomli
           - types-PyYAML
 
   - repo: https://github.com/codespell-project/codespell

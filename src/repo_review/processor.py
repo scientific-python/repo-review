@@ -41,14 +41,8 @@ from .ghpath import EmptyTraversable
 
 TYPE_CHECKING = False
 if TYPE_CHECKING:
-    import sys
-
-    from ._compat.importlib.resources.abc import Traversable
-
-    if sys.version_info >= (3, 11):
-        from typing import Self
-    else:
-        from typing_extensions import Self
+    from importlib.resources.abc import Traversable
+    from typing import Self
 
 __all__ = [
     "CollectionReturn",
