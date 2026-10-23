@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 __lazy_modules__ = [
-    f"{__spec__.parent}._compat",
+    "tomllib",
     f"{__spec__.parent}.ghpath",
     "graphlib",
     "importlib",
@@ -12,18 +12,17 @@ __lazy_modules__ = [
 import graphlib
 import importlib.metadata
 import inspect
+import tomllib
 import typing
 from typing import Any
 
-from ._compat import tomllib
 from .ghpath import EmptyTraversable
 
 TYPE_CHECKING = False
 if TYPE_CHECKING:
     from collections.abc import Callable, Mapping
     from collections.abc import Set as AbstractSet
-
-    from ._compat.importlib.resources.abc import Traversable
+    from importlib.resources.abc import Traversable
 
 __all__ = [
     "apply_fixtures",

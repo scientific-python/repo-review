@@ -82,10 +82,10 @@ jobs:
           enable-cache: false
 
       # Faster than setup-python for these versions
-      - name: Install Python 3.10 and 3.15
+      - name: Install Python 3.15
         shell: bash
         run: |
-          uv python install 3.10 3.15
+          uv python install 3.15
           uv python dir --bin >> "$GITHUB_PATH"
 
       - wait-all:
@@ -97,8 +97,6 @@ jobs:
           hatch config restore
 
       - parallel:
-          - name: Test Python 3.10
-            run: hatch test -py 3.10
           - name: Test Python 3.11
             run: hatch test -py 3.11
           - name: Test Python 3.12

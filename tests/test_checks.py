@@ -1,6 +1,7 @@
 import dataclasses
 import importlib.metadata
 import sys
+from importlib.resources.abc import Traversable
 from pathlib import Path
 from types import ModuleType
 from typing import ClassVar
@@ -8,7 +9,6 @@ from typing import ClassVar
 import pytest
 
 import repo_review.processor
-from repo_review._compat.importlib.resources.abc import Traversable
 from repo_review.checks import collect_checks
 
 

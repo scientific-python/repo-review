@@ -4,9 +4,8 @@ You can suggest files to pre-load in parallel when async loading is available.
 Prefetching a small set of likely-used files (for example `pyproject.toml` and
 CI/workflow configs) can significantly speed up checks that read repository
 config, and keep the webapp responsive. Files not in this set will be loaded
-normally. Does nothing on local repositories. Prefetching is only performed on
-Python 3.11+ when async support (e.g. `httpx`) is available; on Python 3.10
-prefetching is skipped and entry-points will be ignored.
+normally. Does nothing on local repositories. Prefetching is only performed when
+async support (e.g. `httpx`) is available.
 
 Only prefetch files that will be read; this will needlessly read the file if
 the file is only checked for existence.

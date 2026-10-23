@@ -3,7 +3,6 @@ from __future__ import annotations
 import asyncio
 import importlib.metadata
 import logging
-import sys
 
 from ._timer import log_timer
 
@@ -74,13 +73,10 @@ async def process_prefetch_files(
     package directory (``start / subdir``, or ``start`` when *subdir* is
     empty).
     """
-    if sys.version_info >= (3, 11):
-        with log_timer(logger, "Prefetching files for %s", start):
-            async with asyncio.TaskGroup() as tg:
-                for key, patterns in files.items():
-                    base = (
-                        start.joinpath(subdir) if key == "package" and subdir else start
-                    )
-                    for f in patterns:
-                        for p in base.glob(f):
-                            tg.create_task(p.prefetch())
+    with log_timer(logger, "Prefetching files for %s", start):
+        async with asyncio.TaskGroup() as tg:
+            for key, patterns in files.items():
+                base = start.joinpath(subdir) if key == "package" and subdir else start
+                for f in patterns:
+                    for p in base.glob(f):
+                        tg.create_task(p.prefetch())

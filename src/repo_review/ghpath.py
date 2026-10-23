@@ -18,12 +18,12 @@ import fnmatch
 import io
 import json
 import logging
+import os
 import sys
 import typing
-from typing import Literal
+from importlib.resources.abc import Traversable
+from typing import Literal, Self, assert_never
 
-from ._compat.importlib.resources.abc import Traversable
-from ._compat.typing import Self, assert_never
 from ._timer import log_timer
 
 TYPE_CHECKING = False
@@ -210,11 +210,12 @@ class GHPath(Traversable):
             _fetched=self._fetched,
         )
 
-    def joinpath(self, child: str) -> GHPath:
-        return self._with_path(f"{self.path}/{child}")
+    def joinpath(self, *descendants: str | os.PathLike[str]) -> GHPath:
+        parts = (os.fspath(d) for d in descendants)
+        return self._with_path("/".join([self.path, *parts]))
 
-    def __truediv__(self, child: str) -> GHPath:
-        return self._with_path(f"{self.path}/{child}")
+    def __truediv__(self, child: str | os.PathLike[str]) -> GHPath:
+        return self.joinpath(child)
 
     def iterdir(self) -> Iterator[GHPath]:
         if self.path:
@@ -322,10 +323,10 @@ class EmptyTraversable(Traversable):
     ) -> io.IOBase:
         raise FileNotFoundError(self._fake_name)
 
-    def joinpath(self, child: str) -> EmptyTraversable:
+    def joinpath(self, *descendants: str | os.PathLike[str]) -> EmptyTraversable:
         return self.__class__(is_a_dir=False)
 
-    def __truediv__(self, child: str) -> EmptyTraversable:
+    def __truediv__(self, child: str | os.PathLike[str]) -> EmptyTraversable:
         return self.__class__(is_a_dir=False)
 
     def iterdir(self) -> Iterator[EmptyTraversable]:

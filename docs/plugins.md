@@ -25,7 +25,7 @@ checks and families produce multiple items, so they can be under any name.
 
 ## Testing
 
-If you'd like to test your plugin, add `repo-review; python_version>="3.10"` to
+If you'd like to test your plugin, add `repo-review; python_version>="3.11"` to
 your test dependencies (if your package is only a plugin for repo-review, you
 don't need the Python limit there). Then add some valid and/or invalid examples
 to your test suite (you can write them out during testing, as well, which is

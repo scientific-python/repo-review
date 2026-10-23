@@ -5,7 +5,7 @@ Helpers for testing repo-review plugins.
 from __future__ import annotations
 
 __lazy_modules__ = [
-    f"{__spec__.parent}._compat",
+    "tomllib",
     f"{__spec__.parent}.checks",
     f"{__spec__.parent}.fixtures",
     f"{__spec__.parent}.processor",
@@ -17,9 +17,9 @@ __lazy_modules__ = [
 
 import importlib.metadata
 import textwrap
+import tomllib
 from typing import Any
 
-from ._compat import tomllib
 from .checks import Check, get_check_url, process_result_bool
 from .fixtures import apply_fixtures
 from .processor import Result
@@ -33,7 +33,7 @@ def __dir__() -> list[str]:
 
 def toml_loads(contents: str, /) -> Any:
     """
-    A helper function to quickly load a TOML string for Python 3.10+.
+    A helper function to quickly load a TOML string.
 
     :param contents: The TOML string to load.
     :return: The loaded TOML.

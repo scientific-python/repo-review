@@ -4,7 +4,7 @@ from typing import Any
 
 TYPE_CHECKING = False
 if TYPE_CHECKING:
-    from repo_review._compat.importlib.resources.abc import Traversable
+    from importlib.resources.abc import Traversable
 
 
 class General:
