@@ -1,5 +1,18 @@
 # Changelog
 
+## Version 1.3.0
+
+This release drops support for Python 3.10; Python 3.11+ is now required.
+
+Features:
+
+- Show a hint to ignore failed checks by @henryiii in https://github.com/scientific-python/repo-review/pull/434
+
+Internal:
+
+- Drop Python 3.10 by @henryiii in https://github.com/scientific-python/repo-review/pull/435
+- Simplify after dropping Python 3.10 by @henryiii in https://github.com/scientific-python/repo-review/pull/436
+
 ## Version 1.2.2
 
 Fixes:
