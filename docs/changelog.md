@@ -2,7 +2,7 @@
 
 ## Version 1.3.0
 
-This release drops support for Python 3.10; Python 3.11+ is now required.
+This release drops support for Python 3.10; Python 3.11+ is now required. The CLI and webapp now show a hint on how to ignore failed checks.
 
 Features:
 
