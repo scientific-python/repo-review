@@ -189,15 +189,14 @@ class GHPath(Traversable):
         :param encoding: The encoding, only ``"utf-8"`` or ``None`` supported.
         """
         assert encoding is None or encoding == "utf-8", "Only utf-8 is supported"
-        url = f"https://raw.githubusercontent.com/{self.repo}/{self.branch}/{self.path}"
-        if url not in self._fetched:
-            logger.debug("Cache miss for %r; fetching.", url)
-            self._fetched[url] = self.open_url(url)
+        if self._url not in self._fetched:
+            logger.debug("Cache miss for %r; fetching.", self._url)
+            self._fetched[self._url] = self.open_url(self._url)
 
         if mode == "r":
-            return io.StringIO(self._fetched[url])
+            return io.StringIO(self._fetched[self._url])
         if mode == "rb":
-            return io.BytesIO(self._fetched[url].encode("utf-8"))
+            return io.BytesIO(self._fetched[self._url].encode("utf-8"))
 
         assert_never(mode)
 
@@ -218,17 +217,12 @@ class GHPath(Traversable):
         return self.joinpath(child)
 
     def iterdir(self) -> Iterator[GHPath]:
-        if self.path:
-            prefix = f"{self.path}/"
-            yield from (
-                self._with_path(d["path"])
-                for d in self._info
-                if d["path"].startswith(prefix) and "/" not in d["path"][len(prefix) :]
-            )
-        else:
-            yield from (
-                self._with_path(d["path"]) for d in self._info if "/" not in d["path"]
-            )
+        prefix = f"{self.path}/" if self.path else ""
+        yield from (
+            self._with_path(d["path"])
+            for d in self._info
+            if d["path"].startswith(prefix) and "/" not in d["path"][len(prefix) :]
+        )
 
     def glob(self, pattern: str) -> Iterator[GHPath]:
         """
@@ -257,13 +251,14 @@ class GHPath(Traversable):
             if _glob_match(pattern_parts, relative_path.split("/")):
                 yield self._with_path(entry_path)
 
+    def _is_type(self, kind: str) -> bool:
+        return any(d["path"] == self.path and d["type"] == kind for d in self._info)
+
     def is_dir(self) -> bool:
-        if not self.path:
-            return True
-        return self.path in {d["path"] for d in self._info if d["type"] == "tree"}
+        return not self.path or self._is_type("tree")
 
     def is_file(self) -> bool:
-        return self.path in {d["path"] for d in self._info if d["type"] == "blob"}
+        return self._is_type("blob")
 
     def read_text(self, encoding: str | None = "utf-8") -> str:
         return self.open("r", encoding=encoding).read()

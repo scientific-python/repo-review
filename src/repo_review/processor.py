@@ -208,8 +208,7 @@ def collect_all(
 
     # These are optional, so fill in missing families.
     for name in {c.family for c in checks.values()}:
-        if name not in families:
-            families[name] = Family()
+        families.setdefault(name, Family())
 
     # Sort results
     checks = _sort_by_family(families, checks)
