@@ -62,14 +62,14 @@ cli = [
   "rich >=12.2",
 ]
 async = [
-  "httpx; python_version >= '3.11'",
+  "httpx",
 ]
 
 [dependency-groups]
 test = [
   "pytest >=9",
   "pytest-asyncio",
-  "httpx; python_version >= '3.11'",
+  "httpx",
   "sp-repo-review >=2025.11.04",
   "validate-pyproject >=0.14",
 ]

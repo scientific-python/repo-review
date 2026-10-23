@@ -24,6 +24,7 @@ __lazy_modules__ = [
     "rich.text",
     "rich.tree",
     "sys",
+    "typing",
     "urllib",
     "urllib.error",
 ]
@@ -38,6 +39,7 @@ import json
 import logging
 import os
 import sys
+import typing
 import urllib.error
 from pathlib import Path
 from typing import Any, Literal, assert_never
@@ -63,6 +65,7 @@ from repo_review.files import collect_prefetch_files, process_prefetch_files
 from repo_review.ghpath import GHPath
 from repo_review.html import to_html
 from repo_review.processor import (
+    CollectionReturn,
     Result,
     as_simple_dict,
     collect_all,
@@ -88,12 +91,22 @@ Formats = Literal["rich", "json", "html", "svg"]
 Show = Literal["all", "err", "errskip"]
 
 
+def _split_list(value: str) -> set[str]:
+    return {x.strip() for x in value.split(",") if x.strip()}
+
+
+def _require_checks(collected: CollectionReturn) -> None:
+    if not collected.checks:
+        print(
+            "Error: No checks registered. Please install a repo-review plugin.",
+            file=sys.stderr,
+        )
+        raise SystemExit(1)
+
+
 def _list_all() -> None:
     collected = collect_all()
-    if len(collected.checks) == 0:
-        msg = "No checks registered. Please install a repo-review plugin."
-        print(f"Error: {msg}", file=sys.stderr)
-        raise SystemExit(1)
+    _require_checks(collected)
 
     for family, grp in itertools.groupby(
         collected.checks.items(), key=lambda x: x[1].family
@@ -357,19 +370,19 @@ def main(args: list[str] | None = None) -> None:
     parser.add_argument(
         "--format",
         dest="format_opt",
-        choices=["rich", "json", "html", "svg"],
+        choices=typing.get_args(Formats),
         default="rich",
         help="Select output format.",
     )
     parser.add_argument(
         "--stderr",
         dest="stderr_fmt",
-        choices=["rich", "json", "html", "svg"],
+        choices=typing.get_args(Formats),
         help="Select additional output format for stderr. Will disable terminal escape codes for stdout for easy redirection.",
     )
     parser.add_argument(
         "--show",
-        choices=["all", "err", "errskip"],
+        choices=typing.get_args(Show),
         default="all",
         help="Show all (default), or just errors, or errors and skips",
     )
@@ -477,8 +490,8 @@ def main(args: list[str] | None = None) -> None:
 
 def on_each(
     package: Path | GHPath,
-    format_opt: Literal["rich", "json", "html", "svg"],
-    stderr_fmt: Literal["rich", "json", "html", "svg"] | None,
+    format_opt: Formats,
+    stderr_fmt: Formats | None,
     select: str,
     ignore: str,
     extend_select: str,
@@ -489,11 +502,6 @@ def on_each(
     show: Show,
 ) -> int:
     base_package: Traversable
-
-    ignore_list = {x.strip() for x in ignore.split(",") if x.strip()}
-    select_list = {x.strip() for x in select.split(",") if x.strip()}
-    extend_ignore_list = {x.strip() for x in extend_ignore.split(",") if x.strip()}
-    extend_select_list = {x.strip() for x in extend_select.split(",") if x.strip()}
 
     # Local paths support pointing at pyproject.toml as a special case
     match package:
@@ -507,17 +515,14 @@ def on_each(
             header = getattr(package, "name", str(package))
 
     collected = collect_all(base_package, subdir=package_dir)
-    if len(collected.checks) == 0:
-        msg = "No checks registered. Please install a repo-review plugin."
-        print(f"Error: {msg}", file=sys.stderr)
-        raise SystemExit(1)
+    _require_checks(collected)
 
     families, processed = process(
         base_package,
-        select=select_list,
-        ignore=ignore_list,
-        extend_select=extend_select_list,
-        extend_ignore=extend_ignore_list,
+        select=_split_list(select),
+        ignore=_split_list(ignore),
+        extend_select=_split_list(extend_select),
+        extend_ignore=_split_list(extend_ignore),
         subdir=package_dir,
         collected=collected,
     )
