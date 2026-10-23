@@ -26,6 +26,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import Heading from "./components/Heading";
 import Results from "./components/Results";
+import IgnoreHint from "./components/IgnoreHint";
 import MyThemeProvider from "./components/MyThemeProvider";
 import { injectFonts } from "./utils/injectFonts";
 import { fetchRepoRefs } from "./utils/github";
@@ -322,6 +323,24 @@ export class App extends React.Component<AppProps, AppState> {
       }
     } catch (e: unknown) {
       console.error("Error copying HTML:", e);
+      const emsg = (e as Error)?.message || String(e);
+      this.setState({
+        snackbarOpen: true,
+        snackbarMsg: "Could not copy to clipboard: " + emsg,
+        snackbarSeverity: "error",
+      });
+    }
+  }
+
+  async handleCopyIgnore(toml: string) {
+    try {
+      await navigator.clipboard.writeText(toml);
+      this.setState({
+        snackbarOpen: true,
+        snackbarMsg: "Ignore config copied to clipboard",
+        snackbarSeverity: "success",
+      });
+    } catch (e: unknown) {
       const emsg = (e as Error)?.message || String(e);
       this.setState({
         snackbarOpen: true,
@@ -790,6 +809,12 @@ export class App extends React.Component<AppProps, AppState> {
                   results={filteredResults}
                   families={filteredFamilies}
                 />
+                {this.state.results && (
+                  <IgnoreHint
+                    results={this.state.results}
+                    onCopy={(toml) => this.handleCopyIgnore(toml)}
+                  />
+                )}
               </>
             )}
           </Paper>

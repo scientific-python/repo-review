@@ -228,6 +228,22 @@ def rich_printer(
         elif status == "skips":
             console.print("[bold green]All checks passed [yellow](with some skips)")
 
+    failed = [r.name for r in processed if r.result is False]
+    if failed:
+        quoted = ", ".join(f'"{name}"' for name in failed)
+        console.print(
+            "[dim]Hint: to ignore the failed checks, add this to pyproject.toml:\n"
+        )
+        console.print(
+            rich.syntax.Syntax(
+                f"[tool.repo-review]\nignore = [{quoted}]",
+                lexer="toml",
+                theme=CODE_THEME,
+                word_wrap=True,
+            )
+        )
+        console.print()
+
     if svg:
         string = console.export_svg(theme=rich.terminal_theme.DEFAULT_TERMINAL_THEME)
         if color:
